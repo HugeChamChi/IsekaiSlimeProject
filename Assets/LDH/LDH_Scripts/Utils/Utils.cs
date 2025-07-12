@@ -51,14 +51,10 @@ namespace Util
             return (target - onwer).normalized;
         }
 
-        /// <summary>
-        /// 임시 함수 수정 예정
-        /// </summary>        
-        public static int FindTarget(Transform transform, Collider2D[] cols, float distance, LayerMask targetLayer)
-        {
-            return Physics2D.OverlapCircleNonAlloc(transform.position, distance, cols, targetLayer);
-        }
 
+        /// <summary>
+        /// 가까운 적을 찾는데 필터 적용 가능
+        /// </summary>
         public static Transform FindClosestTarget(Vector2 origin, float range, OverlapType type, LayerMask layerMask, float boxAngle = 0f, Vector2? boxSize = null,
         Func<GameObject, bool> filter = null)
         {
