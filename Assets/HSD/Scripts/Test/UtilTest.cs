@@ -17,7 +17,7 @@ public class UtilTest : MonoBehaviour
             Debug.Log(Utils.FindClosestTarget(transform.position, range, overlapType, targetLayer, boxAngle, boxsize, Filter).gameObject.name);
     }
 
-    private bool Filter(Transform transform)
+    private bool Filter(GameObject obj)
     {
         return transform.position.y > 1;
     }    
