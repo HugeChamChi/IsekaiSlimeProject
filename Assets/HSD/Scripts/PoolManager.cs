@@ -1,8 +1,9 @@
+using DesignPattern;
+using Managers;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Unity.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.SceneManagement;
@@ -31,7 +32,7 @@ public class PoolManager : Singleton<PoolManager>
         poolCleanupRoutine = StartCoroutine(PoolCleanupRoutine());
 
         popupParent = new GameObject("PopupTextParent").transform;
-        popupParent.parent = Manager.UI.WorldCanvas.transform;
+        //popupParent.parent = Manager.UI.WorldCanvas.transform;
 
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
@@ -85,7 +86,7 @@ public class PoolManager : Singleton<PoolManager>
     {
         while (true)
         {
-            yield return Utile.GetDelay(poolCleanupDelay);
+            //yield return Utile.GetDelay(poolCleanupDelay);
 
             float now = Time.time;
             List<string> removePoolKeys = new List<string>();
