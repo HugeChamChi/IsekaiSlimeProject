@@ -1,10 +1,9 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using Unity.VisualScripting;
 using UnityEngine;
 
-namespace Utile
+namespace Util
 {
     public static class Utils
     {
@@ -58,6 +57,49 @@ namespace Utile
         public static int FindTarget(Transform transform, Collider2D[] cols, float distance, LayerMask targetLayer)
         {
             return Physics2D.OverlapCircleNonAlloc(transform.position, distance, cols, targetLayer);
+        }
+
+        public static Transform FindClosestTarget(Vector2 origin, float range, OverlapType type, LayerMask layerMask, float boxAngle = 0f, Vector2? boxSize = null,
+        Func<GameObject, bool> filter = null)
+        {
+            int count = GetTargets(origin, range, type, layerMask, boxAngle, boxSize, buffer);
+ 
+            Transform best = null;
+            float bestValue = float.MaxValue;
+
+            for (int i = 0; i < count; i++)
+            {
+                Transform target = buffer[i].transform;
+
+                if (!filter(target.gameObject))
+                    continue;
+
+                float value = Vector2.Distance(origin, target.position);
+
+                if (value < bestValue)
+                {
+                    bestValue = value;
+                    best = target;
+                }
+            }
+
+            return best;
+        }
+
+        public static int GetTargets(Vector2 origin, float range, OverlapType type, LayerMask layerMask, float boxAngle, Vector2? boxSize, Collider2D[] results)
+        {            
+            switch (type)
+            {
+                case OverlapType.Circle:
+                    return Physics2D.OverlapCircleNonAlloc(origin, range, results, layerMask);
+
+                case OverlapType.Box:
+                    Vector2 size = boxSize ?? new Vector2(range, range);
+                    return Physics2D.OverlapBoxNonAlloc(origin, size, boxAngle, results, layerMask);
+
+                default:
+                    return -1;
+            }
         }
     }
 }
