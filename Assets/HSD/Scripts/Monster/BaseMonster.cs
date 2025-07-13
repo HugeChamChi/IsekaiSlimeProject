@@ -1,3 +1,5 @@
+using Managers;
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,51 +7,67 @@ using Util;
 
 public class BaseMonster : MonoBehaviour
 {
-    [SerializeField] private Rigidbody2D rb;    
+    [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private PhotonView pv;
     [SerializeField] private float moveSpeed;
 
     [SerializeField] private float distance;
-    Vector2[] points;
+    private Vector2[] points = new Vector2[4];
+
+    private Coroutine moveRoutine;
 
     private void Start()
     {
-        StartCoroutine(MoveRoutine());
+        SetupPoints();
+
+        moveRoutine = StartCoroutine(MoveRoutine());
+    }
+
+    private void OnEnable()
+    {
+        if (points[0] != Vector2.zero && moveRoutine == null)
+            StartCoroutine(MoveRoutine());
+    }
+
+    private void OnDisable()
+    {
+        moveRoutine = null;
     }
 
     private void SetupPoints()
     {
-        for (int i = 0; i < points.Length; i++)
-        { 
-        }
+        Vector2 origin = transform.position;
+
+        points[0] = origin + new Vector2(0, distance);
+        points[1] = origin + new Vector2(distance, distance);
+        points[2] = origin + new Vector2(distance, 0);
+        points[3] = origin + new Vector2(0, 0);
     }
 
     private IEnumerator MoveRoutine()
     {
+        int index = 0;
+
         while (true)
         {
-            while (Vector2.Distance(transform.position, points[0]) > .1f)
+            Vector2 target = points[index];
+
+            while (Vector2.Distance(transform.position, target) > 0.1f)
             {
-                Vector2.MoveTowards(transform.position, points[0], moveSpeed * Time.deltaTime);
+                transform.position = Vector2.MoveTowards(
+                    transform.position,
+                    target,
+                    moveSpeed * Time.deltaTime
+                );
+
                 yield return null;
             }
 
-            while (Vector2.Distance(transform.position, points[1]) > .1f)
-            {
-                Vector2.MoveTowards(transform.position, points[1], moveSpeed * Time.deltaTime);
-                yield return null;
-            }
+            index = (index + 1) % points.Length; // 0→1→2→3→0 순환
 
-            while (Vector2.Distance(transform.position, points[2]) > .1f)
-            {
-                Vector2.MoveTowards(transform.position, points[2], moveSpeed * Time.deltaTime);
-                yield return null;
-            }
-
-            while (Vector2.Distance(transform.position, points[3]) > .1f)
-            {
-                Vector2.MoveTowards(transform.position, points[3], moveSpeed * Time.deltaTime);
-                yield return null;
-            }
-        }        
+            //Test
+            if (index == 3)
+                Manager.Resources.Destroy(gameObject);
+        }
     }
 }

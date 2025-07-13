@@ -7,6 +7,7 @@ using DesignPattern;
 using Managers;
 using Object = UnityEngine.Object;
 using Photon.Pun;
+using System.IO;
 
 public class ResourcesManager : Singleton<ResourcesManager>
 {
@@ -104,13 +105,12 @@ public class ResourcesManager : Singleton<ResourcesManager>
     #endregion
     #region Network
     [PunRPC]
-    public void NetworkInstantiate_RPC(string name, Vector3 pos, Quaternion rot, bool isPool = false)
+    public void NetworkInstantiate_RPC(string name, Vector3 pos, Quaternion rot)
     {
-        if (isPool)
-            Manager.Pool.GetNetwork<GameObject>(name, pos, rot);
-        else
-            PhotonNetwork.Instantiate($"Prefabs/{name}", pos, rot);
-    }
+        //Manager.Pool.GetNetwork<GameObject>(name, pos, rot);
+        Manager.Pool.Get<GameObject>(name, pos, rot);
+    }    
+
     public void NetworkInstantiate<T>(T original, Vector3 position, Quaternion rotation, bool isPool = false) where T : Object
     {
         if (!PhotonNetwork.IsMasterClient)
@@ -119,7 +119,14 @@ public class ResourcesManager : Singleton<ResourcesManager>
             return;
         }
 
-        pv.RPC("NetworkInstantiate_RPC", RpcTarget.All, (original as GameObject).name, position, rotation, isPool);
+        if (isPool)
+        {
+            pv.RPC("NetworkInstantiate_RPC", RpcTarget.All, (original as GameObject).name, position, rotation);
+        }
+        else
+        {
+            PhotonNetwork.Instantiate($"Prefabs/{(original as GameObject).name}", position, rotation);
+        }
     }
     public void NetworkInstantiate<T>(T original, Vector3 position, bool isPool = false) where T : Object
     {
@@ -141,11 +148,11 @@ public class ResourcesManager : Singleton<ResourcesManager>
     }
     public void NetworkInstantiate<T>(string path, Vector3 position, bool isPool = false) where T : Object
     {
-        NetworkInstantiate<T>(path, position, Quaternion.identity, false);
+        NetworkInstantiate<T>(path, position, Quaternion.identity, isPool);
     }
     public void NetworkInstantiate<T>(string path, bool isPool = false) where T : Object
     {
-        NetworkInstantiate<T>(path, Vector3.zero, Quaternion.identity, false);
+        NetworkInstantiate<T>(path, Vector3.zero, Quaternion.identity, isPool);
     }
 
     // 네트워크 용 Destroy함수 들
