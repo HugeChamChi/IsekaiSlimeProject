@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 using DesignPattern;
 using Managers;
+using Object = UnityEngine.Object;
 
 public class ResourcesManager : Singleton<ResourcesManager>
 {
