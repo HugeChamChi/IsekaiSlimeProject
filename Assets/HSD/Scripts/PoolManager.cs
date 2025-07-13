@@ -1,5 +1,6 @@
 using DesignPattern;
 using Managers;
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -7,6 +8,7 @@ using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.SceneManagement;
+using Util;
 
 public class PoolManager : Singleton<PoolManager>
 {
@@ -14,12 +16,16 @@ public class PoolManager : Singleton<PoolManager>
     private Dictionary<string, Transform> parentDic;
     private Dictionary<string, float> lastUseTimeDic;
 
+    private Dictionary<string, ObjectPool<GameObject>> networkPoolDic;
+    private Dictionary<string, Transform> networkParentDic;
+
     [Header("PopupText")]
     private Transform popupCanvas;
     private Transform popupParent;
     private ObjectPool<GameObject> popUpPool;
 
     private Transform parent;
+    private Transform networkParent;
 
     private Coroutine poolCleanupRoutine;
 
@@ -31,10 +37,66 @@ public class PoolManager : Singleton<PoolManager>
         ResetPool();
         poolCleanupRoutine = StartCoroutine(PoolCleanupRoutine());
 
+        networkPoolDic = new();
+        networkParentDic = new();
+        networkParent = new GameObject("NetworkPools").transform;
+
         popupParent = new GameObject("PopupTextParent").transform;
         //popupParent.parent = Manager.UI.WorldCanvas.transform;
 
         SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private IObjectPool<GameObject> GetOrCreateNetworkPool(string name)
+    {
+        if (networkPoolDic.ContainsKey(name))
+            return networkPoolDic[name];
+
+        Transform root = new GameObject($"{name} Pool").transform;
+        root.parent = networkParent;
+        networkParentDic.Add(name, root);
+
+        ObjectPool<GameObject> pool = new ObjectPool<GameObject>
+        (
+            createFunc: () =>
+            {
+                GameObject obj = PhotonNetwork.Instantiate($"Prefabs/{name}", Vector3.zero, Quaternion.identity);
+                obj.name = name;
+                obj.transform.parent = root;
+                return obj;
+            },
+            actionOnGet: (GameObject go) =>
+            {
+                go.transform.parent = null;
+                go.SetActive(true);
+            },
+            actionOnRelease: (GameObject go) =>
+            {
+                go.transform.parent = root;
+                go.SetActive(false);
+            },
+            actionOnDestroy: (GameObject go) =>
+            {
+                PhotonNetwork.Destroy(go);
+            },
+            maxSize: 10
+        );
+
+        networkPoolDic.Add(name, pool);
+        return pool;
+    }
+    public T GetNetwork<T>(string prefabName, Vector3 position, Quaternion rotation) where T : Object
+    {
+        var pool = GetOrCreateNetworkPool(prefabName);
+
+        if (pool == null) return null;
+
+        GameObject obj = pool.Get();
+
+        obj.transform.position = position;
+        obj.transform.rotation = rotation;        
+
+        return obj as T;
     }
 
     public void ResetPool()
@@ -86,7 +148,7 @@ public class PoolManager : Singleton<PoolManager>
     {
         while (true)
         {
-            //yield return Utile.GetDelay(poolCleanupDelay);
+            yield return Utils.GetDelay(poolCleanupDelay);
 
             float now = Time.time;
             List<string> removePoolKeys = new List<string>();
@@ -231,19 +293,61 @@ public class PoolManager : Singleton<PoolManager>
     {
         StartCoroutine(DelayRelease(original, delay));
     }
+    public void ReleaseNetwork<T>(T original) where T : Object
+    {
+        GameObject obj = original as GameObject;
+        string name = obj.name;
+
+        if (networkPoolDic.ContainsKey(name))
+        {
+            networkPoolDic[name].Release(obj);
+        }
+        else
+        {
+            PhotonNetwork.Destroy(obj);
+        }
+    }
+    public void ReleaseNetwork<T>(T original, float delay) where T : Object
+    {
+        GameObject obj = original as GameObject;
+        string name = obj.name;
+
+        if (networkPoolDic.ContainsKey(name))
+        {
+            StartCoroutine(DelayNetworkRelease(obj, delay));
+        }
+        else
+        {
+            PhotonNetwork.Destroy(obj);
+        }
+    }
+
+    private IEnumerator DelayNetworkRelease<T>(T original, float delay) where T : Object
+    {
+        yield return Utils.GetDelay(delay);
+
+        GameObject obj = original as GameObject;
+        string name = obj.name;
+
+        if (!networkPoolDic.ContainsKey(name) && !obj.activeSelf)
+            yield break;
+
+        networkPoolDic[name].Release(obj);
+    }
 
     private IEnumerator DelayRelease<T>(T original, float delay) where T : Object
     {
-        yield return new WaitForSeconds(delay);
+        yield return Utils.GetDelay(delay);
 
         GameObject obj = original as GameObject;
         string name = obj.name;
 
         if (!poolDic.ContainsKey(name) && !obj.activeSelf)
             yield break;
-        //Debug.Log(obj.activeSelf);
+        
         poolDic[name].Release(obj);
     }
 
     public bool ContainsKey(string name) => poolDic.ContainsKey(name);
+    public bool NetworkContainsKey(string name) => networkPoolDic.ContainsKey(name);
 }
