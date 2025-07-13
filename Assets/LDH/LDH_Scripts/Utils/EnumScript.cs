@@ -12,7 +12,10 @@ namespace Util
     {
         None, Effect
     }
-
+    public enum StatType
+    {
+        Health, Attack, Defense, Speed
+    }
     public class EnumScript : MonoBehaviour
     {
    
