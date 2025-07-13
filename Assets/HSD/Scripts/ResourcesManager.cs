@@ -1,13 +1,9 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Collections;
-using UnityEngine;
 using DesignPattern;
 using Managers;
-using Object = UnityEngine.Object;
 using Photon.Pun;
-using System.IO;
+using System.Collections.Generic;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 public class ResourcesManager : Singleton<ResourcesManager>
 {
@@ -29,7 +25,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
         T resource = Resources.Load(path) as T;
 
-        if(resource != null)
+        if (resource != null)
             resources.Add(_path, resource);
 
         return resource;
@@ -82,13 +78,13 @@ public class ResourcesManager : Singleton<ResourcesManager>
     {
         return Instantiate<T>(path, postion, Quaternion.identity, null, isPool);
     }
-    
+
     public void Destroy(GameObject obj)
     {
         if (obj == null || !obj.activeSelf) return;
 
         if (Manager.Pool.ContainsKey(obj.name))
-            Manager.Pool.Release(obj);   
+            Manager.Pool.Release(obj);
         else
             Object.Destroy(obj);
     }
@@ -98,18 +94,12 @@ public class ResourcesManager : Singleton<ResourcesManager>
         if (obj == null || !obj.activeSelf) return;
 
         if (Manager.Pool.ContainsKey(obj.name))
-            Manager.Pool.Release(obj, delay);     
+            Manager.Pool.Release(obj, delay);
         else
             Object.Destroy(obj, delay);
     }
     #endregion
     #region Network
-    [PunRPC]
-    public void NetworkInstantiate_RPC(string name, Vector3 pos, Quaternion rot)
-    {
-        //Manager.Pool.GetNetwork<GameObject>(name, pos, rot);
-        Manager.Pool.Get<GameObject>(name, pos, rot);
-    }    
 
     public void NetworkInstantiate<T>(T original, Vector3 position, Quaternion rotation, bool isPool = false) where T : Object
     {
@@ -119,14 +109,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
             return;
         }
 
-        if (isPool)
-        {
-            pv.RPC("NetworkInstantiate_RPC", RpcTarget.All, (original as GameObject).name, position, rotation);
-        }
-        else
-        {
-            PhotonNetwork.Instantiate($"Prefabs/{(original as GameObject).name}", position, rotation);
-        }
+        PhotonNetwork.Instantiate($"Prefabs/{(original as GameObject).name}", position, rotation);
     }
     public void NetworkInstantiate<T>(T original, Vector3 position, bool isPool = false) where T : Object
     {
@@ -156,28 +139,13 @@ public class ResourcesManager : Singleton<ResourcesManager>
     }
 
     // 네트워크 용 Destroy함수 들
-    public void NetworkDestroy(int viewID, string name)
+    public void NetworkDestroy(GameObject obj, string name)
     {
-       if (PhotonNetwork.IsMasterClient && Manager.Pool.NetworkContainsKey(name))
-            pv.RPC("Destroy_RPC", RpcTarget.All, viewID);
-    }
-    public void NetworkDestroy(int viewID, string name, float delay)
-    {       
-        if (PhotonNetwork.IsMasterClient && Manager.Pool.NetworkContainsKey(name))
-            pv.RPC("Destroy_RPC", RpcTarget.All, viewID, delay);
-    }
-
-    [PunRPC]
-    public void Destroy_RPC(int viewID, float delay)
-    {
-        GameObject obj = PhotonView.Find(viewID).gameObject;
-        Manager.Pool.ReleaseNetwork(obj, delay);
-    }
-    [PunRPC]
-    public void Destroy_RPC(int viewID)
-    {
-        GameObject obj = PhotonView.Find(viewID).gameObject;
         Manager.Pool.ReleaseNetwork(obj);
+    }
+    public void NetworkDestroy(GameObject obj, string name, float delay)
+    {
+        Manager.Pool.ReleaseNetwork(obj, delay);
     }
     #endregion
 }

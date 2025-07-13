@@ -3,9 +3,10 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Util;
 
-public class BaseMonster : MonoBehaviour
+public class BaseMonster : MonoBehaviourPun, IPunObservable
 {
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private PhotonView pv;
@@ -68,6 +69,32 @@ public class BaseMonster : MonoBehaviour
             //Test
             if (index == 3)
                 Manager.Resources.Destroy(gameObject);
+        }
+    }
+
+    [PunRPC]
+    public void RemoteSetInactive()
+    {
+        gameObject.SetActive(false);
+    }
+    [PunRPC]
+    public void RemoteSetactive(Vector2 position, Quaternion rotation)
+    {
+        transform.SetPositionAndRotation(position, rotation);
+        gameObject.SetActive(true);
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(transform.position);
+            stream.SendNext(transform.rotation);
+        }
+        else if(stream.IsReading)
+        {
+            transform.position = (Vector3)stream.ReceiveNext();
+            transform.rotation = (Quaternion)stream.ReceiveNext();
         }
     }
 }
