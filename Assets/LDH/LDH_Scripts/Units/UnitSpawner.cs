@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Units
 {
@@ -11,10 +13,50 @@ namespace Units
         [SerializeField] private int _xCount = 4; // X축 슬롯 개수 (열 개수)
         [SerializeField] private int _yCount = 6; // Y축 슬롯 개수 (행 개수)
 
+        [Header("Unit")] 
+        [SerializeField] private GameObject _unitPrefab;
         
-        private void Start() => GenerateGridSlots();
+        
+        [Header("UI")] 
+        [SerializeField] private Button _summonButton;
+        
+        
+        
+        
+        //데이터만 들고 있으면 되니까 list로 좌표 저장
+        private List<Vector2> spawnList = new();
 
+
+
+        #region Unity LifeCycle Function
+
+        private void Awake() => Init();
+        private void Start() =>GenerateGridSlots();
+        private void OnDestroy() => UnSubscribe();
         
+        #endregion
+        
+        
+        //참조 초기화
+        private void Init()
+        {
+            Subscribe();
+        }
+        
+        //이벤트
+        private void Subscribe()
+        {
+            _summonButton.onClick.AddListener(Summon);
+        }
+
+        private void UnSubscribe()
+        {
+            _summonButton.onClick.RemoveListener(Summon);
+        }
+        
+        
+        
+        #region Make Grid
         /// <summary>
         /// 유닛이 배치되는 패널 영역에 그리드 형태로 슬롯을 생성하고 배치한다.
         /// 우측 상단부터 시작해서 좌로 이동, 아래로 이동하며 순서대로 배치
@@ -29,9 +71,6 @@ namespace Units
             //슬롯 사이즈 계산
             float slotScaleX = _spawnPanel.localScale.x / _xCount;
             float slotScaleY = _spawnPanel.localScale.y / _yCount;
-            // float slotScaleX = _spawnPanel.localScale.x / _xCount / _spawnPanel.lossyScale.x;
-            // float slotScaleY = _spawnPanel.localScale.y / _yCount / _spawnPanel.lossyScale.y;
-            Vector3 slotScale = new Vector3(slotScaleX, slotScaleY, 1);
             
             //슬롯 시작 포지션 좌표 계산
             float startX = panelWidth / 2 - slotScaleX / 2;
@@ -46,31 +85,28 @@ namespace Units
             {
                 for (int column = 0; column < _xCount; column++)
                 {
-                    var slot = new GameObject($"Slot({column}, {row})");
                     
-                    //todo: 임시로 색깔 추가
-                    SpriteRenderer slotSp = slot.AddComponent<SpriteRenderer>();
-                    slotSp.sprite = _spawnPanel.GetComponent<SpriteRenderer>().sprite;
-                    slotSp.color = Color.blue;
-                    
-                    
-                    //position 설정
+                    //position 계산
                     float xPos = startX - column * slotScaleX;
                     float yPos = startY - row * slotScaleY;
-                    slot.transform.position = new Vector3(xPos, yPos, 1) + _spawnPanel.position;
+                    Vector3 slotPos = new Vector2(xPos, yPos) + (Vector2)_spawnPanel.position;
                     
-                    //scale 설정
-                    slot.transform.localScale = slotScale;
+                    spawnList.Add(slotPos);
                     
-                    slot.transform.SetParent(_spawnPanel, true); // gridParent에 붙이기
-
-
-
-
 
                 }
             }
         }
+        #endregion
+
+        #region Summon
+
+        private void Summon()
+        {
+            
+        }
+
+        #endregion
 
     }
 }
