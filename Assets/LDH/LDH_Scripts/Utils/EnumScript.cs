@@ -15,7 +15,7 @@ namespace Util
 
 namespace Unit
 {
-    public enum UnitTier { Common, Rare, Epic, Legendary }
-    public enum UnitType { AreaAttack, MovementSpeedDebuff, ArmorDebuff, AttackSpeedBuff, AttackPowerBuff }
+    public enum UnitTier { Common, Rare, Epic }
+    public enum UnitType { RangeAttack, SpeedDebuff, ArmorDebuff, AttackSpeedBuff, AttackPowerBuff }
     public enum EffectType { Faint, Slow }
 }

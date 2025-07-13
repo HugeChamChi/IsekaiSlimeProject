@@ -1,6 +1,6 @@
 namespace LDH.LDH_Scripts.Temp
 {
-    public class Temp_IEffectable
+    public interface Temp_IEffectable
     {
         
     }
