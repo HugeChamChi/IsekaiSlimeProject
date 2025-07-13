@@ -8,6 +8,11 @@ namespace Util
     {
         Circle, Box
     }
+    public enum ClearEventType
+    {
+        None, Effect
+    }
+
     public class EnumScript : MonoBehaviour
     {
    
