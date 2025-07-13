@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Util
@@ -12,7 +13,7 @@ namespace Util
         private static Collider2D[] buffer = new Collider2D[100];
 
         /// <summary>
-        /// ÄÚ·çÆ¾ µô·¹ÀÌ °¡Á®¿À´Â ÇÔ¼ö
+        /// ï¿½Ú·ï¿½Æ¾ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
         /// </summary>       
         public static WaitForSeconds GetDelay(float delay)
         {
@@ -24,17 +25,17 @@ namespace Util
         }
 
         /// <summary>
-        /// StringBuilder¿¡ Text¸¦ Ãß°¡ÇÏ´Â ÇÔ¼ö (ÁÙ ¹Ù²Þ X)
+        /// StringBuilderï¿½ï¿½ Textï¿½ï¿½ ï¿½ß°ï¿½ï¿½Ï´ï¿½ ï¿½Ô¼ï¿½ (ï¿½ï¿½ ï¿½Ù²ï¿½ X)
         /// </summary>        
         public static void Append(string text) => sb.Append(text);
 
         /// <summary>
-        /// StringBuilder¿¡ Text¸¦ Ãß°¡ÇÏ´Â ÇÔ¼ö (ÁÙ ¹Ù²Þ O)
+        /// StringBuilderï¿½ï¿½ Textï¿½ï¿½ ï¿½ß°ï¿½ï¿½Ï´ï¿½ ï¿½Ô¼ï¿½ (ï¿½ï¿½ ï¿½Ù²ï¿½ O)
         /// </summary>        
         public static void AppendLind(string text) => sb.AppendLine(text);
 
         /// <summary>
-        /// StringBuilder¿¡ ÀúÀåµÈ StringÀ» °¡Á®¿À°í StringBuilder¸¦ ÃÊ±âÈ­ÇÏ´Â ÇÔ¼ö
+        /// StringBuilderï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ Stringï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ StringBuilderï¿½ï¿½ ï¿½Ê±ï¿½È­ï¿½Ï´ï¿½ ï¿½Ô¼ï¿½
         /// </summary>        
         public static string GetText()
         {
@@ -44,7 +45,7 @@ namespace Util
         }
 
         /// <summary>
-        /// Å¸°ÙÀ¸·Î ÇâÇÏ´Â ¹æÇâÀ» ±¸ÇÏ´Â ÇÔ¼ö
+        /// Å¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Ô¼ï¿½
         /// </summary>
         public static Vector2 DirToTarget(Vector2 target, Vector2 onwer)
         {
@@ -53,7 +54,7 @@ namespace Util
 
 
         /// <summary>
-        /// °¡±î¿î ÀûÀ» Ã£´Âµ¥ ÇÊÅÍ Àû¿ë °¡´É
+        /// ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã£ï¿½Âµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         public static Transform FindClosestTarget(Vector2 origin, float range, OverlapType type, LayerMask layerMask, float boxAngle = 0f, Vector2? boxSize = null,
         Func<GameObject, bool> filter = null)

@@ -1,18 +1,38 @@
-using System.Collections;
 using System.Collections.Generic;
+using Unit;
 using UnityEngine;
 
-public class Unit : MonoBehaviour
+//todo: IDamagable 수정
+using IDamagable = LDH.LDH_Scripts.Temp.Temp_IDamagable;
+
+namespace Units
 {
-    // Start is called before the first frame update
-    void Start()
+    public class Unit : MonoBehaviour {
+    public int Index;
+    public string Name;
+    public UnitTier Tier;
+    public UnitType Type;
+    public string Description;
+    public string ModelFileName;
+
+    public UnitStat Stat;
+    public UnitSkill Skill;
+
+    
+    
+    private void Awake() {
+        // Stat = new UnitStat();
+        // Skill = new();
+    }
+
+    public void Attack(IDamagable target) 
     {
         
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    public void UseSkill(int index, List<IDamagable> targets) {
+        // Skill.Execute(this, targets);
     }
+}
+
 }

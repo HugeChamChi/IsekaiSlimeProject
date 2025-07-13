@@ -8,8 +8,14 @@ namespace Util
     {
         Circle, Box
     }
-    public class EnumScript : MonoBehaviour
-    {
-   
-    }
+    
+}
+
+
+
+namespace Unit
+{
+    public enum UnitTier { Common, Rare, Epic, Legendary }
+    public enum UnitType { AreaAttack, MovementSpeedDebuff, ArmorDebuff, AttackSpeedBuff, AttackPowerBuff }
+    public enum EffectType { Faint, Slow }
 }
