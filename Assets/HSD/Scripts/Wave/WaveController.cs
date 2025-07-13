@@ -91,12 +91,12 @@ public class WaveController : MonoBehaviour
 
         while (waveDatas[curWaveIdx].SpawnCount != curSpawnCount)
         {
-            Manager.Resources.NetworkInstantiate(testPrefab, transform.position);
+            Manager.Resources.NetworkInstantiate(testPrefab, transform.position, true);
             curSpawnCount++;
             yield return Utils.GetDelay(waveDatas[curWaveIdx].SpawnTime / waveDatas[curWaveIdx].SpawnCount);
         }
 
-        Manager.Resources.NetworkInstantiate(testPrefab, transform.position);
+        Manager.Resources.NetworkInstantiate(testPrefab, transform.position, true);
         yield return Utils.GetDelay(waveDatas[curWaveIdx].WaveTime - waveDatas[curWaveIdx].SpawnTime);
 
         if(isClear)

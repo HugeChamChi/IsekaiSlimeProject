@@ -162,7 +162,7 @@ MonoBehaviour:
     EventType: 0
     SpawnMonster: 11
     SpawnBoss: 11
-    SpawnCount: 10
+    SpawnCount: 22
     SpawnBossCount: 1
     SpawnHP: 1
   testPrefab: {fileID: 5223704376216169489, guid: a0c1affd330b825449cbecbd658833cb, type: 3}

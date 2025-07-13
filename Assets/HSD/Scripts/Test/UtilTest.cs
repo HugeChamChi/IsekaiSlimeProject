@@ -16,13 +16,20 @@ public class UtilTest : MonoBehaviour
     [SerializeField] private Vector2 boxsize;
     [SerializeField] private LayerMask targetLayer;
 
-    private void Start()
+    private void Awake()
     {
-        pv = GetComponent<PhotonView>();
-
-        Manager.Resources.Destroy(gameObject, 4);
+        pv = GetComponent<PhotonView>();        
     }
 
+    private void Start()
+    {
+        Manager.Resources.NetworkDestroy(pv.ViewID, name, 4);
+
+    }
+    private void OnEnable()
+    {
+        Manager.Resources.NetworkDestroy(pv.ViewID, name, 4);
+    }
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.V))

@@ -135,9 +135,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
         if (obj == null || !obj.activeSelf) return;
 
         if (Manager.Pool.ContainsKey(obj.name))
-            Manager.Pool.Release(obj);
-        else if (PhotonNetwork.IsMasterClient && Manager.Pool.NetworkContainsKey(obj.name))
-            pv.RPC("Destroy_RPC", RpcTarget.All, obj);
+            Manager.Pool.Release(obj);   
         else
             Object.Destroy(obj);
     }
@@ -147,21 +145,32 @@ public class ResourcesManager : Singleton<ResourcesManager>
         if (obj == null || !obj.activeSelf) return;
 
         if (Manager.Pool.ContainsKey(obj.name))
-            Manager.Pool.Release(obj, delay);
-        else if (PhotonNetwork.IsMasterClient && Manager.Pool.NetworkContainsKey(obj.name))
-            pv.RPC("Destroy_RPC", RpcTarget.All, obj, delay);
+            Manager.Pool.Release(obj, delay);     
         else
             Object.Destroy(obj, delay);
     }
 
-    [PunRPC]
-    public void Destroy_RPC(GameObject obj, float delay)
+    public void NetworkDestroy(int viewID, string name)
     {
+       if (PhotonNetwork.IsMasterClient && Manager.Pool.NetworkContainsKey(name))
+            pv.RPC("Destroy_RPC", RpcTarget.All, viewID);
+    }
+    public void NetworkDestroy(int viewID, string name, float delay)
+    {       
+        if (PhotonNetwork.IsMasterClient && Manager.Pool.NetworkContainsKey(name))
+            pv.RPC("Destroy_RPC", RpcTarget.All, viewID, delay);
+    }
+
+    [PunRPC]
+    public void Destroy_RPC(int viewID, float delay)
+    {
+        GameObject obj = PhotonView.Find(viewID).gameObject;
         Manager.Pool.ReleaseNetwork(obj, delay);
     }
     [PunRPC]
-    public void Destroy_RPC(GameObject obj)
+    public void Destroy_RPC(int viewID)
     {
+        GameObject obj = PhotonView.Find(viewID).gameObject;
         Manager.Pool.ReleaseNetwork(obj);
     }
 }
