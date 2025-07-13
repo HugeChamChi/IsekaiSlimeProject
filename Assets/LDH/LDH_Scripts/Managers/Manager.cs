@@ -31,7 +31,7 @@ namespace Managers
             
             //-----접근용 프로퍼티 등록------//
             public static PoolManager Pool => PoolManager.Instance;
-            public static ResourcesManager Resources => ResourcesManager.Instance;
+            //public static ResourcesManager Resources => ResourcesManager.Instance;
             
             [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
             private static void Initialize()
@@ -40,9 +40,11 @@ namespace Managers
                 manager = GameObject.Instantiate(prefab);
                 manager.gameObject.name = "@Manager";
                 GameObject.DontDestroyOnLoad(manager);
-                        
-                manager.AddComponent<PoolManager>();
-                manager.AddComponent<ResourcesManager>();
+             
+                
+                //todo: 주석해제하기
+                // manager.AddComponent<PoolManager>();
+                // manager.AddComponent<ResourcesManager>();
 
                 //각각의 매니저 스크립트를 프리팹에 스크립트를 직접 추가해두거나 아래와 같이 AddComponent로 동적으로 추가한다.
                 // 예시 : manager.AddComponent<RandomManager>();
