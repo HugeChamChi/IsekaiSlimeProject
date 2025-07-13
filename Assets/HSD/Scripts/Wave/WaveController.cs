@@ -1,4 +1,5 @@
 using Managers;
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -35,7 +36,6 @@ using Util;
 public struct WaveData
 {
     public int WaveIdx;
-    public int Stage;
     public int Wave;
     public float WaveTime;
     public float SpawnTime;
@@ -50,10 +50,14 @@ public struct WaveData
 
 public class WaveController : MonoBehaviour
 {
+    [SerializeField] private PhotonView pv;
+
+    [Header("Wave")]
     [SerializeField] private WaveData[] waveDatas;
     private int curWaveIdx;
     private int curSpawnCount;
     private int curBossCount;
+    private bool isClear;
     private Coroutine waveRoutine;
 
     [SerializeField] private GameObject testPrefab;
@@ -61,7 +65,8 @@ public class WaveController : MonoBehaviour
     private void Start()
     {
         WaveStart();
-    }
+        PhotonNetwork.ConnectUsingSettings();
+    }    
 
     private void WaveStart()
     {        
@@ -72,9 +77,9 @@ public class WaveController : MonoBehaviour
     {
         curBossCount--;
 
-        if(curBossCount <= 0)
-            StopCoroutine(waveRoutine);
-        
+        if (curBossCount <= 0)
+            isClear = true;
+
         // 클리어 이벤트 실행
     }
 
@@ -82,19 +87,25 @@ public class WaveController : MonoBehaviour
     {
         curSpawnCount = 0;
         curBossCount = waveDatas[curWaveIdx].SpawnBossCount;
+        isClear = false;
 
         while (waveDatas[curWaveIdx].SpawnCount != curSpawnCount)
         {
-            Instantiate(testPrefab);
-            //Manager.Resources.Instantiate<GameObject>(waveDatas[curWaveIdx].SpawnMonster, transform.position);
+            Manager.Resources.NetworkInstantiate(testPrefab, transform.position);
             curSpawnCount++;
             yield return Utils.GetDelay(waveDatas[curWaveIdx].SpawnTime / waveDatas[curWaveIdx].SpawnCount);
         }
 
-        Instantiate(testPrefab);
-        //Manager.Resources.Instantiate<GameObject>(waveDatas[curWaveIdx].SpawnBoss, transform.position);
+        Manager.Resources.NetworkInstantiate(testPrefab, transform.position);
         yield return Utils.GetDelay(waveDatas[curWaveIdx].WaveTime - waveDatas[curWaveIdx].SpawnTime);
 
-        // 게임 오버
+        if(isClear)
+        {
+            WaveClear();
+        }
+        else
+        {
+            // 게임 오버
+        }
     }
 }
