@@ -73,7 +73,7 @@ namespace Util
             {
                 Transform target = buffer[i].transform;
 
-                if (!filter(target.gameObject))
+                if (filter!=null && !filter(target.gameObject))
                     continue;
 
                 float value = Vector2.Distance(origin, target.position);

@@ -2,12 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Managers;
+using Photon.Pun;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Units
 {
-    public class UnitSpawner : MonoBehaviour
+    public class UnitSpawner : MonoBehaviourPun
     {
         [Header("Spawn Setting")] 
         [SerializeField] private Transform _spawnPanel;    // 유닛이 배치될 부모 패널
@@ -20,7 +21,7 @@ namespace Units
         [Header("UI")] 
         [SerializeField] private Button _summonButton;    // 소환 버튼
 
-        private List<Vector2> spawnList = new();          // 슬롯 좌표 목록
+        [SerializeField] private List<Vector2> spawnList = new();          // 슬롯 좌표 목록
         private List<bool> spawnListArray = new();        // 슬롯 점유 여부 (false = 빈칸)
 
         #region Unity LifeCycle
@@ -58,8 +59,8 @@ namespace Units
             float panelWidth = panelBounds.size.x;
             float panelHeight = panelBounds.size.y;
 
-            float slotScaleX = _spawnPanel.localScale.x / _xCount;
-            float slotScaleY = _spawnPanel.localScale.y / _yCount;
+            float slotScaleX = _spawnPanel.lossyScale.x / _xCount;
+            float slotScaleY = _spawnPanel.lossyScale.y / _yCount;
 
             float startX = -panelWidth / 2 + slotScaleX / 2;
             float startY = panelHeight / 2 - slotScaleY / 2;
@@ -102,6 +103,9 @@ namespace Units
         /// </summary>
         private void Summon()
         {
+            //todo: 보유 재화... 랑 소환 비용이랑 비교해서 처리해주기
+            //소환할때마다.. 비용 올라가나..?
+            
             int slotIndex = GetEmptySlotIndex();
             if (slotIndex == -1)
             {
@@ -113,8 +117,21 @@ namespace Units
             Vector3 position = spawnList[slotIndex];
 
             var go = Manager.Resources.Instantiate<GameObject>(_unitPrefab, position);
+            
+            //유닛 스케일 조정
+            go.transform.localScale = Vector3.Scale(go.transform.localScale, transform.parent.lossyScale);
+            
+            
             go.name = "Unit"; // 임시 이름
+            
+            
         }
+
+        // [PunRPC()]
+        // private void ServerSummon()
+        // {
+        //     
+        // }
 
         #endregion
     }
