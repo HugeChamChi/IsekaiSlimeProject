@@ -22,6 +22,9 @@ namespace DesignPattern
             }
         }
 
+        protected void Awake() => SingletonInit();
+        
+
         protected void SingletonInit()
         {
             //Debug.Log("SingletonInit 호출");

@@ -36,12 +36,14 @@ namespace Managers
             [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
             private static void Initialize()
             {
-                var prefab = Resources.Load<GameObject>("Prefabs/@Manager");
+                var prefab = UnityEngine.Resources.Load<GameObject>("Prefabs/@Manager");
                 manager = GameObject.Instantiate(prefab);
                 manager.gameObject.name = "@Manager";
                 GameObject.DontDestroyOnLoad(manager);
-                        
-                manager.AddComponent<PoolManager>();
+             
+                
+                //todo: 주석해제하기
+                //manager.AddComponent<PoolManager>();
                 manager.AddComponent<ResourcesManager>();
 
                 //각각의 매니저 스크립트를 프리팹에 스크립트를 직접 추가해두거나 아래와 같이 AddComponent로 동적으로 추가한다.
