@@ -16,7 +16,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
     private void Start()
     {
         pv = GetComponent<PhotonView>();
-        pv.ViewID = 94; // ÀÓ½Ã·Î ¼³Á¤
+        pv.ViewID = 94; // ì„ì‹œë¡œ ì„¤ì •
     }
 
     public T Load<T>(string path) where T : Object
@@ -115,7 +115,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
     {
         if (!PhotonNetwork.IsMasterClient)
         {
-            Debug.LogWarning("NetworkInstantiate´Â ¸¶½ºÅÍ Å¬¶óÀÌ¾ğÆ®¿¡¼­¸¸ È£ÃâÇØ¾ß ÇÕ´Ï´Ù.");
+            Debug.LogWarning("NetworkInstantiateëŠ” ë§ˆìŠ¤í„° í´ë¼ì´ì–¸íŠ¸ì—ì„œë§Œ í˜¸ì¶œí•´ì•¼ í•©ë‹ˆë‹¤.");
             return;
         }
 
@@ -133,7 +133,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
     {
         if (!PhotonNetwork.IsMasterClient)
         {
-            Debug.LogWarning("NetworkInstantiate´Â ¸¶½ºÅÍ Å¬¶óÀÌ¾ğÆ®¿¡¼­¸¸ È£ÃâÇØ¾ß ÇÕ´Ï´Ù.");
+            Debug.LogWarning("NetworkInstantiateëŠ” ë§ˆìŠ¤í„° í´ë¼ì´ì–¸íŠ¸ì—ì„œë§Œ í˜¸ì¶œí•´ì•¼ í•©ë‹ˆë‹¤.");
             return;
         }
 
@@ -148,7 +148,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
         NetworkInstantiate<T>(path, Vector3.zero, Quaternion.identity, false);
     }
 
-    // ³×Æ®¿öÅ© ¿ë DestroyÇÔ¼ö µé
+    // ë„¤íŠ¸ì›Œí¬ ìš© Destroyí•¨ìˆ˜ ë“¤
     public void NetworkDestroy(int viewID, string name)
     {
        if (PhotonNetwork.IsMasterClient && Manager.Pool.NetworkContainsKey(name))

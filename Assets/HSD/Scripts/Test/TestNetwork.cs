@@ -15,13 +15,13 @@ public class TestNetwork : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         base.OnConnected();
-        Debug.Log("¿¬°á µÊ");
+        Debug.Log("ì—°ê²° ë¨");
         PhotonNetwork.JoinLobby();
     }
     public override void OnJoinedLobby()
     {
         base.OnJoinedLobby();
-        Debug.Log("¹æ µé¾î°¨");
+        Debug.Log("ë°© ë“¤ì–´ê°");
         RoomOptions roomOptions = new RoomOptions { MaxPlayers = 4 };
         PhotonNetwork.JoinOrCreateRoom("TestRoom", roomOptions, TypedLobby.Default);
         Manager.InitPool();
@@ -29,8 +29,8 @@ public class TestNetwork : MonoBehaviourPunCallbacks
     public override void OnCreatedRoom()
     {
         base.OnCreatedRoom();
-        Debug.Log("¹æ ¸¸µë");
+        Debug.Log("ë°© ë§Œë“¬");
         if (PhotonNetwork.IsMasterClient)
-            Debug.Log("¸¶½ºÅÍ Å¬¶óÀÌ¾ğÆ® ÀÔ´Ï´Ù.");      
+            Debug.Log("ë§ˆìŠ¤í„° í´ë¼ì´ì–¸íŠ¸ ì…ë‹ˆë‹¤.");      
     }
 }

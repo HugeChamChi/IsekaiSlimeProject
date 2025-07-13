@@ -38,13 +38,13 @@ public class Stat<T,T1>
     private event Action<T1> onValueChanged;
 
     /// <param name="combineFunc">
-    /// ╣н ╟╙ю╩ ╟Агуго╢б гт╪Жют╢о╢ы. ©╧: <c>(a, b) => a + b</c><br/>
-    /// ©╧╦╕ ╣И╬Н, ╫╨ехю╩ ╢╘юШго╟еЁ╙ гуд╔ ╤╖ ╩Г©К╣к╢о╢ы.
+    /// К▒░ Й╟▓Л²└ Й╡╟М∙╘М∙≤К┼■ М∙╗Л┬≤Л·┘К▀┬К▀╓. Л≤┬: <c>(a, b) => a + b</c><br/>
+    /// Л≤┬К╔╪ К⌠╓Л√╢, Л┼╓М┐╞Л²└ К┬└Л═│М∙≤Й╠╟К┌≤ М∙╘Л╧═ К∙▄ Л┌╛Л ╘К░╘К▀┬К▀╓.
     /// </param>
     /// <param name="convertFunc">
-    /// е╦ют <typeparamref name="T"/>ю╩ <typeparamref name="T1"/>ю╦╥н ╨╞х╞го╢б гт╪Жют╢о╢ы.<br/>
-    /// ©╧: <c>value => Mathf.Clamp(value, 0, 100)</c><br/>
-    /// аж╥н а╓╠тх╜, ╧Эю╖ а╕гя ╣Н©║ ╩Г©К╣к╢о╢ы.
+    /// М┐─Л·┘ <typeparamref name="T"/>Л²└ <typeparamref name="T1"/>Л°╪К║° КЁ─М≥≤М∙≤К┼■ М∙╗Л┬≤Л·┘К▀┬К▀╓.<br/>
+    /// Л≤┬: <c>value => Mathf.Clamp(value, 0, 100)</c><br/>
+    /// Лё╪К║° Л═∙Й╥°М≥■, К╡■Л°└ Л═°М∙° К⌠╠Л≈░ Л┌╛Л ╘К░╘К▀┬К▀╓.
     /// </param>
     public Stat(Func<T, T, T> combineFunc , Func<T, T1> convertFunc = null)
     {

@@ -27,7 +27,7 @@ public class UnitTestStat_HSD : ScriptableObject, IEffectProvider
     }
 }
 
-public class MonsterTest : MonoBehaviour, IEffectReceiver // ÀÌ°Ô ¸Â³ª...?
+public class MonsterTest : MonoBehaviour, IEffectReceiver // ï¿½Ì°ï¿½ ï¿½Â³ï¿½...?
 {    
     public MonsterStat stat {  get; private set; }
     private Dictionary<string, Coroutine> activeEffects = new Dictionary<string, Coroutine>();
