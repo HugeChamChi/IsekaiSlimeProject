@@ -11,4 +11,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/USW/Scene/LobbyScene.unity
     guid: b86ff156ddcfdf043a9f704826dd1a5b
+  - enabled: 1
+    path: Assets/USW/Scene/InGameScene.unity
+    guid: af368a2dad403cb4ba604c4b7e305f2f
+  - enabled: 1
+    path: Assets/USW/Scene/GachaScene.unity
+    guid: aa9c3e05a104b8e4ca0f1acb71206f27
   m_configObjects: {}
