@@ -3,6 +3,7 @@ using Managers;
 using Photon.Pun;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.UI.Image;
 using Object = UnityEngine.Object;
 
 public class ResourcesManager : Singleton<ResourcesManager>
@@ -101,25 +102,28 @@ public class ResourcesManager : Singleton<ResourcesManager>
     #endregion
     #region Network
 
-    public void NetworkInstantiate<T>(T original, Vector3 position, Quaternion rotation, bool isPool = false) where T : Object
+    public void NetworkInstantiate<T>(T original, Vector3 position, Quaternion rotation, bool isMaster = true) where T : Object
     {
-        if (!PhotonNetwork.IsMasterClient)
+        if(isMaster)
         {
-            Debug.LogWarning("NetworkInstantiate는 마스터 클라이언트에서만 호출해야 합니다.");
-            return;
-        }
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                Debug.LogWarning("NetworkInstantiate는 마스터 클라이언트에서만 호출해야 합니다.");
+                return;
+            }
+        }       
 
         PhotonNetwork.Instantiate($"Prefabs/{(original as GameObject).name}", position, rotation);
     }
-    public void NetworkInstantiate<T>(T original, Vector3 position, bool isPool = false) where T : Object
+    public void NetworkInstantiate<T>(T original, Vector3 position, bool isMaster = true) where T : Object
     {
-        NetworkInstantiate<T>(original, position, Quaternion.identity, isPool);
+        NetworkInstantiate<T>(original, position, Quaternion.identity, isMaster);
     }
-    public void NetworkInstantiate<T>(T original, bool isPool = false) where T : Object
+    public void NetworkInstantiate<T>(T original, bool isMaster = true) where T : Object
     {
-        NetworkInstantiate<T>(original, Vector3.zero, Quaternion.identity, isPool);
+        NetworkInstantiate<T>(original, Vector3.zero, Quaternion.identity, isMaster);
     }
-    public void NetworkInstantiate<T>(string path, Vector3 position, Quaternion rotation, bool isPool = false) where T : Object
+    public void NetworkInstantiate<T>(string path, Vector3 position, Quaternion rotation, bool isMaster = true) where T : Object
     {
         if (!PhotonNetwork.IsMasterClient)
         {
@@ -127,15 +131,15 @@ public class ResourcesManager : Singleton<ResourcesManager>
             return;
         }
 
-        pv.RPC("NetworkInstantiate_RPC", RpcTarget.All, path, position, rotation, isPool);
+        PhotonNetwork.Instantiate($"Prefabs/{path}", position, rotation);
     }
-    public void NetworkInstantiate<T>(string path, Vector3 position, bool isPool = false) where T : Object
+    public void NetworkInstantiate<T>(string path, Vector3 position, bool isMaster = true) where T : Object
     {
-        NetworkInstantiate<T>(path, position, Quaternion.identity, isPool);
+        NetworkInstantiate<T>(path, position, Quaternion.identity, isMaster);
     }
-    public void NetworkInstantiate<T>(string path, bool isPool = false) where T : Object
+    public void NetworkInstantiate<T>(string path, bool isMaster = true) where T : Object
     {
-        NetworkInstantiate<T>(path, Vector3.zero, Quaternion.identity, isPool);
+        NetworkInstantiate<T>(path, Vector3.zero, Quaternion.identity, isMaster);
     }
 
     // 네트워크 용 Destroy함수 들

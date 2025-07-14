@@ -35,17 +35,15 @@ using Util;
 [System.Serializable]
 public struct WaveData
 {
+    public int WaveCount;
     public int WaveIdx;
-    public int Wave;
     public float WaveTime;
     public float SpawnTime;
-    public int WaveGold;
     public ClearEventType EventType;
     public string SpawnMonster;
     public string SpawnBoss;
     public int SpawnCount;
     public int SpawnBossCount;
-    public float SpawnHP;
 }
 
 public class WaveController : MonoBehaviour
@@ -64,13 +62,25 @@ public class WaveController : MonoBehaviour
 
     private void Start()
     {
+                
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.V))
+            pv.RPC("WaveStart_RPC", RpcTarget.AllViaServer);
+    }
+
+    [PunRPC]
+    private void WaveStart_RPC()
+    {
         WaveStart();
-        PhotonNetwork.ConnectUsingSettings();
-    }    
+    }
 
     private void WaveStart()
-    {        
-        waveRoutine = StartCoroutine(WaveRoutine());
+    {   
+        if(pv.IsMine)
+            waveRoutine = StartCoroutine(WaveRoutine());
     }
 
     private void WaveClear()
@@ -91,17 +101,19 @@ public class WaveController : MonoBehaviour
 
         while (waveDatas[curWaveIdx].SpawnCount != curSpawnCount)
         {
-            Manager.Resources.NetworkInstantiate(testPrefab, transform.position, true);
+            Manager.Resources.NetworkInstantiate(testPrefab, transform.position, false);
             curSpawnCount++;
             yield return Utils.GetDelay(waveDatas[curWaveIdx].SpawnTime / waveDatas[curWaveIdx].SpawnCount);
         }
 
-        Manager.Resources.NetworkInstantiate(testPrefab, transform.position, true);
+        if(curBossCount > 0)
+            Manager.Resources.NetworkInstantiate(testPrefab, transform.position, false);
+
         yield return Utils.GetDelay(waveDatas[curWaveIdx].WaveTime - waveDatas[curWaveIdx].SpawnTime);
 
         if(isClear)
         {
-            WaveClear();
+            WaveClear(); // Boss가 IsMine이면 죽고 이벤트를 보냄
         }
         else
         {

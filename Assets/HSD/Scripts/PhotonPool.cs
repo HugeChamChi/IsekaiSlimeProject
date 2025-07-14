@@ -15,11 +15,11 @@ public class PhotonPool : IPunPrefabPool
         if (_pool.ContainsKey(prefabId) && _pool[prefabId].Count > 0)
         {
             obj = _pool[prefabId].Dequeue();
-            
-            PhotonView view = obj.GetComponent<PhotonView>();
+
+            PhotonView view = Provider.Get<PhotonView>(obj);
             if (view != null && view.IsMine)
             {
-                view.RPC("RemoteSetactive", RpcTarget.All, position, rotation);
+                view.RPC("RemoteSetactive", RpcTarget.AllViaServer, position, rotation);
             }
             obj.SetActive(true);
         }
@@ -41,10 +41,10 @@ public class PhotonPool : IPunPrefabPool
 
         _pool[prefabId].Enqueue(gameObject);
 
-        PhotonView view = gameObject.GetComponent<PhotonView>();
+        PhotonView view = Provider.Get<PhotonView>(gameObject);
         if (view != null && view.IsMine)
         {
-            view.RPC("RemoteSetInactive", RpcTarget.All);
+            view.RPC("RemoteSetInactive", RpcTarget.AllViaServer);
         }
     }
 }
