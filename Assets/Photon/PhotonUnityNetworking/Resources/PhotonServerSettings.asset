@@ -42,6 +42,10 @@ MonoBehaviour:
   - Release
   - Destroy_RPC
   - NetworkInstantiate_RPC
+  - RemoteSetactive
+  - RemoteSetInactive
+  - TakeDamage_RPC
+  - WaveStart_RPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

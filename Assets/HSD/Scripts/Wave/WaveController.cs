@@ -12,40 +12,38 @@ using Util;
 
 //Wave
 
-//WaveTime // ¿şÀÌºê ÁøÇà½Ã°£
+//WaveTime // ì›¨ì´ë¸Œ ì§„í–‰ì‹œê°„
 
-//SpawnTime // ¸ó½ºÅÍ°¡ ¼ÒÈ¯µÇ´Â ÃÑ ½Ã°£
+//SpawnTime // ëª¬ìŠ¤í„°ê°€ ì†Œí™˜ë˜ëŠ” ì´ ì‹œê°„
 
-//WaveGold // ¸ó½ºÅÍ¿¡¼­ È¹µæ°¡´ÉÇÑ °ñµå ·®
+//WaveGold // ëª¬ìŠ¤í„°ì—ì„œ íšë“ê°€ëŠ¥í•œ ê³¨ë“œ ëŸ‰
 
-//Message // ¿şÀÌºê Å¬¸®¾î ½Ã È£ÃâµÇ´Â ÀÌº¥Æ® °áÁ¤À» EnumÀ¸·Î ÀÌº¥Æ® °ü¸®
+//Message // ì›¨ì´ë¸Œ í´ë¦¬ì–´ ì‹œ í˜¸ì¶œë˜ëŠ” ì´ë²¤íŠ¸ ê²°ì •ì„ Enumìœ¼ë¡œ ì´ë²¤íŠ¸ ê´€ë¦¬
 
-//Monster // ½ºÆùµÉ ¸ó½ºÅÍ
+//Monster // ìŠ¤í°ë  ëª¬ìŠ¤í„°
 
-//Boss // ½ºÆùµÉ º¸½º
+//Boss // ìŠ¤í°ë  ë³´ìŠ¤
 
-//SpawnCount // ½ºÆùµÉ ¸ó½ºÅÍÀÇ ¼ö·®
+//SpawnCount // ìŠ¤í°ë  ëª¬ìŠ¤í„°ì˜ ìˆ˜ëŸ‰
 
 //Interval = SpawnTime / SpawCount;
 
-//SpawnBossCount // ½ºÆùµÉ º¸½º ¼ö
+//SpawnBossCount // ìŠ¤í°ë  ë³´ìŠ¤ ìˆ˜
 
-//SpawnHP // ÇØ´ç ¿şÀÌºê ¸ó½ºÅÍ ´ç Ã¼·Â
+//SpawnHP // í•´ë‹¹ ì›¨ì´ë¸Œ ëª¬ìŠ¤í„° ë‹¹ ì²´ë ¥
 
 [System.Serializable]
 public struct WaveData
 {
+    public int WaveCount;
     public int WaveIdx;
-    public int Wave;
     public float WaveTime;
     public float SpawnTime;
-    public int WaveGold;
     public ClearEventType EventType;
     public string SpawnMonster;
     public string SpawnBoss;
     public int SpawnCount;
     public int SpawnBossCount;
-    public float SpawnHP;
 }
 
 public class WaveController : MonoBehaviour
@@ -64,13 +62,25 @@ public class WaveController : MonoBehaviour
 
     private void Start()
     {
+                
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.V))
+            pv.RPC("WaveStart_RPC", RpcTarget.AllViaServer);
+    }
+
+    [PunRPC]
+    private void WaveStart_RPC()
+    {
         WaveStart();
-        PhotonNetwork.ConnectUsingSettings();
-    }    
+    }
 
     private void WaveStart()
-    {        
-        waveRoutine = StartCoroutine(WaveRoutine());
+    {   
+        if(pv.IsMine)
+            waveRoutine = StartCoroutine(WaveRoutine());
     }
 
     private void WaveClear()
@@ -80,7 +90,7 @@ public class WaveController : MonoBehaviour
         if (curBossCount <= 0)
             isClear = true;
 
-        // Å¬¸®¾î ÀÌº¥Æ® ½ÇÇà
+        // í´ë¦¬ì–´ ì´ë²¤íŠ¸ ì‹¤í–‰
     }
 
     private IEnumerator WaveRoutine()
@@ -91,21 +101,23 @@ public class WaveController : MonoBehaviour
 
         while (waveDatas[curWaveIdx].SpawnCount != curSpawnCount)
         {
-            Manager.Resources.NetworkInstantiate(testPrefab, transform.position, true);
+            Manager.Resources.NetworkInstantiate(testPrefab, transform.position, false);
             curSpawnCount++;
             yield return Utils.GetDelay(waveDatas[curWaveIdx].SpawnTime / waveDatas[curWaveIdx].SpawnCount);
         }
 
-        Manager.Resources.NetworkInstantiate(testPrefab, transform.position, true);
+        if(curBossCount > 0)
+            Manager.Resources.NetworkInstantiate(testPrefab, transform.position, false);
+
         yield return Utils.GetDelay(waveDatas[curWaveIdx].WaveTime - waveDatas[curWaveIdx].SpawnTime);
 
         if(isClear)
         {
-            WaveClear();
+            WaveClear(); // Bossê°€ IsMineì´ë©´ ì£½ê³  ì´ë²¤íŠ¸ë¥¼ ë³´ëƒ„
         }
         else
         {
-            // °ÔÀÓ ¿À¹ö
+            // ê²Œì„ ì˜¤ë²„
         }
     }
 }
