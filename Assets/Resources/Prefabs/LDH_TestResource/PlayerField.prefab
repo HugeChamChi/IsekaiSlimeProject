@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1286538580305366115}
+  - component: {fileID: 6840476057599457269}
   m_Layer: 0
   m_Name: PlayerField
   m_TagString: Untagged
@@ -30,9 +31,20 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1737973599619309171}
-  - {fileID: 3495016327956398806}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6840476057599457269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 303706020762553931}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6322ceacfb7b46548b42f9bb2ccc533e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1131228285626251466
 GameObject:
   m_ObjectHideFlags: 0
@@ -117,52 +129,3 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &8173532569909973897
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3495016327956398806}
-  - component: {fileID: 4080859356374798064}
-  m_Layer: 0
-  m_Name: Spawner
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3495016327956398806
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8173532569909973897}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1286538580305366115}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4080859356374798064
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8173532569909973897}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8e5476f5e6677495f81c48baf84a3c17, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _spawnPanel: {fileID: 1737973599619309171}
-  _xCount: 4
-  _yCount: 4
-  _unitPrefab: {fileID: 2563347809932505990, guid: 90ee01a665bf045908de6c12aacae965, type: 3}
-  _summonButton: {fileID: 0}
