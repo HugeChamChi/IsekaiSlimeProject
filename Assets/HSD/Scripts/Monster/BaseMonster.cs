@@ -67,10 +67,6 @@ public class BaseMonster : NetworkUnit, IPunObservable, IDamageable
             }
 
             index = (index + 1) % points.Length; // 0→1→2→3→0 순환
-
-            //Test
-            if (index == 3)
-                Manager.Resources.Destroy(gameObject);
         }
     }
 

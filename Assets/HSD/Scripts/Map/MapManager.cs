@@ -2,6 +2,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MapManager : MonoBehaviour
@@ -15,15 +16,11 @@ public class MapManager : MonoBehaviour
 
     [SerializeField] private float xInterval;
 
-    private void Awake()
-    {
-        players = PhotonNetwork.PlayerList;
-    }
-
     private void Update()
     {
         if(Input.GetKeyDown(KeyCode.R))
         {
+            players = PhotonNetwork.PlayerList;
             MapGenerate();
             MapSetting();
         }
@@ -51,15 +48,18 @@ public class MapManager : MonoBehaviour
 
         for (int i = 0; i < players.Length; i++)
         {
-            if (players[i] != maps[players[i]].Owner)
+            if (players[i] == PhotonNetwork.LocalPlayer)
+            {
+                maps[players[i]].Cam.depth = 1;
+                maps[players[i]].Cam.AddComponent<AudioListener>();
+                maps[players[i]].CreateWaveController();
+            }
+            else
             {
                 maps[players[i]].Cam.targetTexture = playTextures[idx];
                 maps[players[i]].Cam.depth = 0;
                 idx++;
-                continue;
             }
-
-            maps[players[i]].Cam.depth = 1;
         }
     }
 }

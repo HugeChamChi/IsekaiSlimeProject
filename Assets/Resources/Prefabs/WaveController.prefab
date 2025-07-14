@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1621631470027498443}
   - component: {fileID: 7997995579175223367}
-  - component: {fileID: 4356596986346605214}
+  - component: {fileID: -3540162939166955448}
   m_Layer: 0
   m_Name: WaveController
   m_TagString: Untagged
@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1b61ca20cdad0542a32e5a0c8655260, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pv: {fileID: 0}
+  pv: {fileID: -3540162939166955448}
   waveDatas:
   - WaveCount: 0
     WaveIdx: 1
@@ -57,7 +57,7 @@ MonoBehaviour:
     SpawnCount: 10
     SpawnBossCount: 1
   testPrefab: {fileID: 2578002554422532683, guid: 07f7d6d0109b9274aa6485dc62864890, type: 3}
---- !u!114 &4356596986346605214
+--- !u!114 &-3540162939166955448
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -66,6 +66,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 8772742289094167048}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eab7231d3dcc60c46b848bbdcc19d12d, type: 3}
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
