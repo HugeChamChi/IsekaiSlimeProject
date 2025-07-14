@@ -3,8 +3,6 @@ using Managers;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.SceneManagement;
@@ -15,9 +13,6 @@ public class PoolManager : Singleton<PoolManager>
     private Dictionary<string, IObjectPool<GameObject>> poolDic;
     private Dictionary<string, Transform> parentDic;
     private Dictionary<string, float> lastUseTimeDic;
-
-    private Dictionary<string, ObjectPool<GameObject>> networkPoolDic;
-    private Dictionary<string, Transform> networkParentDic;
 
     [Header("PopupText")]
     private Transform popupCanvas;
@@ -32,13 +27,16 @@ public class PoolManager : Singleton<PoolManager>
     private const float poolCleanupTime = 60;
     private const float poolCleanupDelay = 30;
 
+    private PhotonView pv;
+
     public void Start()
     {
+        pv = GetComponent<PhotonView>();
+        PhotonNetwork.PrefabPool = new PhotonPool();
+
         ResetPool();
         poolCleanupRoutine = StartCoroutine(PoolCleanupRoutine());
 
-        networkPoolDic = new();
-        networkParentDic = new();
         networkParent = new GameObject("NetworkPools").transform;
 
         popupParent = new GameObject("PopupTextParent").transform;
@@ -47,57 +45,57 @@ public class PoolManager : Singleton<PoolManager>
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    private IObjectPool<GameObject> GetOrCreateNetworkPool(string name)
-    {
-        if (networkPoolDic.ContainsKey(name))
-            return networkPoolDic[name];
+    //private IObjectPool<GameObject> GetOrCreateNetworkPool(string name)
+    //{
+    //    if (networkPoolDic.ContainsKey(name))
+    //        return networkPoolDic[name];
 
-        Transform root = new GameObject($"{name} Pool").transform;
-        root.parent = networkParent;
-        networkParentDic.Add(name, root);
+    //    Transform root = new GameObject($"{name} Pool").transform;
+    //    root.parent = networkParent;
+    //    networkParentDic.Add(name, root);
 
-        ObjectPool<GameObject> pool = new ObjectPool<GameObject>
-        (
-            createFunc: () =>
-            {
-                GameObject obj = PhotonNetwork.Instantiate($"Prefabs/{name}", Vector3.zero, Quaternion.identity);
-                obj.name = name;
-                obj.transform.parent = root;
-                return obj;
-            },
-            actionOnGet: (GameObject go) =>
-            {
-                go.transform.parent = null;
-                go.SetActive(true);
-            },
-            actionOnRelease: (GameObject go) =>
-            {
-                go.transform.parent = root;
-                go.SetActive(false);
-            },
-            actionOnDestroy: (GameObject go) =>
-            {
-                PhotonNetwork.Destroy(go);
-            },
-            maxSize: 10
-        );
+    //    ObjectPool<GameObject> pool = new ObjectPool<GameObject>
+    //    (
+    //        createFunc: () =>
+    //        {
+    //            GameObject obj = PhotonNetwork.Instantiate($"Prefabs/{name}", Vector3.zero, Quaternion.identity);
+    //            obj.name = name;
+    //            obj.transform.parent = root;
+    //            return obj;
+    //        },
+    //        actionOnGet: (GameObject go) =>
+    //        {
+    //            go.transform.parent = null;
+    //            go.SetActive(true);
+    //        },
+    //        actionOnRelease: (GameObject go) =>
+    //        {
+    //            go.transform.parent = root;
+    //            PhotonNetwork.PrefabPool.Destroy(go);
+    //        },
+    //        actionOnDestroy: (GameObject go) =>
+    //        {
+    //            PhotonNetwork.Destroy(go);
+    //        },
+    //        maxSize: 10
+    //    );
 
-        networkPoolDic.Add(name, pool);
-        return pool;
-    }
-    public T GetNetwork<T>(string prefabName, Vector3 position, Quaternion rotation) where T : Object
-    {
-        var pool = GetOrCreateNetworkPool(prefabName);
+    //    networkPoolDic.Add(name, pool);
+    //    return pool;
+    //}
+    //public T GetNetwork<T>(string prefabName, Vector3 position, Quaternion rotation) where T : Object
+    //{
+    //    var pool = GetOrCreateNetworkPool(prefabName);
 
-        if (pool == null) return null;
+    //    if (pool == null) return null;
 
-        GameObject obj = pool.Get();
+    //    GameObject obj = pool.Get();
 
-        obj.transform.position = position;
-        obj.transform.rotation = rotation;        
+    //    obj.transform.position = position;
+    //    obj.transform.rotation = rotation;        
 
-        return obj as T;
-    }
+    //    return obj as T;
+    //}
 
     public void ResetPool()
     {
@@ -187,7 +185,7 @@ public class PoolManager : Singleton<PoolManager>
 
     private IObjectPool<GameObject> GetOrCreatePool(string name, GameObject prefab)
     {
-        if(poolDic.ContainsKey(name))
+        if (poolDic.ContainsKey(name))
             return poolDic[name];
 
         Transform root = new GameObject($"{name} Pool").transform;
@@ -237,7 +235,7 @@ public class PoolManager : Singleton<PoolManager>
         return obj;
     }
 
-    public T Get<T> (T original, Vector3 position, Quaternion rotation, Transform parent) where T : Object
+    public T Get<T>(T original, Vector3 position, Quaternion rotation, Transform parent) where T : Object
     {
         GameObject go = original as GameObject;
         string name = go.name;
@@ -254,31 +252,52 @@ public class PoolManager : Singleton<PoolManager>
 
         return go as T;
     }
-
     public T Get<T>(T original, Vector3 position, Quaternion rotation) where T : Object
     {
         return Get<T>(original, position, rotation, null);
     }
-
     public T Get<T>(T original, Vector3 position) where T : Object
     {
         return Get<T>(original, position, Quaternion.identity);
     }
-
     public T Get<T>(T original, Vector3 position, Transform parent) where T : Object
     {
         return Get<T>(original, position, Quaternion.identity, parent);
     }
+    public T Get<T>(string objName, Vector3 position, Quaternion rotation, Transform parent) where T : Object
+    {
+        GameObject go = Manager.Resources.Load<GameObject>($"Prefabs/{objName}");
+        string name = go.name;
 
-    public void PopupRelease<T> (T original) where T : Object
+        var pool = GetOrCreatePool(name, go);
+
+        go = pool.Get();
+
+        if (parent != null)
+            go.transform.SetParent(parent, false);
+
+        go.transform.localPosition = position;
+        go.transform.rotation = rotation;
+
+        return go as T;
+    }
+    public T Get<T>(string objName, Vector3 position, Quaternion rotation) where T : Object
+    {
+        return Get<T>(objName, position, rotation, null);
+    }
+    public T Get<T>(string objName, Vector3 position) where T : Object
+    {
+        return Get<T>(objName, position, Quaternion.identity, null);
+    }
+
+    public void PopupRelease<T>(T original) where T : Object
     {
         GameObject obj = original as GameObject;
 
-        if(obj.activeSelf)
+        if (obj.activeSelf)
             popUpPool.Release(obj);
     }
-
-    public void Release<T> (T original) where T : Object
+    public void Release<T>(T original) where T : Object
     {
         GameObject obj = original as GameObject;
         string name = obj.name;
@@ -288,7 +307,6 @@ public class PoolManager : Singleton<PoolManager>
 
         poolDic[name].Release(obj);
     }
-
     public void Release<T>(T original, float delay) where T : Object
     {
         StartCoroutine(DelayRelease(original, delay));
@@ -296,13 +314,8 @@ public class PoolManager : Singleton<PoolManager>
     public void ReleaseNetwork<T>(T original) where T : Object
     {
         GameObject obj = original as GameObject;
-        string name = obj.name;
 
-        if (networkPoolDic.ContainsKey(name))
-        {
-            networkPoolDic[name].Release(obj);
-        }
-        else
+        if (pv.IsMine)
         {
             PhotonNetwork.Destroy(obj);
         }
@@ -312,29 +325,17 @@ public class PoolManager : Singleton<PoolManager>
         GameObject obj = original as GameObject;
         string name = obj.name;
 
-        if (networkPoolDic.ContainsKey(name))
+        if (pv.IsMine)
         {
             StartCoroutine(DelayNetworkRelease(obj, delay));
         }
-        else
-        {
-            PhotonNetwork.Destroy(obj);
-        }
     }
-
     private IEnumerator DelayNetworkRelease<T>(T original, float delay) where T : Object
     {
         yield return Utils.GetDelay(delay);
 
-        GameObject obj = original as GameObject;
-        string name = obj.name;
-
-        if (!networkPoolDic.ContainsKey(name) && !obj.activeSelf)
-            yield break;
-
-        networkPoolDic[name].Release(obj);
+        PhotonNetwork.Destroy(original as GameObject);
     }
-
     private IEnumerator DelayRelease<T>(T original, float delay) where T : Object
     {
         yield return Utils.GetDelay(delay);
@@ -344,10 +345,8 @@ public class PoolManager : Singleton<PoolManager>
 
         if (!poolDic.ContainsKey(name) && !obj.activeSelf)
             yield break;
-        
+
         poolDic[name].Release(obj);
     }
-
     public bool ContainsKey(string name) => poolDic.ContainsKey(name);
-    public bool NetworkContainsKey(string name) => networkPoolDic.ContainsKey(name);
 }

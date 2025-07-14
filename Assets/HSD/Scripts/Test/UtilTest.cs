@@ -21,15 +21,6 @@ public class UtilTest : MonoBehaviour
         pv = GetComponent<PhotonView>();        
     }
 
-    private void Start()
-    {
-        Manager.Resources.NetworkDestroy(pv.ViewID, name, 4);
-
-    }
-    private void OnEnable()
-    {
-        Manager.Resources.NetworkDestroy(pv.ViewID, name, 4);
-    }
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.V))
