@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Util;
 
-public class BaseMonster : MonoBehaviourPun, IPunObservable
+public class BaseMonster : NetworkUnit, IPunObservable
 {
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private PhotonView pv;
