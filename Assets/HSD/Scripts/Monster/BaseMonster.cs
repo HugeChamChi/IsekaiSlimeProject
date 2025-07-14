@@ -6,11 +6,8 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Util;
 
-<<<<<<< Updated upstream
-public class BaseMonster : MonoBehaviourPun, IPunObservable
-=======
+
 public class BaseMonster : NetworkUnit, IPunObservable, IDamageable
->>>>>>> Stashed changes
 {
     [SerializeField] private Rigidbody2D rb;
 
