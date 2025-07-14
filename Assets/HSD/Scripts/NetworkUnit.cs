@@ -9,12 +9,12 @@ public class NetworkUnit : MonoBehaviourPun
 {
     protected virtual void Awake()
     {
-        Provider.Add<PhotonView>(gameObject);
+        ComponentProvider.Add<PhotonView>(gameObject);
     }
 
     protected virtual void OnDestroy()
     {
-        Provider.Remove<PhotonView>(gameObject);
+        ComponentProvider.Remove<PhotonView>(gameObject);
     }
 
     [PunRPC]
