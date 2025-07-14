@@ -6,16 +6,21 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Util;
 
+<<<<<<< Updated upstream
 public class BaseMonster : MonoBehaviourPun, IPunObservable
+=======
+public class BaseMonster : NetworkUnit, IPunObservable, IDamageable
+>>>>>>> Stashed changes
 {
     [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private PhotonView pv;
-    [SerializeField] private float moveSpeed;
 
+    [Header("Patrol")]
     [SerializeField] private float distance;
     private Vector2[] points = new Vector2[4];
-
     private Coroutine moveRoutine;
+
+    [Header("Stat")]
+    [SerializeField] private MonsterStat stat;
 
     private void Start()
     {
@@ -58,7 +63,7 @@ public class BaseMonster : MonoBehaviourPun, IPunObservable
                 transform.position = Vector2.MoveTowards(
                     transform.position,
                     target,
-                    moveSpeed * Time.deltaTime
+                    4 * Time.deltaTime
                 );
 
                 yield return null;
@@ -70,18 +75,6 @@ public class BaseMonster : MonoBehaviourPun, IPunObservable
             if (index == 3)
                 Manager.Resources.Destroy(gameObject);
         }
-    }
-
-    [PunRPC]
-    public void RemoteSetInactive()
-    {
-        gameObject.SetActive(false);
-    }
-    [PunRPC]
-    public void RemoteSetactive(Vector2 position, Quaternion rotation)
-    {
-        transform.SetPositionAndRotation(position, rotation);
-        gameObject.SetActive(true);
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -96,5 +89,17 @@ public class BaseMonster : MonoBehaviourPun, IPunObservable
             transform.position = (Vector3)stream.ReceiveNext();
             transform.rotation = (Quaternion)stream.ReceiveNext();
         }
+    }
+
+    public void TakeDamage(float damage)
+    {
+        if(PhotonNetwork.IsMasterClient)
+            photonView.RPC(nameof(TakeDamage_RPC), RpcTarget.AllViaServer, damage);
+    }
+
+    [PunRPC]
+    public void TakeDamage_RPC(float damage)
+    {
+        
     }
 }

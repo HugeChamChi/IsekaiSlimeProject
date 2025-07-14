@@ -35,17 +35,15 @@ using Util;
 [System.Serializable]
 public struct WaveData
 {
+    public int WaveCount;
     public int WaveIdx;
-    public int Wave;
     public float WaveTime;
     public float SpawnTime;
-    public int WaveGold;
     public ClearEventType EventType;
     public string SpawnMonster;
     public string SpawnBoss;
     public int SpawnCount;
     public int SpawnBossCount;
-    public float SpawnHP;
 }
 
 public class WaveController : MonoBehaviour
@@ -91,12 +89,14 @@ public class WaveController : MonoBehaviour
 
         while (waveDatas[curWaveIdx].SpawnCount != curSpawnCount)
         {
-            Manager.Resources.NetworkInstantiate(testPrefab, transform.position, true);
+            Manager.Resources.NetworkInstantiate(testPrefab, transform.position);
             curSpawnCount++;
             yield return Utils.GetDelay(waveDatas[curWaveIdx].SpawnTime / waveDatas[curWaveIdx].SpawnCount);
         }
 
-        Manager.Resources.NetworkInstantiate(testPrefab, transform.position, true);
+        if(curBossCount > 0)
+            Manager.Resources.NetworkInstantiate(testPrefab, transform.position);
+
         yield return Utils.GetDelay(waveDatas[curWaveIdx].WaveTime - waveDatas[curWaveIdx].SpawnTime);
 
         if(isClear)

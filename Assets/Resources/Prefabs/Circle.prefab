@@ -100,9 +100,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 5222976258119375969}
-  pv: {fileID: 332928760552109317}
-  moveSpeed: 3
-  distance: 5
+  distance: 8
+  stat: {fileID: 0}
 --- !u!50 &5222976258119375969
 Rigidbody2D:
   serializedVersion: 4
@@ -149,7 +148,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
-  - {fileID: 0}
+  - {fileID: 2808753864550373168}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0

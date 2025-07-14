@@ -19,7 +19,7 @@ public class PhotonPool : IPunPrefabPool
             PhotonView view = obj.GetComponent<PhotonView>();
             if (view != null && view.IsMine)
             {
-                view.RPC("RemoteSetactive", RpcTarget.All, position, rotation);
+                view.RPC("RemoteSetactive", RpcTarget.AllViaServer, position, rotation);
             }
             obj.SetActive(true);
         }
@@ -44,7 +44,7 @@ public class PhotonPool : IPunPrefabPool
         PhotonView view = gameObject.GetComponent<PhotonView>();
         if (view != null && view.IsMine)
         {
-            view.RPC("RemoteSetInactive", RpcTarget.All);
+            view.RPC("RemoteSetInactive", RpcTarget.AllViaServer);
         }
     }
 }
