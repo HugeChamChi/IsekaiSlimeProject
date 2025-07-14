@@ -8,16 +8,18 @@ namespace Util
     {
         Circle, Box
     }
-    public enum ClearEventType
-    {
-        None, Effect
-    }
-    public enum StatType
-    {
-        Health, Attack, Defense, Speed
-    }
-    public class EnumScript : MonoBehaviour
-    {
-   
-    }
+
+}
+
+public enum ClearEventType
+{
+    None, Effect
+}
+
+
+namespace Unit
+{
+    public enum UnitTier { Common, Rare, Epic, Legendary }
+    public enum UnitType { RangeAttack, SpeedDebuff, ArmorDebuff, AttackSpeedBuff, AttackPowerBuff }
+    public enum EffectType { Faint, Slow }
 }

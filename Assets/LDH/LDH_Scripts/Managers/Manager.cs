@@ -53,4 +53,3 @@ namespace Managers
         public static void InitPool() => manager.AddComponent<PoolManager>();
     }
 }
-
