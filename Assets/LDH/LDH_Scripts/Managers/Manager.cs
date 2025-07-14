@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Managers
@@ -44,10 +43,13 @@ namespace Managers
 
             //todo: 주석해제하기
             //manager.AddComponent<PoolManager>();
-            manager.AddComponent<ResourcesManager>();
+            manager.GetOrAddComponent<ResourcesManager>();
 
             //각각의 매니저 스크립트를 프리팹에 스크립트를 직접 추가해두거나 아래와 같이 AddComponent로 동적으로 추가한다.
             // 예시 : manager.AddComponent<RandomManager>();
+
         }
+
+        public static void InitPool() => manager.AddComponent<PoolManager>();
     }
 }
