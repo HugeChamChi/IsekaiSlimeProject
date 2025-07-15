@@ -27,64 +27,64 @@ public class UnitTestStat_HSD : ScriptableObject, IEffectProvider
     }
 }
 
-public class MonsterTest : MonoBehaviour, IEffectReceiver
-{    
-    public MonsterStat stat {  get; private set; }
-    private Dictionary<string, Coroutine> activeEffects = new Dictionary<string, Coroutine>();
+//public class MonsterTest : MonoBehaviour, IEffectReceiver
+//{    
+//    public MonsterStat stat {  get; private set; }
+//    private Dictionary<string, Coroutine> activeEffects = new Dictionary<string, Coroutine>();
 
-    public void ReceiveEffect(StatType type, float amount, float duration, string source)
-    {
-        if (activeEffects.ContainsKey(source))
-        {
-            StopCoroutine(activeEffects[source]);
-        }
+//    public void ReceiveEffect(StatType type, float amount, float duration, string source)
+//    {
+//        if (activeEffects.ContainsKey(source))
+//        {
+//            StopCoroutine(activeEffects[source]);
+//        }
 
-        activeEffects[source] = StartCoroutine(EffectRoutine(type, amount, duration, source));
-    }
+//        activeEffects[source] = StartCoroutine(EffectRoutine(type, amount, duration, source));
+//    }
 
-    public IEnumerator EffectRoutine(StatType type, float amount, float duration, string source)
-    {
-        switch (type)
-        {
-            case StatType.Health:
-                if (stat.Health.CheckDuplication(source))
-                {
-                    stat.Health.RemoveModifierAll(source);
-                }
-                stat.Health.AddModifier(amount, source);
-                break;
-            case StatType.Speed:
-                if (stat.Speed.CheckDuplication(source))
-                {
-                    stat.Speed.RemoveModifierAll(source);
-                }
-                stat.Speed.AddModifier(amount, source);
-                break;
-            case StatType.Defense:
-                if (stat.Defense.CheckDuplication(source))
-                {
-                    stat.Defense.RemoveModifierAll(source);
-                }
-                stat.Defense.AddModifier(amount, source);
-                break;
-        }
+//    public IEnumerator EffectRoutine(StatType type, float amount, float duration, string source)
+//    {
+//        switch (type)
+//        {
+//            case StatType.Health:
+//                if (stat.Health.CheckDuplication(source))
+//                {
+//                    stat.Health.RemoveModifierAll(source);
+//                }
+//                stat.Health.AddModifier(amount, source);
+//                break;
+//            case StatType.Speed:
+//                if (stat.Speed.CheckDuplication(source))
+//                {
+//                    stat.Speed.RemoveModifierAll(source);
+//                }
+//                stat.Speed.AddModifier(amount, source);
+//                break;
+//            case StatType.Defense:
+//                if (stat.Defense.CheckDuplication(source))
+//                {
+//                    stat.Defense.RemoveModifierAll(source);
+//                }
+//                stat.Defense.AddModifier(amount, source);
+//                break;
+//        }
 
-        yield return Utils.GetDelay(duration);
+//        yield return Utils.GetDelay(duration);
 
-        switch (type)
-        {
-            case StatType.Health:
-                stat.Health.RemoveModifierAll(source);
-                break;
-            case StatType.Speed:
-                stat.Speed.RemoveModifierAll(source);
-                break;
-            case StatType.Defense:
-                stat.Defense.RemoveModifierAll(source);
-                break;
-        }
+//        switch (type)
+//        {
+//            case StatType.Health:
+//                stat.Health.RemoveModifierAll(source);
+//                break;
+//            case StatType.Speed:
+//                stat.Speed.RemoveModifierAll(source);
+//                break;
+//            case StatType.Defense:
+//                stat.Defense.RemoveModifierAll(source);
+//                break;
+//        }
 
-        activeEffects.Remove(source);
-    }
+//        activeEffects.Remove(source);
+//    }
 
-}
+//}

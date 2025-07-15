@@ -52,7 +52,7 @@ public class MapManager : MonoBehaviour
             {
                 maps[players[i]].Cam.depth = 1;
                 maps[players[i]].Cam.AddComponent<AudioListener>();
-                maps[players[i]].CreateWaveController();
+                maps[players[i]].CreateWaveController();                   
             }
             else
             {

@@ -55,67 +55,108 @@ public class WaveController : MonoBehaviour
     private int curWaveIdx;
     private int curSpawnCount;
     private int curBossCount;
-    private bool isClear;
     private Coroutine waveRoutine;
+    private Coroutine nextWaveRoutine;
+    private WaitUntil clearCondition;
 
-    [SerializeField] private GameObject testPrefab;
+    [SerializeField] private GameObject prefab;
+
+    [Header("")]
+    private const int maxCount = 100;
+    private int monsterCount;
 
     private void Start()
     {
-                
+        clearCondition = new WaitUntil(() => monsterCount == 0);
+
+        if(pv.IsMine)
+            MonsterStatusController.OnDied += MonsterDie;
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.V))
-            pv.RPC("WaveStart_RPC", RpcTarget.AllViaServer);
+            pv.RPC(nameof(WaveStart_RPC), RpcTarget.AllViaServer);
     }
 
     [PunRPC]
     private void WaveStart_RPC()
     {
-        WaveStart();
+        if(pv.IsMine)
+            WaveStart();
     }
 
     private void WaveStart()
     {   
         if(pv.IsMine)
+        {
+            if(waveRoutine != null)
+            {
+                StopCoroutine(waveRoutine);
+                waveRoutine = null;
+            }
             waveRoutine = StartCoroutine(WaveRoutine());
-    }
-
-    private void WaveClear()
-    {
-        curBossCount--;
-
-        if (curBossCount <= 0)
-            isClear = true;
-
-        // 클리어 이벤트 실행
+        }
     }
 
     private IEnumerator WaveRoutine()
     {
+        WaveData waveData = waveDatas[curWaveIdx];        
         curSpawnCount = 0;
         curBossCount = waveDatas[curWaveIdx].SpawnBossCount;
-        isClear = false;
 
-        while (waveDatas[curWaveIdx].SpawnCount != curSpawnCount)
+        yield return Utils.GetDelay(3f);
+
+        while (waveData.SpawnCount != curSpawnCount)
         {
-            Manager.Resources.NetworkInstantiate(testPrefab, transform.position, false);
-            curSpawnCount++;
-            yield return Utils.GetDelay(waveDatas[curWaveIdx].SpawnTime / waveDatas[curWaveIdx].SpawnCount);
+            MonsterSpawn(waveData.SpawnMonster);
+            yield return Utils.GetDelay(waveData.SpawnTime / waveData.SpawnCount);
         }
 
         if(curBossCount > 0)
-            Manager.Resources.NetworkInstantiate(testPrefab, transform.position, false);
+            MonsterSpawn(waveData.SpawnBoss);
 
-        yield return Utils.GetDelay(waveDatas[curWaveIdx].WaveTime - waveDatas[curWaveIdx].SpawnTime);
-
-        if(isClear)
+        if(nextWaveRoutine != null)
         {
-            WaveClear(); // Boss가 IsMine이면 죽고 이벤트를 보냄
+            StopCoroutine(nextWaveRoutine);
+            nextWaveRoutine = null;
+        }
+        nextWaveRoutine = StartCoroutine(NextWave());
+
+        yield return Utils.GetDelay(waveData.WaveTime - waveData.SpawnTime);
+
+        if(curWaveIdx == waveDatas.Length - 1)
+        {
+            // 게임 클리어
         }
         else
+        {
+            curWaveIdx++;
+            WaveStart();
+        }        
+    }
+
+    private IEnumerator NextWave()
+    {
+        yield return clearCondition;
+
+        WaveStart();
+    }
+
+    private void MonsterDie(PhotonView pv)
+    {
+        if (!pv.IsMine) return;
+
+        monsterCount--;
+    }
+
+    private void MonsterSpawn(string monsterName)
+    {
+        Manager.Resources.NetworkInstantiate<GameObject>(monsterName, transform.position, false, true);
+        monsterCount++;
+        curSpawnCount++;
+
+        if(monsterCount >= maxCount)
         {
             // 게임 오버
         }

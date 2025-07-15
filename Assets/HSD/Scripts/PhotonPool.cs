@@ -20,15 +20,14 @@ public class PhotonPool : IPunPrefabPool
             if (view != null && view.IsMine)
             {
                 view.RPC("RemoteSetactive", RpcTarget.AllViaServer, position, rotation);
-            }
-            obj.SetActive(true);
+            }       
         }
         else
         {
             GameObject prefab = Manager.Resources.Load<GameObject>(prefabId);
             obj = Object.Instantiate(prefab, position, rotation);
         }
-
+        obj.SetActive(false);
         return obj;
     }
 
