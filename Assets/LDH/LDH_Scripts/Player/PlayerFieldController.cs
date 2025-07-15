@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 using Managers;
-using Unity.VisualScripting;
 
-namespace Player
+namespace PlayerField
 {
     /// <summary>
     /// 각 플레이어의 유닛 배치 공간(패널)을 관리하는 컨트롤러.

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Managers;
 using Photon.Pun;
-using Player;
+using PlayerField;
 using UnityEngine;
 using UnityEngine.UI;
 
