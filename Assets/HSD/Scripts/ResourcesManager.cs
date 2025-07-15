@@ -102,44 +102,52 @@ public class ResourcesManager : Singleton<ResourcesManager>
     #endregion
     #region Network
 
-    public void NetworkInstantiate<T>(T original, Vector3 position, Quaternion rotation, bool isMaster = true) where T : Object
+    public T NetworkInstantiate<T>(T original, Vector3 position, Quaternion rotation, bool isMaster = true, bool isRoomObject = false) where T : Object
     {
-        if(isMaster)
+        if (isMaster)
         {
             if (!PhotonNetwork.IsMasterClient)
             {
                 Debug.LogWarning("NetworkInstantiate는 마스터 클라이언트에서만 호출해야 합니다.");
-                return;
+                return null;
             }
-        }       
-
-        PhotonNetwork.Instantiate($"Prefabs/{(original as GameObject).name}", position, rotation);
-    }
-    public void NetworkInstantiate<T>(T original, Vector3 position, bool isMaster = true) where T : Object
-    {
-        NetworkInstantiate<T>(original, position, Quaternion.identity, isMaster);
-    }
-    public void NetworkInstantiate<T>(T original, bool isMaster = true) where T : Object
-    {
-        NetworkInstantiate<T>(original, Vector3.zero, Quaternion.identity, isMaster);
-    }
-    public void NetworkInstantiate<T>(string path, Vector3 position, Quaternion rotation, bool isMaster = true) where T : Object
-    {
-        if (!PhotonNetwork.IsMasterClient)
-        {
-            Debug.LogWarning("NetworkInstantiate는 마스터 클라이언트에서만 호출해야 합니다.");
-            return;
         }
 
-        PhotonNetwork.Instantiate($"Prefabs/{path}", position, rotation);
+        if (isRoomObject)
+            return PhotonNetwork.InstantiateRoomObject($"Prefabs/{(original as GameObject).name}", position, rotation) as T;
+        else
+            return PhotonNetwork.Instantiate($"Prefabs/{(original as GameObject).name}", position, rotation) as T;
     }
-    public void NetworkInstantiate<T>(string path, Vector3 position, bool isMaster = true) where T : Object
+    public T NetworkInstantiate<T>(T original, Vector3 position, bool isMaster = true, bool isRoomObject = false) where T : Object
     {
-        NetworkInstantiate<T>(path, position, Quaternion.identity, isMaster);
+        return NetworkInstantiate<T>(original, position, Quaternion.identity, isMaster, isRoomObject);
     }
-    public void NetworkInstantiate<T>(string path, bool isMaster = true) where T : Object
+    public T NetworkInstantiate<T>(T original, bool isMaster = true, bool isRoomObject = false) where T : Object
     {
-        NetworkInstantiate<T>(path, Vector3.zero, Quaternion.identity, isMaster);
+        return NetworkInstantiate<T>(original, Vector3.zero, Quaternion.identity, isMaster, isRoomObject);
+    }
+    public T NetworkInstantiate<T>(string path, Vector3 position, Quaternion rotation, bool isMaster = true, bool isRoomObject = false) where T : Object
+    {
+        if (isMaster)
+        {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                Debug.LogWarning("NetworkInstantiate는 마스터 클라이언트에서만 호출해야 합니다.");
+                return null;
+            }
+        }
+        if (isRoomObject)
+            return PhotonNetwork.InstantiateRoomObject($"Prefabs/{path}", position, rotation) as T;
+        else
+            return PhotonNetwork.Instantiate($"Prefabs/{path}", position, rotation) as T;
+    }
+    public T NetworkInstantiate<T>(string path, Vector3 position, bool isMaster = true, bool isRoomObject = false) where T : Object
+    {
+         return NetworkInstantiate<T>(path, position, Quaternion.identity, isMaster, isRoomObject);
+    }
+    public T NetworkInstantiate<T>(string path, bool isMaster = true, bool isRoomObject = false) where T : Object
+    {
+        return NetworkInstantiate<T>(path, Vector3.zero, Quaternion.identity, isMaster, isRoomObject);
     }
 
     // 네트워크 용 Destroy함수 들

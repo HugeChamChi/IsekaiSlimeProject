@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 using Util;
 
 
-public class BaseMonster : NetworkUnit, IPunObservable, IDamageable
+public class BaseMonster : NetworkUnit, IPunObservable
 {
     [SerializeField] private Rigidbody2D rb;
 
@@ -17,7 +17,7 @@ public class BaseMonster : NetworkUnit, IPunObservable, IDamageable
     private Coroutine moveRoutine;
 
     [Header("Stat")]
-    [SerializeField] private MonsterStat stat;
+    [SerializeField] private MonsterStatusController status;    
 
     private void Start()
     {
@@ -82,17 +82,5 @@ public class BaseMonster : NetworkUnit, IPunObservable, IDamageable
             transform.position = (Vector3)stream.ReceiveNext();
             transform.rotation = (Quaternion)stream.ReceiveNext();
         }
-    }
-
-    public void TakeDamage(float damage)
-    {
-        if(PhotonNetwork.IsMasterClient)
-            photonView.RPC(nameof(TakeDamage_RPC), RpcTarget.AllViaServer, damage);
-    }
-
-    [PunRPC]
-    public void TakeDamage_RPC(float damage)
-    {
-        
     }
 }
