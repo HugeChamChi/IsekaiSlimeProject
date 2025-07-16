@@ -72,7 +72,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 4
   m_Sprite: {fileID: -2413806693520163455, guid: ebe73ca9363db456bacf42c025bb4847, type: 3}
   m_Color: {r: 0.24528301, g: 0.24528301, b: 0.24528301, a: 0.6862745}
   m_FlipX: 0
@@ -94,7 +94,10 @@ GameObject:
   m_Component:
   - component: {fileID: 264780490216556231}
   - component: {fileID: 5221198320689052460}
+  - component: {fileID: 8090055858216181288}
+  - component: {fileID: 6473966714448134175}
   - component: {fileID: 1762821425609110763}
+  - component: {fileID: 472774097811871306}
   m_Layer: 0
   m_Name: Unit
   m_TagString: Untagged
@@ -137,15 +140,40 @@ MonoBehaviour:
   <Type>k__BackingField: 0
   <Description>k__BackingField: 
   <ModelFileName>k__BackingField: 
+  Controller: {fileID: 8090055858216181288}
+--- !u!114 &8090055858216181288
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2563347809932505990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df48f79cc2914af6bb2153e584d30a66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   Stat:
-    <Attack>k__BackingField: 800
-    <AttackSpeed>k__BackingField: 1
+    <Attack>k__BackingField: 10
+    <AttackSpeed>k__BackingField: 4
     <AttackRange>k__BackingField: 2.1
-    <BuffRange>k__BackingField: 0
+    <BuffRange>k__BackingField: 10
   targetLayer:
     serializedVersion: 2
     m_Bits: 4096
   isLeftFacingSprite: 1
+--- !u!114 &6473966714448134175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2563347809932505990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a5717c135c4da7b8c46e7c07704c65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1762821425609110763
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -164,10 +192,27 @@ MonoBehaviour:
   Synchronization: 3
   OwnershipTransfer: 0
   observableSearch: 2
-  ObservedComponents: []
+  ObservedComponents:
+  - {fileID: 472774097811871306}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &472774097811871306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2563347809932505990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 1
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 1
 --- !u!1 &3695170740614145454
 GameObject:
   m_ObjectHideFlags: 0
@@ -241,8 +286,8 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: e70c75f0c42cd4ce7a322252b28797eb, type: 3}
+  m_SortingOrder: 5
+  m_Sprite: {fileID: 21300000, guid: 0baab28ca64db465aa3fe25a41831cd2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -263,7 +308,7 @@ Animator:
   m_GameObject: {fileID: 3695170740614145454}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 77d95164d287a4807b7fc0167d27add9, type: 2}
+  m_Controller: {fileID: 9100000, guid: be75f23719ece491891a416b56c8d9fe, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
