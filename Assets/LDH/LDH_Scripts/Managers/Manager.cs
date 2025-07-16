@@ -31,7 +31,9 @@ namespace Managers
         //-----접근용 프로퍼티 등록------//
         public static PoolManager Pool => PoolManager.Instance;
         public static ResourcesManager Resources => ResourcesManager.Instance;
-
+        public static UnitDataManager UnitData => UnitDataManager.Instance;
+        
+        
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Initialize()
         {
@@ -44,6 +46,7 @@ namespace Managers
             //todo: 주석해제하기
             //manager.AddComponent<PoolManager>();
             manager.GetOrAddComponent<ResourcesManager>();
+            manager.AddComponent<UnitDataManager>();
 
             //각각의 매니저 스크립트를 프리팹에 스크립트를 직접 추가해두거나 아래와 같이 AddComponent로 동적으로 추가한다.
             // 예시 : manager.AddComponent<RandomManager>();

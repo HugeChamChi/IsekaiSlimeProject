@@ -159,5 +159,31 @@ public class ResourcesManager : Singleton<ResourcesManager>
     {
         Manager.Pool.ReleaseNetwork(obj, delay);
     }
+    
+    public void NetworkDestroy(GameObject obj)
+    {
+        PhotonView pv = ComponentProvider.Get<PhotonView>(obj);
+        if (pv != null)
+        {
+            if (pv.IsMine || PhotonNetwork.IsMasterClient)
+            {
+                PhotonNetwork.Destroy(pv);
+            }
+            else
+            {
+                pv.RPC("RequestDeleteToMaster", RpcTarget.MasterClient, pv);
+            }
+        }
+    }
+    
+    [PunRPC]
+    public void RequestDeleteToMaster(PhotonView photonView)
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.Destroy(photonView);
+        }
+    }
+    
     #endregion
 }
