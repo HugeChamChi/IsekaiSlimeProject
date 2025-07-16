@@ -8,8 +8,26 @@ namespace Util
     {
         Circle, Box
     }
-    public class EnumScript : MonoBehaviour
-    {
-   
-    }
+
+}
+
+public enum ClearEventType
+{
+    None, Effect
+}
+
+
+//임시 생성 (컴파일 오류 해결)
+public enum StatType
+{
+    hp,
+    speed,
+    
+}
+
+namespace Unit
+{
+    public enum UnitTier { Common, Rare, Epic, Legendary }
+    public enum UnitType { RangeAttack, SpeedDebuff, ArmorDebuff, AttackSpeedBuff, AttackPowerBuff }
+    public enum EffectType { Faint, Slow }
 }

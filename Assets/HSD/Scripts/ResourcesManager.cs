@@ -1,15 +1,21 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Collections;
-using UnityEngine;
 using DesignPattern;
 using Managers;
+using Photon.Pun;
+using System.Collections.Generic;
+using UnityEngine;
+using static UnityEngine.UI.Image;
 using Object = UnityEngine.Object;
 
 public class ResourcesManager : Singleton<ResourcesManager>
 {
     private static Dictionary<string, Object> resources = new();
+    private PhotonView pv;
+
+    private void Start()
+    {
+        pv = GetComponent<PhotonView>();
+        pv.ViewID = 94; // 임시로 설정
+    }
 
     public T Load<T>(string path) where T : Object
     {
@@ -20,7 +26,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
         T resource = Resources.Load(path) as T;
 
-        if(resource != null)
+        if (resource != null)
             resources.Add(_path, resource);
 
         return resource;
@@ -42,6 +48,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
         resources.Clear();
     }
 
+    #region Synchronous
     public T Instantiate<T>(T original, Vector3 position, Quaternion rotation, Transform parent, bool isPool = false) where T : Object
     {
         GameObject obj = original as GameObject;
@@ -51,28 +58,23 @@ public class ResourcesManager : Singleton<ResourcesManager>
         else
             return Object.Instantiate(obj, position, rotation, parent) as T;
     }
-
     public T Instantiate<T>(T original, Vector3 position, Quaternion rotation, bool isPool = false) where T : Object
     {
         return Instantiate(original, position, rotation, null, isPool);
     }
-
     public T Instantiate<T>(T original, Vector3 position, bool isPool = false) where T : Object
     {
         return Instantiate(original, position, Quaternion.identity, null, isPool);
     }
-
     public T Instantiate<T>(string path, Vector3 position, Quaternion rotation, Transform parent, bool isPool = false) where T : Object
     {
         T obj = Load<T>(path);
         return Instantiate(obj, position, rotation, parent, isPool);
     }
-
     public T Instantiate<T>(string path, Vector3 position, Quaternion rotation, bool isPool = false) where T : Object
     {
         return Instantiate<T>(path, position, rotation, null, isPool);
     }
-
     public T Instantiate<T>(string path, Vector3 postion, bool isPool = false) where T : Object
     {
         return Instantiate<T>(path, postion, Quaternion.identity, null, isPool);
@@ -90,9 +92,98 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
     public void Destroy(GameObject obj, float delay)
     {
+        if (obj == null || !obj.activeSelf) return;
+
         if (Manager.Pool.ContainsKey(obj.name))
             Manager.Pool.Release(obj, delay);
         else
             Object.Destroy(obj, delay);
     }
+    #endregion
+    #region Network
+
+    public T NetworkInstantiate<T>(T original, Vector3 position, Quaternion rotation, bool isMaster = true, bool isRoomObject = false) where T : Object
+    {
+        if (isMaster)
+        {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                Debug.LogWarning("NetworkInstantiate는 마스터 클라이언트에서만 호출해야 합니다.");
+                return null;
+            }
+        }
+
+        if (isRoomObject)
+            return PhotonNetwork.InstantiateRoomObject($"Prefabs/{(original as GameObject).name}", position, rotation) as T;
+        else
+            return PhotonNetwork.Instantiate($"Prefabs/{(original as GameObject).name}", position, rotation) as T;
+    }
+    public T NetworkInstantiate<T>(T original, Vector3 position, bool isMaster = true, bool isRoomObject = false) where T : Object
+    {
+        return NetworkInstantiate<T>(original, position, Quaternion.identity, isMaster, isRoomObject);
+    }
+    public T NetworkInstantiate<T>(T original, bool isMaster = true, bool isRoomObject = false) where T : Object
+    {
+        return NetworkInstantiate<T>(original, Vector3.zero, Quaternion.identity, isMaster, isRoomObject);
+    }
+    public T NetworkInstantiate<T>(string path, Vector3 position, Quaternion rotation, bool isMaster = true, bool isRoomObject = false) where T : Object
+    {
+        if (isMaster)
+        {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                Debug.LogWarning("NetworkInstantiate는 마스터 클라이언트에서만 호출해야 합니다.");
+                return null;
+            }
+        }
+        if (isRoomObject)
+            return PhotonNetwork.InstantiateRoomObject($"Prefabs/{path}", position, rotation) as T;
+        else
+            return PhotonNetwork.Instantiate($"Prefabs/{path}", position, rotation) as T;
+    }
+    public T NetworkInstantiate<T>(string path, Vector3 position, bool isMaster = true, bool isRoomObject = false) where T : Object
+    {
+         return NetworkInstantiate<T>(path, position, Quaternion.identity, isMaster, isRoomObject);
+    }
+    public T NetworkInstantiate<T>(string path, bool isMaster = true, bool isRoomObject = false) where T : Object
+    {
+        return NetworkInstantiate<T>(path, Vector3.zero, Quaternion.identity, isMaster, isRoomObject);
+    }
+
+    // 네트워크 용 Destroy함수 들
+    public void NetworkDestroy(GameObject obj, string name)
+    {
+        Manager.Pool.ReleaseNetwork(obj);
+    }
+    public void NetworkDestroy(GameObject obj, string name, float delay)
+    {
+        Manager.Pool.ReleaseNetwork(obj, delay);
+    }
+    
+    public void NetworkDestroy(GameObject obj)
+    {
+        PhotonView pv = ComponentProvider.Get<PhotonView>(obj);
+        if (pv != null)
+        {
+            if (pv.IsMine || PhotonNetwork.IsMasterClient)
+            {
+                PhotonNetwork.Destroy(pv);
+            }
+            else
+            {
+                pv.RPC("RequestDeleteToMaster", RpcTarget.MasterClient, pv);
+            }
+        }
+    }
+    
+    [PunRPC]
+    public void RequestDeleteToMaster(PhotonView photonView)
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.Destroy(photonView);
+        }
+    }
+    
+    #endregion
 }

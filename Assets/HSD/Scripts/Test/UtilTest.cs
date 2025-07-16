@@ -1,15 +1,25 @@
+using Managers;
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using Util;
 
 public class UtilTest : MonoBehaviour
 {
+    private PhotonView pv;
+
     [SerializeField] private float range;
     [SerializeField] private OverlapType overlapType;
     [SerializeField] private float boxAngle;
     [SerializeField] private Vector2 boxsize;
     [SerializeField] private LayerMask targetLayer;
+
+    private void Awake()
+    {
+        pv = GetComponent<PhotonView>();        
+    }
 
     private void Update()
     {
