@@ -1,5 +1,6 @@
 using Photon.Pun;
 using Photon.Realtime;
+using PlayerField;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,8 +16,12 @@ public class Map : MonoBehaviour
     private static readonly string waveController = "Prefabs/WaveController";
     [SerializeField] private Transform spawnPoint;
 
+    [Header("PlayerFieldController")] 
+    public PlayerFieldController fieldController; 
+    
     public void CreateWaveController()
     {
         PhotonNetwork.Instantiate(waveController, spawnPoint.position, spawnPoint.rotation);
     }
+    
 }

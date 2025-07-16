@@ -11,13 +11,9 @@ namespace PlayerField
     /// </summary>
     public class PlayerFieldController : MonoBehaviour
     {
-        //private PhotonView _photonView;
-        
         // --- reference --- //
         private Transform _spawnPanel; // 패널 (유닛 스폰 영역)
         public Transform SpawnPanel => _spawnPanel;
-        private int _actorNumber; // 각 패널의 ActorNumber
-        
         
         // --- Grid Info --- //
         private List<Vector2> spawnList = new();  // 유닛을 배치할 수 있는 좌표 리스트
@@ -35,7 +31,12 @@ namespace PlayerField
         
         private void Awake() => Init();
 
-        private void Start() => GenerateGridSlots();
+        private void Start()
+        {
+            GenerateGridSlots();
+            
+        }
+
         #endregion
         
         
@@ -86,48 +87,6 @@ namespace PlayerField
         }
         
         #endregion
-
-
-        #region Field Register / Field Setting
-
-        /// <summary>
-        /// ActorNumber 등록 및 스케일, 색상 설정.
-        /// </summary>
-        public void RegisterField(int actorNumber)
-        {
-            _actorNumber = actorNumber;
-            
-            SetScale();
-            
-            PlayerFieldManager.Instance.RegisterPlayerField(actorNumber, this);
-        }
-        
-        /// <summary>
-        /// 내 필드는 메인 스케일, 다른 플레이어 필드는 서브 스케일로 설정한다.
-        /// </summary>
-        private void SetScale()
-        {
-            int localActorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
-
-            float scale = (_actorNumber == localActorNumber)
-                ? PlayerFieldManager.Instance.MainScale
-                : PlayerFieldManager.Instance.SubScale;
-
-            transform.localScale = Vector3.one * scale;
-            
-            
-            //색깔도 임시로 설정 (임시 색상: 본인 = 파란색, 타인 = 흰색)
-            //todo: 임시 설정 부분
-            Color color = (_actorNumber == localActorNumber)
-                ? Color.blue
-                : Color.white;
-
-            _spawnPanel.GetComponent<SpriteRenderer>().color = color;
-
-        }
-
-        #endregion
-        
         
         #region Gizmo
 
@@ -152,6 +111,52 @@ namespace PlayerField
         }
 
         #endregion
+        
+        
+        
+        
+        
+        #region Legacy
+        
+        
+        //---- Field Register / Field Setting ----//
+        /// <summary>
+        /// ActorNumber 등록 및 스케일, 색상 설정.
+        /// </summary>
+        public void RegisterField(int actorNumber)
+        {
+            SetScale();
+            
+            PlayerFieldManager.Instance.RegisterPlayerField(actorNumber, this);
+        }
+        
+        /// <summary>
+        /// 내 필드는 메인 스케일, 다른 플레이어 필드는 서브 스케일로 설정한다.
+        /// </summary>
+        private void SetScale()
+        {
+            int localActorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+
+            // float scale = (_actorNumber == localActorNumber)
+            //     ? PlayerFieldManager.Instance.MainScale
+            //     : PlayerFieldManager.Instance.SubScale;
+            //
+            // transform.localScale = Vector3.one * scale;
+            //
+            //
+            // //색깔도 임시로 설정 (임시 색상: 본인 = 파란색, 타인 = 흰색)
+            // //todo: 임시 설정 부분
+            // Color color = (_actorNumber == localActorNumber)
+            //     ? Color.blue
+            //     : Color.white;
+            //
+            // _spawnPanel.GetComponent<SpriteRenderer>().color = color;
+
+        }
+
+        #endregion
+
+
       
     }
 }

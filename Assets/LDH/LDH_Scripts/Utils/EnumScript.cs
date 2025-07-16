@@ -17,6 +17,14 @@ public enum ClearEventType
 }
 
 
+//임시 생성 (컴파일 오류 해결)
+public enum StatType
+{
+    hp,
+    speed,
+    
+}
+
 namespace Unit
 {
     public enum UnitTier { Common, Rare, Epic, Legendary }
