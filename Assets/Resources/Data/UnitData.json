@@ -1,0 +1,28 @@
+{
+  "units": [
+    {
+      "Index": 201,
+      "Name" : "아그네스",
+      "Tier" : 1,
+      "Type" : 1,
+      "Description" : "불꽃의 여왕 아그네스는.....",
+      "ModelFileName" : "file name...",
+      "Attack": 800,
+      "AttackSpeed": 1,
+      "AttackRange": 2.1,
+      "BuffRange": 0.0
+    },
+    {
+      "Index": 202,
+      "Name" : "잉그리드",
+      "Tier" : 1,
+      "Type" : 2,
+      "Description" : "근위기사단의 창 잉그리드....",
+      "ModelFileName" : "file name...",
+      "Attack": 600,
+      "AttackSpeed": 0.8,
+      "AttackRange": 2,
+      "BuffRange": 1.0
+    }
+  ]
+}
