@@ -16,7 +16,6 @@ namespace Units
     {
         [Header("Field Settings")]
         [SerializeField] private PlayerFieldController _fieldController;  // 로컬 플레이어 필드 (현재 클라이언트 필드)
-        [SerializeField] private Transform _spawnPanel;    // 유닛이 배치될 부모 패널
 
         [Header("Unit Settings")]
         // [SerializeField] private GameObject _unitPrefab;  // 소환할 유닛 프리팹
@@ -51,23 +50,21 @@ namespace Units
         //구독
         private void Subscribe()
         {
-            _summonButton.onClick.AddListener(Summon);
+            _summonButton.onClick.AddListener(Summon); //소환 버튼 이벤트 구독
         }
 
         //구독 해제
         private void Unsubscribe()
         {
-            _summonButton.onClick.RemoveListener(Summon);
+            _summonButton.onClick.RemoveListener(Summon); //소환 버튼 이벤트 구독 해제
         }
         
         /// <summary>
-        /// 스폰 패널 및 필드 컨트롤러 설정.
+        /// 클라이언트 필드 컨트롤러 설정.
         /// </summary>
-        public void SetSpawnPanel(PlayerFieldController fieldController, Transform spawnPanel)
+        public void SetSpawnPanel(PlayerFieldController fieldController)
         {
             _fieldController = fieldController;
-            _spawnPanel = spawnPanel;
-            //GenerateGridSlots();  //코드 이동
         }
         #endregion
         
@@ -92,37 +89,47 @@ namespace Units
         #endregion
 
         #region Summon
-
         /// <summary>
-        /// 유닛 소환
-        /// 비어있는 슬롯이 없으면 경고 로그 출력
+        /// 유닛 소환 로직.
+        /// 1) 랜덤 유닛 index 선택
+        /// 2) 빈 슬롯 탐색 → 없으면 경고 출력
+        /// 3) Photon 네트워크 Instantiate 실행
         /// </summary>
         private void Summon()
         {
             //todo: 보유 재화... 랑 소환 비용이랑 비교해서 처리해주기
             //소환할때마다.. 비용 올라가나..?
             
+            //슬롯 점유 상태 확인
             int slotIndex = GetEmptySlotIndex();
             if (slotIndex == -1)
             {
                 Debug.LogWarning("빈 슬롯 없음!!");
                 return;
             }
-
+            
+            //랜덤 유닛 뽑기
+            int unitIndex = Manager.UnitData.PickRandomUnitIndex();
+            
+            // 슬롯 점유 상태 업데이트
             _fieldController.SpawnListArray[slotIndex] = true;
+            
+            // 슬롯 위치 가져오기
             Vector3 position =  _fieldController.SpawnList[slotIndex];
 
             // Manager.Resources.NetworkInstantiate<GameObject>(_unitPrefabPath, position);
             
+            
+            // Photon 네트워크 Instantiate
             //todo: 테스트중 → 추후 Manager.Resources.NetworkInstantiate 사용 가능한지 확인 필요 , 로직 변동 될 수 있음
-            PhotonNetwork.Instantiate(_unitPrefabPath, position, Quaternion.identity);
+            PhotonNetwork.Instantiate(_unitPrefabPath, position, Quaternion.identity, 0, new object[] { unitIndex});
         }
 
         #endregion
 
 
 
-        #region Legacy
+        #region Legacy(미사용)
 
         //------ 코드 이동 ------//
         // /// <summary>
