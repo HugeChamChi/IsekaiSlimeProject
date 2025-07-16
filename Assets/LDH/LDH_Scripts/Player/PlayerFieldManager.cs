@@ -14,6 +14,7 @@ namespace Managers
         // 싱글톤 (게임 씬에서만 유지)
         public static PlayerFieldManager Instance { get; private set; }
         
+        
         // 각 플레이어의 ActorNumber로 PlayerFieldController 매핑
         public Dictionary<int, PlayerFieldController> playerFields = new();
 
@@ -22,20 +23,21 @@ namespace Managers
         [field: Header("Field Settings")]
         [field: SerializeField] public int XCount { get; private set; } = 4;
         [field: SerializeField] public int YCount { get; private set; } = 4;
-        [SerializeField] private float _mainScale = 1.4f;     // 로컬 플레이어 필드 스케일
-        [SerializeField] private float _subScale = 0.4f;     // 다른 플레이어 필드 스케일
-        public float MainScale => _mainScale;
-        public float SubScale => _subScale;
+        
+        // --- Legacy --- //
+        // [SerializeField] private float _mainScale = 1.4f;     // 로컬 플레이어 필드 스케일
+        // [SerializeField] private float _subScale = 0.4f;     // 다른 플레이어 필드 스케일
+        // public float MainScale => _mainScale;
+        // public float SubScale => _subScale;
         
         
         [Header("Player Field Prefab")]
-        [SerializeField] private GameObject playerFieldPrefab;  // PlayerField 프리팹
         [SerializeField] private string _playerPrefabPath = "LDH_TestResource/PlayerField";
         
         [Header("Spawn Settings")]
-        [SerializeField] private List<Transform> spawnPoints;   // 인원 수별 스폰 위치
-        [SerializeField] private UnitSpawner _unitSpawner;
-        
+        // [SerializeField] private List<Transform> spawnPoints;   // (Legacy) 인원 수별 스폰 위치
+        private UnitSpawner _unitSpawner;
+        public UnitSpawner UnitSpanwer => _unitSpawner;
         
         #region Unity LifeCycle
         private void Awake()
@@ -53,39 +55,22 @@ namespace Managers
                 Instance = null;
         }
 
-        private void Start() => SpawnPlayerFields();
+        private void Start() => Init();
+        
         #endregion
 
 
-        #region Field Manage
+        #region Initialize
 
-        
-
-
-        /// <summary>
-        /// 모든 플레이어의 PlayerField 생성 및 초기 등록
-        /// </summary>
-        public void SpawnPlayerFields()
+        private void Init()
         {
-            var players = PhotonNetwork.PlayerList;
-
-            int idx = 1;  // 본인(로컬)은 spawnPoints[0], 다른 사람은 순서대로
-            
-            for (int i = 0; i < players.Length; i++)
-            {
-                var player = players[i];
-                Vector3 spawnPos = player.IsLocal? spawnPoints[0].position : spawnPoints[idx++].position;
-
-                // var fieldObj = PhotonNetwork.Instantiate(playerFieldPrefab.name, spawnPos, Quaternion.identity);
-                
-                // 리소스 매니저를 통한 프리팹 인스턴스화 (클라이언트에서 로컬로 생성)
-                // 네트워크 동기화 불필요
-                var playerField = Manager.Resources.Instantiate(playerFieldPrefab, spawnPos).GetComponent<PlayerFieldController>();
-                
-                playerField.RegisterField(player.ActorNumber);
-            }
+            _unitSpawner = GetComponent<UnitSpawner>();
         }
 
+
+        #endregion
+        
+        #region Field Manage
 
         /// <summary>
         /// PlayerField 등록 및 로컬 플레이어의 경우 UnitSpawner 연동
@@ -114,6 +99,36 @@ namespace Managers
             }
         }
         #endregion
-      
+
+
+
+        #region Legacy
+
+        // 플레이어 필드를 Map Prefab 안에 등록해서 맵 생성시 같이 생성되도록 변경함에 따라 해당 메서드 사용x
+        /// <summary>
+        /// 모든 플레이어의 PlayerField 생성 및 초기 등록
+        /// </summary>
+        public void SpawnPlayerFields()
+        {
+            // var players = PhotonNetwork.PlayerList;
+            //
+            // int idx = 1;  // 본인(로컬)은 spawnPoints[0], 다른 사람은 순서대로
+            //
+            // for (int i = 0; i < players.Length; i++)
+            // {
+            //     var player = players[i];
+            //     Vector3 spawnPos = player.IsLocal? spawnPoints[0].position : spawnPoints[idx++].position;
+            //
+            //     // var fieldObj = PhotonNetwork.Instantiate(playerFieldPrefab.name, spawnPos, Quaternion.identity);
+            //     
+            //     // 리소스 매니저를 통한 프리팹 인스턴스화 (클라이언트에서 로컬로 생성)
+            //     // 네트워크 동기화 불필요
+            //     var playerField = Manager.Resources.Instantiate(playerFieldPrefab, spawnPos).GetComponent<PlayerFieldController>();
+            //     
+            //     playerField.RegisterField(player.ActorNumber);
+            //}
+        }
+
+        #endregion
     }
 }

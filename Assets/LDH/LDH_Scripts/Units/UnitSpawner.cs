@@ -9,7 +9,6 @@ using UnityEngine.UI;
 
 namespace Units
 {
-    
     /// <summary>
     /// 유닛을 소환 및 배치
     /// </summary>
@@ -73,39 +72,7 @@ namespace Units
         #endregion
         
 
-        #region Spawn Slot
-
-        //------ 코드 이동 ------//
-        // /// <summary>
-        // /// 유닛이 배치될 패널 영역을 X, Y로 나누어 그리드 슬롯 좌표를 계산한다.
-        // /// 좌상단부터 우측 → 아래 방향으로 순차 배치
-        // /// </summary>
-        // private void GenerateGridSlots()
-        // {
-        //     Bounds panelBounds = _spawnPanel.GetComponent<SpriteRenderer>().bounds;
-        //     float panelWidth = panelBounds.size.x;
-        //     float panelHeight = panelBounds.size.y;
-        //
-        //     float slotScaleX = _spawnPanel.lossyScale.x / _xCount;
-        //     float slotScaleY = _spawnPanel.lossyScale.y / _yCount;
-        //
-        //     float startX = -panelWidth / 2 + slotScaleX / 2;
-        //     float startY = panelHeight / 2 - slotScaleY / 2;
-        //
-        //     for (int row = 0; row < _yCount; row++)
-        //     {
-        //         for (int col = 0; col < _xCount; col++)
-        //         {
-        //             float xPos = startX + col * slotScaleX;
-        //             float yPos = startY - row * slotScaleY;
-        //             Vector2 slotPos = new Vector2(xPos, yPos) + (Vector2)_spawnPanel.position;
-        //
-        //             spawnList.Add(slotPos);
-        //             spawnListArray.Add(false);
-        //         }
-        //     }
-        // }
-        
+        #region Slot
         
         /// <summary>
         /// 현재 비어있는 슬롯 인덱스를 반환
@@ -148,14 +115,47 @@ namespace Units
             // Manager.Resources.NetworkInstantiate<GameObject>(_unitPrefabPath, position);
             
             //todo: 테스트중 → 추후 Manager.Resources.NetworkInstantiate 사용 가능한지 확인 필요 , 로직 변동 될 수 있음
-            PhotonNetwork.Instantiate(
-                _unitPrefabPath, 
-                position,
-                Quaternion.identity,
-                0,
-                new object [] {PhotonNetwork.LocalPlayer.ActorNumber, slotIndex}
-                );
+            PhotonNetwork.Instantiate(_unitPrefabPath, position, Quaternion.identity);
         }
+
+        #endregion
+
+
+
+        #region Legacy
+
+        //------ 코드 이동 ------//
+        // /// <summary>
+        // /// 유닛이 배치될 패널 영역을 X, Y로 나누어 그리드 슬롯 좌표를 계산한다.
+        // /// 좌상단부터 우측 → 아래 방향으로 순차 배치
+        // /// </summary>
+        // private void GenerateGridSlots()
+        // {
+        //     Bounds panelBounds = _spawnPanel.GetComponent<SpriteRenderer>().bounds;
+        //     float panelWidth = panelBounds.size.x;
+        //     float panelHeight = panelBounds.size.y;
+        //
+        //     float slotScaleX = _spawnPanel.lossyScale.x / _xCount;
+        //     float slotScaleY = _spawnPanel.lossyScale.y / _yCount;
+        //
+        //     float startX = -panelWidth / 2 + slotScaleX / 2;
+        //     float startY = panelHeight / 2 - slotScaleY / 2;
+        //
+        //     for (int row = 0; row < _yCount; row++)
+        //     {
+        //         for (int col = 0; col < _xCount; col++)
+        //         {
+        //             float xPos = startX + col * slotScaleX;
+        //             float yPos = startY - row * slotScaleY;
+        //             Vector2 slotPos = new Vector2(xPos, yPos) + (Vector2)_spawnPanel.position;
+        //
+        //             spawnList.Add(slotPos);
+        //             spawnListArray.Add(false);
+        //         }
+        //     }
+        // }
+        
+        
 
         #endregion
     }

@@ -94,35 +94,13 @@ namespace Units
             _attackWait = new WaitForSeconds(Stat.AttackDelay);
             _photonView = GetComponent<PhotonView>();
             
-            InitPhotonData();
-            SetPositionScale();
+            
+            //카메라로 각 클라이언트 필드 렌더링하는 방식으로 변경함에 따라 주석 처리
+            // InitPhotonData();
+            //SetPositionScale();
 
             
         }
-        
-        private void InitPhotonData()
-        {
-            object[] data = _photonView.InstantiationData;
-            _ownerActorNumber = (int)data[0];
-            _slotIndex = (int)data[1];
-        }
-        
-        private void SetPositionScale()
-        {
-            PlayerFieldController field = PlayerFieldManager.Instance.GetFieldController(_ownerActorNumber);
-            if (field == null)
-            {
-                Debug.LogError($"{_ownerActorNumber}의 필드 위치를 찾을 수 없습니다.");
-                return;
-            }
-
-            //position 설정
-            transform.position = field.SpawnList[_slotIndex];
-            
-            //scale 설정
-            transform.localScale = Vector3.one * field.transform.localScale.x;
-        }
-        
         #endregion
 
         
@@ -207,6 +185,35 @@ namespace Units
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, Stat.AttackRange);
         }
+
+        #endregion
+
+
+
+        #region Legacy
+        private void InitPhotonData()
+        {
+            object[] data = _photonView.InstantiationData;
+            _ownerActorNumber = (int)data[0];
+            _slotIndex = (int)data[1];
+        }
+        
+        private void SetPositionScale()
+        {
+            PlayerFieldController field = PlayerFieldManager.Instance.GetFieldController(_ownerActorNumber);
+            if (field == null)
+            {
+                Debug.LogError($"{_ownerActorNumber}의 필드 위치를 찾을 수 없습니다.");
+                return;
+            }
+
+            //position 설정
+            transform.position = field.SpawnList[_slotIndex];
+            
+            //scale 설정
+            transform.localScale = Vector3.one * field.transform.localScale.x;
+        }
+        
 
         #endregion
     }
