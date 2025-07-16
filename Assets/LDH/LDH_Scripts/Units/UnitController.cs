@@ -38,8 +38,8 @@ namespace Units
 
         // --- 코루틴 --- //
         private Coroutine _attackCoroutine;          // 공격 루프 코루틴 핸들
-        private WaitForSeconds _attackWait;          // 공격 대기 시간 (공격 속도 기반)
-
+        // private WaitForSeconds _attackWait;          // 공격 대기 시간 (공격 속도 기반)
+        private bool _isAttacking = false;
 
         #region Unity LifeCycle
 
@@ -73,7 +73,7 @@ namespace Units
         {
             _anim = GetComponentInChildren<Animator>();
             _sr = GetComponentInChildren<SpriteRenderer>();
-            _attackWait = new WaitForSeconds(Stat.AttackDelay);
+            // _attackWait = new WaitForSeconds(Stat.AttackDelay);
             
             
             //카메라로 각 클라이언트 필드 렌더링하는 방식으로 변경함에 따라 주석 처리
@@ -115,33 +115,71 @@ namespace Units
         /// </summary>
         private IEnumerator AttackCoroutine()
         {
-            _anim.speed = Stat.AttackSpeed;  // 애니메이션 클립은 1초 기준으로 제작되었으며, 공격 속도(초당 횟수)에 맞게 재생 속도를 조절함
-
             while (true)
             {
                 // 범위 내에서 가장 가까운 대상 찾기
-                Transform targetTransform = Utils.FindClosestTarget(
-                    transform.position,
-                        Stat.AttackRange,
-                    OverlapType.Circle,
-                    targetLayer
-                );
+                var targetTransform = GetClosestTarget();
 
-                if (targetTransform != null && targetTransform.TryGetComponent<Temp_IDamagable>(out Temp_IDamagable target))
+                if (IsTargetAlive(targetTransform))
                 {
+                    //타겟 있음
+                    Debug.Log("타겟 발견");
+                 
                     // 스프라이트 방향 전환
-                    Vector2 dir = Utils.DirToTarget(targetTransform.position, transform.position);
-                    UpdateSpriteFlip(dir);
+                    UpdateSpriteFlip(Utils.DirToTarget(targetTransform.position, transform.position));
+
                     
-                   
-                    // 공격 애니메이션 재생
-                    _anim.SetTrigger("Attack");
-
-                    // 공격 실행
-                    Attack(target);
+                    //현재 공격 중인 상태가 아니었다면
+                    if (!_isAttacking)
+                    {
+                        Debug.Log("공격 시작");
+                        _isAttacking = true;
+                        
+                        //공격 애니메이션 재생
+                        _anim.SetTrigger("Attack");
+                        Attack(targetTransform.GetComponent<IDamagable>());
+                        
+                        yield return WaitForAttackCooldown(targetTransform);
+                        
+                        _isAttacking = false;
+                    }
                 }
-
-                yield return _attackWait;
+                else
+                {
+                    //타겟 없음 -> Idle로 전환
+                    _anim.SetTrigger("NoTarget");
+                    _isAttacking = false;
+                }
+                yield return null;
+            }
+        }
+        
+        private Transform GetClosestTarget()
+        {
+            return Utils.FindClosestTarget(transform.position, Stat.AttackRange, OverlapType.Circle, targetLayer);
+        }
+        
+        private bool IsTargetAlive(Transform target)
+        {
+            return target != null && target.TryGetComponent(out Temp_IDamagable _);
+        }
+        
+        private IEnumerator WaitForAttackCooldown(Transform target)
+        {
+            Debug.Log("대기 상태 돌입");
+            
+            float elapsed = 0f;
+            while (elapsed < Stat.AttackDelay)
+            {
+                if (!IsTargetAlive(target))
+                {
+                    Debug.Log("타겟 사라짐, 공격 중단");
+                    _anim.SetTrigger("NoTarget");
+                    _isAttacking = false;
+                    yield break;
+                }
+                elapsed += Time.deltaTime;
+                yield return null;
             }
         }
 
