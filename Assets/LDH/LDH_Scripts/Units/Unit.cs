@@ -1,25 +1,18 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using LDH.LDH_Scripts.Temp;
 using Managers;
 using Photon.Pun;
-using PlayerField;
 using Unit;
 using UnityEngine;
 using Util;
-
-// todo: IDamagable 수정(현재는 임시 클래스 사용 중)
-using IDamagable = LDH.LDH_Scripts.Temp.Temp_IDamagable;
 
 namespace Units
 {
     /// <summary>
     /// 게임 내 유닛(영웅) 기본 클래스.
-    /// 스탯, 일반 공격, 스킬, 애니메이션, 타겟 탐색 및 공격 루프 관리.
+    /// 유닛 기본 정보 보유
     /// </summary>
-    public class Unit : MonoBehaviour
+    public class Unit : NetworkUnit, IPunInstantiateMagicCallback
     {
+        
         #region Variables
 
         [field: Header("Unit Info")]
@@ -30,191 +23,103 @@ namespace Units
         [field: SerializeField] public string Description { get; private set; }
         [field: SerializeField] public string ModelFileName { get; private set; }
 
-        [Header("Stats")]
-        [SerializeField] public UnitStat Stat = new(); // 유닛 능력치 정보 (공격력, 사거리, 속도 등)
-
-        [Header("Skill")]
-        public UnitSkill Skill; // 유닛 보유 스킬
-
-        [Header("Sprite & Animator")]
-        private SpriteRenderer _sr;
-        private Animator _anim;
+        /// <summary>
+        /// 유닛의 컨트롤러 컴포넌트 (Stat, Animator, Attack, Skill 관리)
+        /// </summary>
+        public UnitController Controller;
         
-        [Header("Target Setting")]
-        [SerializeField] private LayerMask targetLayer;         // 공격 대상 레이어
-        [SerializeField] private bool isLeftFacingSprite;       // 스프라이트 기본 방향 (왼쪽)
-
-        
-        // --- 코루틴 --- //
-        private Coroutine _attackCoroutine;
-        private WaitForSeconds _attackWait;
-        
-        // -- photon data -- //
-        private PhotonView _photonView;
-        private int _ownerActorNumber;
-        private int _slotIndex;
         
         #endregion
-
         
         
         #region Unity LifeCycle
 
-        private void Awake() => Init();
-        
-        private void Start()
-        {
-            // 일반 공격 루프 코루틴 시작
-            _attackCoroutine = StartCoroutine(AttackCoroutine());
-        }
+        //private void Awake() => Init();
 
-        private void OnDestroy()
-        {
-            // 유닛 파괴 시 코루틴 정리
-            if (_attackCoroutine != null)
-            {
-                StopCoroutine(_attackCoroutine);
-                _attackCoroutine = null;
-            }
-        }
-        
+        //private void Start() { }
+
         #endregion
         
   
 
-        #region Initialization
+        #region Unit Initialization
+        
         
         /// <summary>
-        /// 유닛 초기화 (애니메이터, 스프라이트, 공격 대기 시간 등)
+        /// 유닛 데이터로 초기화.
+        /// Controller에도 데이터 전달.
         /// </summary>
-        protected virtual void Init()
+        /// <param name="info">유닛 정보</param>
+        protected virtual void InitData(UnitDataManager.UnitInfo info)
         {
-            _anim = GetComponentInChildren<Animator>();
-            _sr = GetComponentInChildren<SpriteRenderer>();
-            _attackWait = new WaitForSeconds(Stat.AttackDelay);
-            _photonView = GetComponent<PhotonView>();
+            Index = info.Index;
+            Name = info.Name;
+            Tier = (UnitTier)info.Tier;
+            Type = (UnitType)info.Type;
+            Description = info.Description;
+            ModelFileName = info.ModelFileName;
             
+            Controller.InitData(info);
             
-            //카메라로 각 클라이언트 필드 렌더링하는 방식으로 변경함에 따라 주석 처리
-            // InitPhotonData();
-            //SetPositionScale();
-
+            Debug.Log($"[Unit] 초기화 완료! 이름: {Name}");
             
         }
         #endregion
 
-        
-
-        #region Attack / Skill
+        #region Unit Delete
 
         /// <summary>
-        /// 일반 공격 반복 실행 루프.
-        /// Stat.AttackDelay 간격으로 FindClosestTarget → Attack 반복.
+        /// 네트워크 상에서 유닛 제거.
         /// </summary>
-        private IEnumerator AttackCoroutine()
+        public void UnitDelete()
         {
-            while (true)
+            Manager.Resources.NetworkDestroy(gameObject);
+            // TODO: PlayerFieldManager의 슬롯 상태 업데이트 필요
+        }
+        
+
+        #endregion
+        
+        #region Photon Callback
+        /// <summary>
+        /// Photon Instantiate 시 InstantiationData로 전달된 index 기반 데이터 로드.
+        /// </summary>
+        public void OnPhotonInstantiate(PhotonMessageInfo info)
+        {
+            object[] instantiationData = info.photonView.InstantiationData;
+            if (instantiationData == null || instantiationData.Length == 0)
             {
-                Transform targetTransform = Utils.FindClosestTarget(
-                    transform.position,
-                    Stat.AttackRange,
-                    OverlapType.Circle,
-                    targetLayer
-                );
-
-                if (targetTransform != null && targetTransform.TryGetComponent<IDamagable>(out IDamagable target))
-                {
-                    // 스프라이트 방향 전환
-                    Vector2 dir = Utils.DirToTarget(targetTransform.position, transform.position);
-                    UpdateSpriteFlip(dir);
-
-                    // 공격 실행
-                    Attack(target);
-                }
-
-                yield return _attackWait;
-            }
-        }
-
-        /// <summary>
-        /// 대상에게 일반 공격 실행 (현재는 로그 출력용)
-        /// </summary>
-        /// <param name="target">공격할 대상</param>
-        public void Attack(IDamagable target)
-        {
-            TempMonster monster = target as TempMonster;
-            Debug.Log($"{monster.name} 을 공격합니다.");
-        }
-
-        /// <summary>
-        /// 유닛 스킬 사용
-        /// </summary>
-        /// <param name="targets">대상 목록</param>
-        public void UseSkill(List<IDamagable> targets)
-        {
-            // Skill.Execute(this, targets);
-        }
-
-        #endregion
-
-        #region Sprite Flip
-
-        /// <summary>
-        /// 방향 벡터를 기준으로 스프라이트 좌우 뒤집기 처리.
-        /// </summary>
-        /// <param name="dir">타겟 방향 벡터</param>
-        private void UpdateSpriteFlip(Vector2 dir)
-        {
-            if (dir.x > 0)
-                _sr.flipX = isLeftFacingSprite;      // 오른쪽 → 기본 방향
-            else if (dir.x < 0)
-                _sr.flipX = !isLeftFacingSprite;     // 왼쪽 → 반대 방향
-            // dir.x == 0 → 기존 flipX 유지
-        }
-
-        #endregion
-
-        #region Gizmos
-
-        /// <summary>
-        /// 에디터에서 공격 범위 시각화.
-        /// </summary>
-        private void OnDrawGizmosSelected()
-        {
-            // 공격 범위 시각화
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, Stat.AttackRange);
-        }
-
-        #endregion
-
-
-
-        #region Legacy
-        private void InitPhotonData()
-        {
-            object[] data = _photonView.InstantiationData;
-            _ownerActorNumber = (int)data[0];
-            _slotIndex = (int)data[1];
-        }
-        
-        private void SetPositionScale()
-        {
-            PlayerFieldController field = PlayerFieldManager.Instance.GetFieldController(_ownerActorNumber);
-            if (field == null)
-            {
-                Debug.LogError($"{_ownerActorNumber}의 필드 위치를 찾을 수 없습니다.");
+                Debug.LogError("[Unit] InstantiationData 비어있음!");
                 return;
             }
-
-            //position 설정
-            transform.position = field.SpawnList[_slotIndex];
             
-            //scale 설정
-            transform.localScale = Vector3.one * field.transform.localScale.x;
+            int unitIndex = (int)instantiationData[0];
+            var unitInfo = Manager.UnitData.GetUnitData(unitIndex);
+            
+            InitData(unitInfo);
+        }
+        #endregion
+        
+        #region Legacy(미사용)
+        private void SetPositionScale()
+        {
+            // PlayerFieldController field = PlayerFieldManager.Instance.GetFieldController(_ownerActorNumber);
+            // if (field == null)
+            // {
+            //     Debug.LogError($"{_ownerActorNumber}의 필드 위치를 찾을 수 없습니다.");
+            //     return;
+            // }
+            //
+            // //position 설정
+            // transform.position = field.SpawnList[_slotIndex];
+            //
+            // //scale 설정
+            // transform.localScale = Vector3.one * field.transform.localScale.x;
         }
         
 
         #endregion
+
+
     }
 }
