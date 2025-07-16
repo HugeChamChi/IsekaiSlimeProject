@@ -80,7 +80,7 @@ namespace Managers
             playerFields[actorNumber] = fieldController;
             
             if(actorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
-                _unitSpawner.SetSpawnPanel(fieldController, fieldController.SpawnPanel);
+                _unitSpawner.SetSpawnPanel(fieldController);
         }
         
         /// <summary>
