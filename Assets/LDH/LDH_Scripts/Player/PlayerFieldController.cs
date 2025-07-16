@@ -20,11 +20,17 @@ namespace PlayerField
         private List<bool> spawnListArray = new(); // 각 슬롯의 점유 여부
         public IReadOnlyList<Vector2> SpawnList => spawnList;
         public List<bool> SpawnListArray => spawnListArray;
-
+        public float SlotScaleX { get; private set; }
+        public float SlotScaleY  { get; private set; }
+        public Vector2 SlotScale => new Vector2(SlotScaleX, SlotScaleY);
+        
         
         // --- Grid Setting --- //
         private int _xCount; 
         private int _yCount;
+        
+        
+        
         
         
         #region Unity LifeCycle
@@ -65,18 +71,18 @@ namespace PlayerField
             float panelWidth = panelBounds.size.x;
             float panelHeight = panelBounds.size.y;
 
-            float slotScaleX = _spawnPanel.lossyScale.x / _xCount;
-            float slotScaleY = _spawnPanel.lossyScale.y / _yCount;
+            SlotScaleX = _spawnPanel.lossyScale.x / _xCount;
+            SlotScaleY = _spawnPanel.lossyScale.y / _yCount;
 
-            float startX = -panelWidth / 2 + slotScaleX / 2;
-            float startY = panelHeight / 2 - slotScaleY / 2;
+            float startX = -panelWidth / 2 + SlotScaleX / 2;
+            float startY = panelHeight / 2 - SlotScaleY / 2;
 
             for (int row = 0; row < _yCount; row++)
             {
                 for (int col = 0; col < _xCount; col++)
                 {
-                    float xPos = startX + col * slotScaleX;
-                    float yPos = startY - row * slotScaleY;
+                    float xPos = startX + col * SlotScaleX;
+                    float yPos = startY - row * SlotScaleY;
                     Vector2 slotPos = new Vector2(xPos, yPos) + (Vector2)_spawnPanel.position;
 
                     spawnList.Add(slotPos);
@@ -111,8 +117,6 @@ namespace PlayerField
         }
 
         #endregion
-        
-        
         
         
         

@@ -17,9 +17,11 @@ namespace Units
         [Header("Field Settings")]
         [SerializeField] private PlayerFieldController _fieldController;  // 로컬 플레이어 필드 (현재 클라이언트 필드)
 
-        [Header("Unit Settings")]
+        [Header("Holder Setting")]
         // [SerializeField] private GameObject _unitPrefab;  // 소환할 유닛 프리팹
         private string _unitPrefabPath = "Prefabs/LDH_TestResource/Unit";  // 소환할 유닛 경로
+
+        private string _unitHolderPrefabPath = "Prefabs/LDH_TestResource/UnitHolder"; // 유닛 홀더 경로
         
         [Header("UI")] 
         [SerializeField] private Button _summonButton;    // 소환 버튼
@@ -119,10 +121,15 @@ namespace Units
 
             // Manager.Resources.NetworkInstantiate<GameObject>(_unitPrefabPath, position);
             
-            
+            SpawnHolder(position, unitIndex);
+        }
+        
+        private void SpawnHolder(Vector3 position, int unitIndex)
+        {
             // Photon 네트워크 Instantiate
             //todo: 테스트중 → 추후 Manager.Resources.NetworkInstantiate 사용 가능한지 확인 필요 , 로직 변동 될 수 있음
-            PhotonNetwork.Instantiate(_unitPrefabPath, position, Quaternion.identity, 0, new object[] { unitIndex});
+           var holder =  PhotonNetwork.Instantiate(_unitHolderPrefabPath, position, Quaternion.identity, 0);
+            holder.GetComponent<UnitHolder>().SpawnUnit(unitIndex);
         }
 
         #endregion
