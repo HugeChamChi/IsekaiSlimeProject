@@ -16,7 +16,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &47960450594625870
 Transform:
   m_ObjectHideFlags: 0
@@ -100,7 +100,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4051505387583321674
 Transform:
   m_ObjectHideFlags: 0
@@ -302,7 +302,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3286900793081779520
 Transform:
   m_ObjectHideFlags: 0
@@ -514,7 +514,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5552124509385802661
 Transform:
   m_ObjectHideFlags: 0
@@ -598,7 +598,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7759108706621159582
 Transform:
   m_ObjectHideFlags: 0
@@ -680,15 +680,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1286538580305366115, guid: 828839e74d8ae4ecc943be9f1d3da099, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 1286538580305366115, guid: 828839e74d8ae4ecc943be9f1d3da099, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 1286538580305366115, guid: 828839e74d8ae4ecc943be9f1d3da099, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 1286538580305366115, guid: 828839e74d8ae4ecc943be9f1d3da099, type: 3}
       propertyPath: m_LocalPosition.x
@@ -730,6 +730,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1737973599619309171, guid: 828839e74d8ae4ecc943be9f1d3da099, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1737973599619309171, guid: 828839e74d8ae4ecc943be9f1d3da099, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4759144815419106909, guid: 828839e74d8ae4ecc943be9f1d3da099, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4759144815419106909, guid: 828839e74d8ae4ecc943be9f1d3da099, type: 3}
       propertyPath: m_SortingOrder
       value: 1
@@ -737,7 +749,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1131228285626251466, guid: 828839e74d8ae4ecc943be9f1d3da099, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9075898723361344106}
   m_SourcePrefab: {fileID: 100100000, guid: 828839e74d8ae4ecc943be9f1d3da099, type: 3}
 --- !u!114 &2890136410927848327 stripped
 MonoBehaviour:
@@ -755,3 +770,30 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1286538580305366115, guid: 828839e74d8ae4ecc943be9f1d3da099, type: 3}
   m_PrefabInstance: {fileID: 8571919625179196530}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &8739091429359424696 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1131228285626251466, guid: 828839e74d8ae4ecc943be9f1d3da099, type: 3}
+  m_PrefabInstance: {fileID: 8571919625179196530}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &9075898723361344106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8739091429359424696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0

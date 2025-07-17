@@ -2,6 +2,8 @@ using Managers;
 using Photon.Pun;
 using PlayerField;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Unit;
 using UnityEngine;
 
@@ -13,17 +15,39 @@ namespace Units
         
         public int Holder_Index;
         public bool HasUnit;
-        public Unit currentUnit;
-        public GridSlot currentSlot;
+
+        private Unit currentUnit = null;
+        private GridSlot currentSlot = null;
+        public Unit CurrentUnit => currentUnit;
+        public GridSlot CurrentSlot => currentSlot;
+        
+
+        private List<GridSlot> skillRangeSlots = new();
+        
+        
+        public void SetCurrentUnit(Unit unit)
+        {
+            Debug.Log("Set Current unit 호출");
+            currentUnit = unit;
+            GetSkillRange();
+        }
+
+        public void SetCurrentSlot(GridSlot slot)
+        {
+            Debug.Log("Set Current Slot 호출");
+            currentSlot = slot;
+            GetSkillRange();
+        }
 
 
+        [Header("Skill Range Test")] public SkillRangeType testSkillRangeType;
+        
         private void Start() => Init();
 
         private void Init()
         {
             //box colider 생성
             AddBoxCollider();
-            
         }
 
         private void AddBoxCollider()
@@ -43,7 +67,7 @@ namespace Units
 
             unit.transform.SetParent(transform);  // 홀더 안으로 배치
             
-            currentUnit = unit.GetComponent<Unit>();
+            SetCurrentUnit(unit.GetComponent<Unit>());
             
         }
 
@@ -51,7 +75,7 @@ namespace Units
         {
             switch (currentUnit.SkillRangeType)
             {
-                case SkillRangeType.Shor1:
+                case SkillRangeType.Short1:
                     break;
                 case SkillRangeType.Short2:
                     break;
@@ -62,18 +86,74 @@ namespace Units
         //스킬 범위
         public void ShowSkillRange()
         {
+            //todo: 공격 범위, 스킬 범위 보여주기(shader), 시간 등
+            Debug.Log(skillRangeSlots.Count);
+            if(currentUnit==null || skillRangeSlots.Count == 0) return;
             
+            foreach (GridSlot gridSlot in skillRangeSlots)
+            {
+                gridSlot.SetColor(true);
+            }
+        }
+
+        public void ShowSkillApplyRange()
+        {
+            foreach (GridSlot gridSlot in skillRangeSlots.Where(g => g.Type == SlotType.Outer))
+            {
+                gridSlot.SetColor(true);
+            }
         }
 
         public void HideSkillRange()
         {
-            
+            foreach (GridSlot gridSlot in skillRangeSlots)
+            {
+                gridSlot.SetColor(false);
+            }            
         }
 
-        private void MakeSkillRange()
+        private void GetSkillRange()
         {
+            Debug.Log("get skill range 호출");
+            if (currentUnit == null || currentSlot == null)
+            {
+                Debug.Log("current unit null or currentslot null");
+                skillRangeSlots.Clear();
+                return;
+            }
             
+            skillRangeSlots.Clear();
+            
+            // var offsetList = SkillRangePattern.Offsets[currentUnit.SkillRangeType];
+            
+            var offsetList = SkillRangePattern.Offsets[testSkillRangeType]; //todo: 수정!!!!!!!!
+            Debug.Log(offsetList.Count());
+
+            var gridSlots = PlayerFieldManager.Instance.GetLocalFieldController().MapSlot;
+            
+            foreach (var offset in offsetList)
+            {
+                int targetRow = currentSlot.Row + offset.x;
+                int targetCol = currentSlot.Column + offset.y;
+
+                Debug.Log($"target slot : {targetRow}, {targetCol}");
+                foreach (GridSlot gridSlot in gridSlots)
+                {
+                    Debug.Log($"{gridSlot.Row}, {gridSlot.Column}");
+                    if (gridSlot.Row == targetRow && gridSlot.Column == targetCol)
+                    {
+                        skillRangeSlots.Add(gridSlot);
+                        Debug.Log("gridslot 추가");
+                    }
+                }
+                //var slot = gridSlots.FirstOrDefault(s => s.Row == targetRow && s.Column == targetCol);
+             
+             
+                
+            }
+
         }
+        
         
     }
 }

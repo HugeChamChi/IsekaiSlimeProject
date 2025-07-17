@@ -22,8 +22,7 @@ namespace Units
         [field: SerializeField] public UnitType Type { get; private set; }
         [field: SerializeField] public string Description { get; private set; }
         [field: SerializeField] public string ModelFileName { get; private set; }
-        [field: SerializeField] public SkillRangeType SkillRangeType { get; private set; }
-
+        [field: SerializeField] public SkillRangeType SkillRangeType { get; set; } //todo :  setter private으로 바꾸기
         /// <summary>
         /// 유닛의 컨트롤러 컴포넌트 (Stat, Animator, Attack, Skill 관리)
         /// </summary>

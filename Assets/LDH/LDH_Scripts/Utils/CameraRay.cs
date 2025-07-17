@@ -19,13 +19,16 @@ namespace Util
                 Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
                 RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
+                
+                //스킬 범위 가리기
+                _holder?.HideSkillRange();
+                
                 if (hit.collider != null && hit.transform.TryGetComponent<UnitHolder>(out UnitHolder holder))
                 {
+                    Debug.Log("클릭된 유닛 ");
                     _holder = holder;
-                    //todo: 공격 범위, 스킬 범위
+                    //todo: 공격 범위, 스킬 범위 보여주기(shader), 시간 등
                     holder.ShowSkillRange();
-                    
-                    //todo: shader
                     
                 }
 

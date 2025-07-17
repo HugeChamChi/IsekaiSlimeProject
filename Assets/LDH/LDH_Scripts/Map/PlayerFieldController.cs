@@ -7,24 +7,6 @@ using System.Linq;
 
 namespace PlayerField
 {
-    public class GridSlot
-    {
-        public int X { get; private set; }
-        public int Y { get; private set; }
-        public Vector2 SpawnPosition { get; private set; }
-        public bool IsOccupied { get; set; }
-        public SlotType Type { get; private set; }
-
-        public GridSlot(int x, int y, Vector2 spawnPosition, SlotType type, bool isOccupied = false)
-        {
-            X = x;
-            Y = y;
-            SpawnPosition = spawnPosition;
-            Type = type;
-            IsOccupied = isOccupied;
-        }
-    }
-
     /// <summary>
     /// 각 플레이어의 유닛 배치 공간(패널)을 관리하는 컨트롤러.
     /// </summary>
@@ -42,10 +24,10 @@ namespace PlayerField
         // private List<bool> spawnListArray = new(); // 각 슬롯의 점유 여부
         
         
-        public float SlotScaleX { get; private set; }
-        public float SlotScaleY  { get; private set; }
-        public Vector2 SlotScale => new Vector2(SlotScaleX, SlotScaleY);
-        
+        public float SlotWidth { get; private set; }
+        public float SlotHeight  { get; private set; }
+        public Vector2 SlotScale => new Vector2(SlotWidth, SlotHeight);
+        private string gridBoxPrefabPath = "Prefabs/LDH_TestResource/GridSlot";
         
         // --- Grid Setting --- //
         private int _xCount; 
@@ -61,7 +43,7 @@ namespace PlayerField
 
         private void Start()
         {
-            GenerateGridSlots();
+            //GenerateGridSlots();
             
         }
 
@@ -88,33 +70,40 @@ namespace PlayerField
         /// 유닛이 배치될 패널 영역을 X, Y로 나누어 그리드 슬롯 좌표를 계산한다.
         /// 좌상단부터 우측 → 아래 방향으로 순차 배치
         /// </summary>
-        private void GenerateGridSlots()
+        public void GenerateGridSlots()
         {
             Bounds panelBounds = _spawnPanel.GetComponent<SpriteRenderer>().bounds;
             float panelWidth = panelBounds.size.x;
             float panelHeight = panelBounds.size.y;
 
-            SlotScaleX = _spawnPanel.lossyScale.x / _xCount;
-            SlotScaleY = _spawnPanel.lossyScale.y / _yCount;
+            SlotWidth = panelWidth / MapXCount;
+            SlotHeight = panelHeight / MapYCount;
 
-            float startX = -panelWidth / 2 + SlotScaleX / 2;
-            float startY = panelHeight / 2 - SlotScaleY / 2;
+            float startX = -panelWidth / 2 + SlotWidth / 2;
+            float startY = panelHeight / 2 - SlotHeight / 2;
 
             for (int row = 0; row < MapYCount; row++)
             {
                 for (int col = 0; col < MapXCount; col++)
                 {
-                    float xPos = startX + col * SlotScaleX;
-                    float yPos = startY - row * SlotScaleY;
+                    float xPos = startX + col * SlotWidth;
+                    float yPos = startY - row * SlotHeight;
                     Vector2 slotPos = new Vector2(xPos, yPos) + (Vector2)_spawnPanel.position;
                     
                     // 내부인지 외부인지 판단
                     bool canSpawnable = (row >= 1 && row <= 4) && (col >= 1 && col <= 4);
                     SlotType type = canSpawnable ? SlotType.Inner : SlotType.Outer;
                     
-                    mapSlot.Add(new GridSlot(row, col, slotPos, type));
-                    // spawnList.Add(slotPos);
-                    // spawnListArray.Add(false);  // false = 빈 슬롯
+                    
+                    //slot gameobject 생성
+                    var gridSlot = PhotonNetwork.Instantiate(gridBoxPrefabPath, slotPos, Quaternion.identity).GetComponent<GridSlot>();;
+                    
+                    gridSlot.SetupGridSlot(row, col, slotPos, type, new Vector3(SlotWidth, SlotHeight, 1), _spawnPanel);
+                    
+                    
+                    mapSlot.Add(gridSlot);
+                   
+
                 }
             }
             Debug.Log("generate grid");
@@ -122,7 +111,7 @@ namespace PlayerField
 
         public void SetSlotOccupied(int x, int y, bool isOccupied)
         {
-            var slot = mapSlot.Find(s => s.X == x && s.Y == y);
+            var slot = mapSlot.Find(s => s.Row == x && s.Column == y);
             if (slot != null)
             {
                 slot.IsOccupied = isOccupied;

@@ -130,7 +130,7 @@ namespace Units
             // Photon 네트워크 Instantiate
             //todo: 테스트중 → 추후 Manager.Resources.NetworkInstantiate 사용 가능한지 확인 필요 , 로직 변동 될 수 있음
            var holder =  PhotonNetwork.Instantiate(_unitHolderPrefabPath, position, Quaternion.identity, 0).GetComponent<UnitHolder>();
-           holder.currentSlot = spawnSlot;
+           holder.SetCurrentSlot(spawnSlot);
            holder.SpawnUnit(unitIndex);
         }
 

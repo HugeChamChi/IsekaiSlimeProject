@@ -63,6 +63,8 @@ public class MapManager : MonoBehaviour
                 
                 maps[players[i]].CreateWaveController();   
                 
+                maps[players[i]].fieldController.GenerateGridSlots();
+                
                
             }
             else

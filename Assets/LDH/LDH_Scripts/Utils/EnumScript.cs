@@ -31,7 +31,8 @@ namespace Unit
     public enum UnitType { RangeAttack, SpeedDebuff, ArmorDebuff, AttackSpeedBuff, AttackPowerBuff }
     public enum EffectType { Faint, Slow }
     
-    public enum SkillRangeType {Shor1, Short2, Long1, Long2}
+    public enum SkillRangeType {Short1, Short2, Long1, Long2}
+    
 }
 
 namespace PlayerField
