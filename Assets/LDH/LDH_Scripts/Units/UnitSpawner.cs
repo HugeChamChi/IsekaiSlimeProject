@@ -79,10 +79,9 @@ namespace Units
         /// </summary>
         public int GetEmptySlotIndex()
         {
-            
-            for (int i = 0; i < _fieldController.SpawnList.Count; i++)
+            for (int i = 0; i < _fieldController.MapSlot.Count; i++)
             {
-                if (!_fieldController.SpawnListArray[i])
+                if (_fieldController.MapSlot[i].Type == SlotType.Inner && !_fieldController.MapSlot[i].IsOccupied)
                     return i;
             }
             return -1;
@@ -114,22 +113,25 @@ namespace Units
             int unitIndex = Manager.UnitData.PickRandomUnitIndex();
             
             // 슬롯 점유 상태 업데이트
-            _fieldController.SpawnListArray[slotIndex] = true;
+            _fieldController.SetSlotOccupied(slotIndex, true);
             
-            // 슬롯 위치 가져오기
-            Vector3 position =  _fieldController.SpawnList[slotIndex];
-
             // Manager.Resources.NetworkInstantiate<GameObject>(_unitPrefabPath, position);
             
-            SpawnHolder(position, unitIndex);
+            SpawnHolder(slotIndex, unitIndex);
         }
         
-        private void SpawnHolder(Vector3 position, int unitIndex)
+        private void SpawnHolder(int slotIndex, int unitIndex)
         {
+            // 슬롯 정보
+            GridSlot spawnSlot = _fieldController.MapSlot[slotIndex];
+            // 슬롯 위치 가져오기
+            Vector3 position = spawnSlot.SpawnPosition;
+            
             // Photon 네트워크 Instantiate
             //todo: 테스트중 → 추후 Manager.Resources.NetworkInstantiate 사용 가능한지 확인 필요 , 로직 변동 될 수 있음
-           var holder =  PhotonNetwork.Instantiate(_unitHolderPrefabPath, position, Quaternion.identity, 0);
-            holder.GetComponent<UnitHolder>().SpawnUnit(unitIndex);
+           var holder =  PhotonNetwork.Instantiate(_unitHolderPrefabPath, position, Quaternion.identity, 0).GetComponent<UnitHolder>();
+           holder.currentSlot = spawnSlot;
+           holder.SpawnUnit(unitIndex);
         }
 
         #endregion

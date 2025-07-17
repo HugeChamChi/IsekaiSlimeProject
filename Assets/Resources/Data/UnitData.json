@@ -10,7 +10,8 @@
       "Attack": 800,
       "AttackSpeed": 1,
       "AttackRange": 2.1,
-      "BuffRange": 0.0
+      "BuffRange": 0.0,
+      "SkillRangeType" : 1
     },
     {
       "Index": 202,
@@ -22,7 +23,8 @@
       "Attack": 600,
       "AttackSpeed": 0.2,
       "AttackRange": 2,
-      "BuffRange": 1.0
+      "BuffRange": 1.0,
+      "SkillRangeType" : 2
     }
   ]
 }

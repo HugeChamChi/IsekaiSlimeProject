@@ -30,4 +30,15 @@ namespace Unit
     public enum UnitTier { Common, Rare, Epic, Legendary }
     public enum UnitType { RangeAttack, SpeedDebuff, ArmorDebuff, AttackSpeedBuff, AttackPowerBuff }
     public enum EffectType { Faint, Slow }
+    
+    public enum SkillRangeType {Shor1, Short2, Long1, Long2}
+}
+
+namespace PlayerField
+{
+    public enum SlotType
+    {
+        Inner,  // 유닛 소환 가능 영역
+        Outer   // 테두리, 몬스터 이동, 스킬 표시용
+    }
 }

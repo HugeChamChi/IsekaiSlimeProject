@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using Util;
 
 public class MapManager : MonoBehaviour
 {
@@ -54,9 +55,15 @@ public class MapManager : MonoBehaviour
         {
             if (players[i] == PhotonNetwork.LocalPlayer)
             {
-                maps[players[i]].Cam.depth = 1;
-                maps[players[i]].Cam.AddComponent<AudioListener>();
-                maps[players[i]].CreateWaveController();                   
+                Camera mapCam = maps[players[i]].Cam;
+                mapCam.depth = 1;
+                mapCam.AddComponent<AudioListener>();
+                var camRay = mapCam.AddComponent<CameraRay>(); //local player의 map에만 camera ray 추가
+                camRay.SetCamera(mapCam);  // 카메라 지정
+                
+                maps[players[i]].CreateWaveController();   
+                
+               
             }
             else
             {

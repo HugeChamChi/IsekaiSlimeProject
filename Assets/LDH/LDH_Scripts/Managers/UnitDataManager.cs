@@ -105,6 +105,7 @@ namespace Managers
             public float AttackSpeed;
             public float AttackRange;
             public float BuffRange;
+            public int SkillRangeType;
 
 
             /// <summary>
@@ -122,6 +123,7 @@ namespace Managers
                 AttackSpeed = original.AttackSpeed;
                 AttackRange = original.AttackRange;
                 BuffRange = original.BuffRange;
+                SkillRangeType = original.SkillRangeType;
             }
 
             /// <summary>

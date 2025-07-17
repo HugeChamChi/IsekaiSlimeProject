@@ -22,6 +22,7 @@ namespace Units
         [field: SerializeField] public UnitType Type { get; private set; }
         [field: SerializeField] public string Description { get; private set; }
         [field: SerializeField] public string ModelFileName { get; private set; }
+        [field: SerializeField] public SkillRangeType SkillRangeType { get; private set; }
 
         /// <summary>
         /// 유닛의 컨트롤러 컴포넌트 (Stat, Animator, Attack, Skill 관리)
@@ -58,6 +59,7 @@ namespace Units
             Type = (UnitType)info.Type;
             Description = info.Description;
             ModelFileName = info.ModelFileName;
+            SkillRangeType = (SkillRangeType)info.SkillRangeType;
             
             Controller.InitData(info);
             

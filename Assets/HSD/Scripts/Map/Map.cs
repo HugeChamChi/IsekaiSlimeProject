@@ -4,6 +4,7 @@ using PlayerField;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Util;
 
 public class Map : MonoBehaviour
 {
@@ -23,5 +24,4 @@ public class Map : MonoBehaviour
     {
         PhotonNetwork.Instantiate(waveController, spawnPoint.position, spawnPoint.rotation);
     }
-    
 }
