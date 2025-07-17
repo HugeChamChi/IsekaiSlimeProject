@@ -19,7 +19,7 @@ namespace Managers
 
         #region Unity LifeCycle
 
-        private void Awake() => SingletonInit();
+        private void Awake() { }
         private void Start() => Init();
 
 

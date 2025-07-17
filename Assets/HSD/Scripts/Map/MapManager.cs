@@ -15,7 +15,7 @@ public class MapManager : MonoBehaviour
     private Player[] players;
 
     private static readonly Dictionary<Player, Map> maps = new Dictionary<Player, Map>();
-
+    
     [SerializeField] private float xInterval;
 
     private void Update()

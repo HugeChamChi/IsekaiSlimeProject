@@ -1,7 +1,6 @@
 using Managers;
 using Photon.Pun;
 using PlayerField;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unit;
@@ -70,18 +69,6 @@ namespace Units
             SetCurrentUnit(unit.GetComponent<Unit>());
             
         }
-
-        public void SpawnSkillRangeSlot()
-        {
-            switch (currentUnit.SkillRangeType)
-            {
-                case SkillRangeType.Short1:
-                    break;
-                case SkillRangeType.Short2:
-                    break;
-            }
-        }
-        
         
         //스킬 범위
         public void ShowSkillRange()

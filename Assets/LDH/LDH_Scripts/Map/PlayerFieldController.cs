@@ -137,10 +137,7 @@ namespace PlayerField
                 return;
             }
             
-            float slotScaleX = _spawnPanel.lossyScale.x / _xCount;
-            float slotScaleY = _spawnPanel.lossyScale.y / _yCount;
-
-            Vector3 slotScale = new Vector3(slotScaleX, slotScaleY, 1);
+            Vector3 slotScale = new Vector3(SlotWidth, SlotHeight, 1);
             
             Gizmos.color = Color.yellow;
             foreach (var slot in mapSlot)
