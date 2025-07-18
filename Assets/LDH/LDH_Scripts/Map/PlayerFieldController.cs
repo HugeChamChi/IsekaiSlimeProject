@@ -4,6 +4,7 @@ using Photon.Pun;
 using UnityEngine;
 using Managers;
 using System.Linq;
+using Units;
 
 namespace PlayerField
 {
@@ -34,6 +35,18 @@ namespace PlayerField
         private int _yCount;
         public int MapXCount => _xCount + 2;
         public int MapYCount => _yCount + 2;
+
+
+        public static void SwapHolderPosition(UnitHolder holder1, UnitHolder holder2)
+        {
+            Units.Unit temp = holder1.CurrentUnit;
+            
+            holder1.ChangeUnit(holder2);
+            holder2.ChangeUnit(holder1);
+
+            holder1.SetCurrentUnit(holder2.CurrentUnit);
+            holder2.SetCurrentUnit(temp);
+        }
         
         
         
@@ -72,6 +85,8 @@ namespace PlayerField
         /// </summary>
         public void GenerateGridSlots()
         {
+            
+            Debug.Log("map grid slot 생성하기");
             Bounds panelBounds = _spawnPanel.GetComponent<SpriteRenderer>().bounds;
             float panelWidth = panelBounds.size.x;
             float panelHeight = panelBounds.size.y;
@@ -96,9 +111,11 @@ namespace PlayerField
                     
                     
                     //slot gameobject 생성
-                    var gridSlot = PhotonNetwork.Instantiate(gridBoxPrefabPath, slotPos, Quaternion.identity).GetComponent<GridSlot>();;
+                    var gridSlot = Manager.Resources.Instantiate<GameObject>(gridBoxPrefabPath, slotPos, Quaternion.identity).GetComponent<GridSlot>();;
                     
-                    gridSlot.SetupGridSlot(row, col, slotPos, type, new Vector3(SlotWidth, SlotHeight, 1), _spawnPanel);
+                    Debug.Log(gridSlot==null);
+                    
+                    gridSlot.SetupGridSlot(row, col, slotPos, type, new Vector3(SlotWidth, SlotHeight, 1), ComponentProvider.Get<InGameObject>(gameObject).uniqueID);
                     
                     
                     mapSlot.Add(gridSlot);

@@ -11,6 +11,8 @@ public class MapManager : MonoBehaviour
 {
     [Header("Map")]
     [SerializeField] private GameObject mapPrefab;
+
+    private string mapPath = "Prefabs/Map_Test";
     [SerializeField] private RenderTexture[] playTextures;
     private Player[] players;
 
@@ -39,11 +41,14 @@ public class MapManager : MonoBehaviour
         for (int i = 0; i < players.Length; i++)
         {
             map = Instantiate(mapPrefab, new Vector3(xInterval * i, 0), Quaternion.identity).GetComponent<Map>();
+            
+            // map = PhotonNetwork.Instantiate(mapPath, new Vector3(xInterval * i, 0), Quaternion.identity).GetComponent<Map>();
             map.Owner = players[i];
             maps.Add(players[i], map);
             
             //필드 매니저에 플레이어의 PlayerFieldController 등록 (추가)
             PlayerFieldManager.Instance.RegisterPlayerField(players[i].ActorNumber, map.fieldController);
+            map.fieldController.GenerateGridSlots();
         }
     }
 
@@ -63,7 +68,7 @@ public class MapManager : MonoBehaviour
                 
                 maps[players[i]].CreateWaveController();   
                 
-                maps[players[i]].fieldController.GenerateGridSlots();
+             
                 
                
             }

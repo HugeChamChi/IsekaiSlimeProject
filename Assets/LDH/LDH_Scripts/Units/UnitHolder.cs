@@ -12,7 +12,8 @@ namespace Units
     {
         private string _unitPrefabPath = "Prefabs/LDH_TestResource/Unit";  // 소환할 유닛 경로
         
-        public int Holder_Index;
+        private int holderIndex; //유닛 인덱스
+        public int HolderIndex => holderIndex;
         public bool HasUnit;
 
         private Unit currentUnit = null;
@@ -22,7 +23,12 @@ namespace Units
         
 
         private List<GridSlot> skillRangeSlots = new();
-        
+
+
+        public void ChangeUnit(UnitHolder targetHolder)
+        {
+            currentUnit.ChangePosition(targetHolder);
+        }
         
         public void SetCurrentUnit(Unit unit)
         {
@@ -36,6 +42,11 @@ namespace Units
             Debug.Log("Set Current Slot 호출");
             currentSlot = slot;
             GetSkillRange();
+        }
+
+        public void SetHolderIndex(int index)
+        {
+            holderIndex = index;
         }
 
 
@@ -58,13 +69,16 @@ namespace Units
 
         public void SpawnUnit(int unitIndex)
         {
-            Holder_Index = unitIndex;
+            holderIndex = unitIndex;
             HasUnit = true;
             
             //todo: 테스트중 → 추후 Manager.Resources.NetworkInstantiate 사용 가능한지 확인 필요 , 로직 변동 될 수 있음
             var unit= PhotonNetwork.Instantiate(_unitPrefabPath, transform.position, Quaternion.identity, 0, new object[] { unitIndex});
 
-            unit.transform.SetParent(transform);  // 홀더 안으로 배치
+            int holderID = ComponentProvider.Get<InGameObject>(gameObject).uniqueID;
+            //unit.transform.SetParent(transform);  // 홀더 안으로 배치
+            //rpc로 수정
+            ComponentProvider.Get<PhotonView>(unit).RPC("SetParentRPC", RpcTarget.All, holderID);
             
             SetCurrentUnit(unit.GetComponent<Unit>());
             
@@ -85,7 +99,7 @@ namespace Units
 
         public void ShowSkillApplyRange()
         {
-            foreach (GridSlot gridSlot in skillRangeSlots.Where(g => g.Type == SlotType.Outer))
+            foreach (GridSlot gridSlot in skillRangeSlots.Where(g => g.SlotType == SlotType.Outer))
             {
                 gridSlot.SetColor(true);
             }
@@ -122,15 +136,11 @@ namespace Units
             {
                 int targetRow = currentSlot.Row + offset.x;
                 int targetCol = currentSlot.Column + offset.y;
-
-                Debug.Log($"target slot : {targetRow}, {targetCol}");
                 foreach (GridSlot gridSlot in gridSlots)
                 {
-                    Debug.Log($"{gridSlot.Row}, {gridSlot.Column}");
                     if (gridSlot.Row == targetRow && gridSlot.Column == targetCol)
                     {
                         skillRangeSlots.Add(gridSlot);
-                        Debug.Log("gridslot 추가");
                     }
                 }
                 //var slot = gridSlots.FirstOrDefault(s => s.Row == targetRow && s.Column == targetCol);
@@ -140,6 +150,9 @@ namespace Units
             }
 
         }
+        
+        
+   
         
         
     }

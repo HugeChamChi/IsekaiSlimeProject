@@ -81,7 +81,7 @@ namespace Units
         {
             for (int i = 0; i < _fieldController.MapSlot.Count; i++)
             {
-                if (_fieldController.MapSlot[i].Type == SlotType.Inner && !_fieldController.MapSlot[i].IsOccupied)
+                if (_fieldController.MapSlot[i].SlotType == SlotType.Inner && !_fieldController.MapSlot[i].IsOccupied)
                     return i;
             }
             return -1;
@@ -126,6 +126,8 @@ namespace Units
             GridSlot spawnSlot = _fieldController.MapSlot[slotIndex];
             // 슬롯 위치 가져오기
             Vector3 position = spawnSlot.SpawnPosition;
+            
+            Debug.Log($"생성할 위치 : {position}");
             
             // Photon 네트워크 Instantiate
             //todo: 테스트중 → 추후 Manager.Resources.NetworkInstantiate 사용 가능한지 확인 필요 , 로직 변동 될 수 있음

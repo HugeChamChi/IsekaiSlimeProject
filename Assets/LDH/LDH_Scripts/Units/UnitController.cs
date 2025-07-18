@@ -212,12 +212,12 @@ namespace Units
         /// 방향 벡터를 기준으로 스프라이트 좌우 뒤집기 처리.
         /// </summary>
         /// <param name="dir">타겟 방향 벡터</param>
-        private void UpdateSpriteFlip(Vector2 dir)
+        public void UpdateSpriteFlip(Vector2 dir)
         {
             if (dir.x > 0)
-                _sr.flipX = isLeftFacingSprite;      // 오른쪽 → 기본 방향
+                _sr.flipX = isLeftFacingSprite;      // 오른쪽 보기 -> 기본 방향이 왼쪽이면 flip하기
             else if (dir.x < 0)
-                _sr.flipX = !isLeftFacingSprite;     // 왼쪽 → 반대 방향
+                _sr.flipX = !isLeftFacingSprite;     // 왼쪽 보기 -> 기본 방향이 왼쪽이면 flip 취소
             // dir.x == 0 → 기존 flipX 유지
         }
 

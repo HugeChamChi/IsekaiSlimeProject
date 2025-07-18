@@ -23,12 +23,12 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
         if (resources.ContainsKey(_path))
             return resources[_path] as T;
-
+        
         T resource = Resources.Load(path) as T;
 
         if (resource != null)
             resources.Add(_path, resource);
-
+        
         return resource;
     }
 

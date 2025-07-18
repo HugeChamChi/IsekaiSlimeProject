@@ -1,5 +1,6 @@
 using Managers;
 using Photon.Pun;
+using System.Collections;
 using Unit;
 using UnityEngine;
 using Util;
@@ -100,6 +101,38 @@ namespace Units
             InitData(unitInfo);
         }
         #endregion
+
+
+        public void ChangePosition(UnitHolder holder)
+        {
+            transform.parent = holder.transform;
+
+            Vector2 dir = holder.transform.position - transform.position;
+            Controller.UpdateSpriteFlip(dir);
+            StartCoroutine(MoveCorutone(holder.transform.position));
+        }
+
+
+        private IEnumerator MoveCorutone(Vector2 endPos)
+        {
+            float current = 0f;
+            float percent = 0f;
+
+            Vector2 starPos = transform.position;
+
+            while (percent<1.0f)
+            {
+                current += Time.deltaTime;
+                percent = current / 0.3f;
+
+                Vector2 lerpPos = Vector2.Lerp(starPos, endPos, percent);
+                transform.position = lerpPos;
+                yield return null;
+
+            }
+            
+        }
+        
         
         #region Legacy(미사용)
         private void SetPositionScale()
