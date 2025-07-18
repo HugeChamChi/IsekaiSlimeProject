@@ -32,14 +32,7 @@ namespace PlayerField
             transform.localScale = slotSize;
             
             SetParent(parentUniqueID);
-            //ComponentProvider.Get<PhotonView>(gameObject).RPC("SetParentRPC", RpcTarget.All, parentUniqueID);
-            
-            
-            // photonView.RPC("SetParentAndScale", RpcTarget.AllBuffered, parent.GetComponent<PhotonView>().ViewID, slotSize);
-
-            // transform.localScale = slotSize;
-            // transform.SetParent(parent);
-            // gameObject.name = $"Grid {row}_{column}";
+            SetColor(type);
         }
         
         public void SetParent(int parentUniqueID)
@@ -61,6 +54,12 @@ namespace PlayerField
         {
             sr ??= GetComponent<SpriteRenderer>();
             sr.color = isSkill ? skillColor : originColor;
+        }
+
+        public void SetColor(SlotType slotType)
+        {
+            sr ??= GetComponent<SpriteRenderer>();
+            sr.color = slotType == SlotType.Inner ? innerColor : outerColor;
         }
         
         

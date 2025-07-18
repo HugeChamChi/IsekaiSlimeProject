@@ -14,7 +14,7 @@ namespace Units
         
         private int holderIndex; //유닛 인덱스
         public int HolderIndex => holderIndex;
-        public bool HasUnit;
+        public bool HasUnit => currentUnit != null;
 
         private Unit currentUnit = null;
         private GridSlot currentSlot = null;
@@ -70,7 +70,6 @@ namespace Units
         public void SpawnUnit(int unitIndex)
         {
             holderIndex = unitIndex;
-            HasUnit = true;
             
             //todo: 테스트중 → 추후 Manager.Resources.NetworkInstantiate 사용 가능한지 확인 필요 , 로직 변동 될 수 있음
             var unit= PhotonNetwork.Instantiate(_unitPrefabPath, transform.position, Quaternion.identity, 0, new object[] { unitIndex});
@@ -120,6 +119,8 @@ namespace Units
             {
                 Debug.Log("current unit null or currentslot null");
                 skillRangeSlots.Clear();
+                
+                HideSkillRange();
                 return;
             }
             
@@ -150,8 +151,15 @@ namespace Units
             }
 
         }
-        
-        
+
+        public void Sell()
+        {
+            Debug.Log($"유닛 {currentUnit.Index} {currentUnit.Name} 판매!");
+            PhotonNetwork.Destroy(currentUnit.gameObject);
+            GameManager.Instance.ClearSelectedHolder();
+            currentUnit = null;
+            HideSkillRange();
+        }
    
         
         
