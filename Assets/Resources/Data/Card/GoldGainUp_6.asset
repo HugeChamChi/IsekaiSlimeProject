@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: GoldGainUp_6
   m_EditorClassIdentifier: 
   cardName: "\uD68D\uB4DD \uC7AC\uD654\uB7C9 \uC99D\uAC00"
-  description: Test
+  description: "\uD68D\uB4DD \uC7AC\uD654\uB7C9 \uC99D\uAC00 : +6%"
   icon: {fileID: 21300000, guid: 4c1bcba664adb224a9c869fdf5c7b5cc, type: 3}
   effect: {fileID: 11400000, guid: c606ed1e0395c6348bff45485c207305, type: 2}

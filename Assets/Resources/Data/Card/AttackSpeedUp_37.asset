@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: AttackSpeedUp_37
   m_EditorClassIdentifier: 
   cardName: "\uC544\uAD70 \uC720\uB2DB \uACF5\uACA9\uC18D\uB3C4 \uC99D\uAC00"
-  description: Test
+  description: "\uC544\uAD70 \uC720\uB2DB \uACF5\uACA9\uC18D\uB3C4 \uC99D\uAC00 :
+    +37%"
   icon: {fileID: 21300000, guid: 4c1bcba664adb224a9c869fdf5c7b5cc, type: 3}
   effect: {fileID: 11400000, guid: 9064e141fb3968f4ea412060c7eb69e9, type: 2}

@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: AttackPowerUp_0
   m_EditorClassIdentifier: 
   cardName: "\uACF5\uACA9\uB825 \uC99D\uAC00"
-  description: Test
+  description: "\uACF5\uACA9\uB825 \uC99D\uAC00 : +0%"
   icon: {fileID: 21300000, guid: 4c1bcba664adb224a9c869fdf5c7b5cc, type: 3}
   effect: {fileID: 11400000, guid: 689a550eb64eefd44a77d4928e1a597a, type: 2}

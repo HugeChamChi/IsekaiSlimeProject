@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: AllEnemyDefenseDown_83
   m_EditorClassIdentifier: 
   cardName: "\uBAA8\uB4E0 \uC801 \uBC29\uC5B4\uB825 \uAC10\uC18C"
-  description: Test
+  description: "\uBAA8\uB4E0 \uC801 \uBC29\uC5B4\uB825 \uAC10\uC18C : +83%"
   icon: {fileID: 21300000, guid: 4c1bcba664adb224a9c869fdf5c7b5cc, type: 3}
   effect: {fileID: 11400000, guid: 989633dd3c747c049a5249b966e05c13, type: 2}
