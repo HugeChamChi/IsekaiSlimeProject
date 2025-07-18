@@ -11,6 +11,14 @@ namespace Util
 
 }
 
+namespace Card
+{
+    public enum CardType
+    {
+        AttackPowerUp, GoldGainUp, AllEnemyDefenseDown, AttackSpeedUp
+    }
+}
+
 public enum ClearEventType
 {
     None, Effect
