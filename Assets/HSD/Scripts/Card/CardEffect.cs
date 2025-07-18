@@ -17,16 +17,16 @@ public class CardEffect : ScriptableObject
         switch (type)
         {
             case CardType.AttackPowerUp:
-                Manager.Card.AttackPower.Value += amount;
+                Manager.Card.AttackPower.Value += amount/100;
                 break;
             case CardType.GoldGainUp:
-                Manager.Card.GoldGainUp.Value += amount;
+                Manager.Card.GoldGainUp.Value += amount/100;
                 break;
             case CardType.AllEnemyDefenseDown:
-                Manager.Card.AllEnemyDefenseDown.Value -= amount;
+                Manager.Card.AllEnemyDefenseDown.Value -= amount/100;
                 break;
             case CardType.AttackSpeedUp:
-                Manager.Card.AttackSpeed.Value += amount;
+                Manager.Card.AttackSpeed.Value += amount/100;
                 break;
         }
     }
