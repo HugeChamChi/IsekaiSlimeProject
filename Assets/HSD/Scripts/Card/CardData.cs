@@ -33,7 +33,7 @@ public class CardData : ScriptableObject
                 break;
         }
 
-        description = $"{cardName} : +{effect.amount}";
+        description = $"{cardName} : +{effect.amount}%";
 
         string newName = $"{effect.type}_{effect.amount}";
         string assetPath = AssetDatabase.GetAssetPath(this);

@@ -15,7 +15,7 @@ public class CardSlot : MonoBehaviour
     [SerializeField] Image icon;
     [SerializeField] TMP_Text cardDescription;
 
-    [HideInInspector] public bool isSelect;
+    public bool isSelect;
     public event Action OnSelected;
 
     private void Awake()
@@ -26,7 +26,6 @@ public class CardSlot : MonoBehaviour
     private void OnEnable()
     {
         slot.onClick.AddListener(SelectCard);
-        isSelect = false;
     }
 
     private void OnDisable()
@@ -50,5 +49,7 @@ public class CardSlot : MonoBehaviour
 
         if (data != null)
             data.effect.Execute();
+
+        OnSelected?.Invoke();
     }
 }

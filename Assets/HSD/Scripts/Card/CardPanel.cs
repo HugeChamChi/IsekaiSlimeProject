@@ -34,6 +34,10 @@ public class CardPanel : MonoBehaviour
     [ContextMenu("Play")]
     public void OpenCardPanel()
     {
+        for (int i = 0; i < slots.Length; i++)
+        {
+            slots[i].isSelect = false;
+        }
         gameObject.SetActive(true);
         SetupCards();
         anim.SetTrigger(inHash);
