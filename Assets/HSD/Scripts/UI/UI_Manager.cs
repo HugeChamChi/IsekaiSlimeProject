@@ -18,7 +18,8 @@ public class UI_Manager : DesignPattern.Singleton<UI_Manager>
 
     private void CreateMainCanvas()
     {
-        mainCanvas = new GameObject().AddComponent<Canvas>();
+        mainCanvas = new GameObject("MainCanvas").AddComponent<Canvas>();
+        mainCanvas.pixelPerfect = true;
         mainCanvas.AddComponent<RectTransform>();
         CanvasScaler scaler = mainCanvas.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
