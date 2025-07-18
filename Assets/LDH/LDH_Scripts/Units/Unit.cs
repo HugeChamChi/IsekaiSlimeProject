@@ -105,7 +105,9 @@ namespace Units
 
         public void ChangePosition(UnitHolder holder)
         {
-            transform.parent = holder.transform;
+            //transform.parent = holder.transform; //rpc 적용
+            int holderID = ComponentProvider.Get<InGameObject>(holder.gameObject).uniqueID;
+            ComponentProvider.Get<PhotonView>(gameObject).RPC("SetParentRPC", RpcTarget.All, holderID);
 
             Vector2 dir = holder.transform.position - transform.position;
             Controller.UpdateSpriteFlip(dir);

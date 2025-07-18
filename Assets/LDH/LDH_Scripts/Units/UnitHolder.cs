@@ -127,7 +127,7 @@ namespace Units
             
             // var offsetList = SkillRangePattern.Offsets[currentUnit.SkillRangeType];
             
-            var offsetList = SkillRangePattern.Offsets[testSkillRangeType]; //todo: 수정!!!!!!!!
+            var offsetList = SkillRangePattern.Offsets[testSkillRangeType]; //todo: 수정..?
             Debug.Log(offsetList.Count());
 
             var gridSlots = PlayerFieldManager.Instance.GetLocalFieldController().MapSlot;
