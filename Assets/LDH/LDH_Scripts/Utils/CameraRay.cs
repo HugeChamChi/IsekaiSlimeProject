@@ -24,13 +24,13 @@ namespace Util
             }
 
             //드래그
-            if (Input.GetMouseButton(0))
+            if (Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject())
             {
                 MouseButton();   
             }
 
 
-            if (Input.GetMouseButtonUp(0))
+            if (Input.GetMouseButtonUp(0) && !EventSystem.current.IsPointerOverGameObject())
             {
                 MouseButtonUp();
             }
@@ -83,7 +83,7 @@ namespace Util
 
                 if (hit.collider != null)
                 {
-                    if(GameManager.Instance.SelectedHolder.transform == hit.collider.transform)
+                    if(GameManager.Instance.SelectedHolder?.transform == hit.collider.transform)
                         //todo: 공격 범위, 스킬 범위 보여주기(shader), 시간 등
                         GameManager.Instance.SelectedHolder?.ShowSkillRange();
                 }
@@ -91,7 +91,10 @@ namespace Util
 
             else
             {
-                PlayerFieldController.SwapHolderPosition(GameManager.Instance.SelectedHolder, _moveHolder);
+                if (GameManager.Instance.SelectedHolder.CurrentUnit != null)
+                {
+                    PlayerFieldController.SwapHolderPosition(GameManager.Instance.SelectedHolder, _moveHolder);
+                }
             }
             
             _moveHolder = null;

@@ -1,5 +1,6 @@
 using Managers;
 using Photon.Pun;
+using Units;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -10,7 +11,9 @@ namespace PlayerField
         public int Row { get; private set; }
         public int Column { get; private set; }
         public Vector2 SpawnPosition { get; private set; }
-        public bool IsOccupied { get; set; }
+        
+        public UnitHolder Holder { get; set; }
+        public bool IsOccupied => Holder.CurrentUnit != null;
         public SlotType SlotType { get; private set; }
 
         private Color innerColor = Color.white;
@@ -21,18 +24,23 @@ namespace PlayerField
 
         public SpriteRenderer sr;
 
-        public void SetupGridSlot(int row, int column, Vector2 spawnPosition, SlotType type, Vector3 slotSize, int parentUniqueID, bool isOccupied = false)
+        public void SetupGridSlot(int row, int column, Vector2 spawnPosition, SlotType type, UnitHolder holder, Vector3 slotSize, int parentUniqueID, bool isOccupied = false)
         {
    
             Row = row;
             Column = column;
             SpawnPosition = spawnPosition;
             SlotType = type;
-            IsOccupied = isOccupied;
+            Holder = holder;
             transform.localScale = slotSize;
             
             SetParent(parentUniqueID);
             SetColor(type);
+        }
+
+        public void SetHolder(UnitHolder holder)
+        {
+            Holder = holder;
         }
         
         public void SetParent(int parentUniqueID)

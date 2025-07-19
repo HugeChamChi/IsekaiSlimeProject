@@ -27,7 +27,7 @@ namespace Units
 
         public void ChangeUnit(UnitHolder targetHolder)
         {
-            currentUnit.ChangePosition(targetHolder);
+            currentUnit?.ChangePosition(targetHolder);
         }
         
         public void SetCurrentUnit(Unit unit)
@@ -37,6 +37,12 @@ namespace Units
             GetSkillRange();
         }
 
+
+        public void ClearCurrentUnit()
+        {
+            currentUnit = null;
+        }
+        
         public void SetCurrentSlot(GridSlot slot)
         {
             Debug.Log("Set Current Slot 호출");
@@ -129,8 +135,7 @@ namespace Units
             // var offsetList = SkillRangePattern.Offsets[currentUnit.SkillRangeType];
             
             var offsetList = SkillRangePattern.Offsets[testSkillRangeType]; //todo: 수정..?
-            Debug.Log(offsetList.Count());
-
+           
             var gridSlots = PlayerFieldManager.Instance.GetLocalFieldController().MapSlot;
             
             foreach (var offset in offsetList)
@@ -152,15 +157,20 @@ namespace Units
 
         }
 
-        public void Sell()
+        public void DeleteUnit()
         {
             Debug.Log($"유닛 {currentUnit.Index} {currentUnit.Name} 판매!");
             PhotonNetwork.Destroy(currentUnit.gameObject);
+            
+            //선택한 홀더 초기화
             GameManager.Instance.ClearSelectedHolder();
-            currentUnit = null;
+            
+            //현재 홀더의 current unit 초기화
+            ClearCurrentUnit();
+            
+            //skill range 숨기기
             HideSkillRange();
         }
-   
         
         
     }

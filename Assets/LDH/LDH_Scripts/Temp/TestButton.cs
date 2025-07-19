@@ -18,7 +18,7 @@ namespace LDH.LDH_Scripts.Temp
             {
                 if (GameManager.Instance.SelectedHolder != null)
                 {
-                    GameManager.Instance.SelectedHolder.Sell();
+                    GameManager.Instance.SelectedHolder.DeleteUnit();
                     GameManager.Instance.ClearSelectedHolder();
                 }
             });

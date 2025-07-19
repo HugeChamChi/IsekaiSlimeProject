@@ -27,7 +27,7 @@ public enum StatType
 
 namespace Unit
 {
-    public enum UnitTier { Common, Rare, Epic, Legendary }
+    public enum UnitTier { Common = 1, Rare, Epic, Legendary }
     public enum UnitType { RangeAttack, SpeedDebuff, ArmorDebuff, AttackSpeedBuff, AttackPowerBuff }
     public enum EffectType { Faint, Slow }
     

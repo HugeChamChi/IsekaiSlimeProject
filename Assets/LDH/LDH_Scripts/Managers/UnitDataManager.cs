@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unit;
 using UnityEngine;
 
 namespace Managers
@@ -16,6 +17,8 @@ namespace Managers
         /// </summary>
         private Dictionary<int, UnitInfo> UnitInfoDict;
 
+        private Dictionary<UnitTier, List<int>> UnitIndexListByTier;
+  
 
         #region Unity LifeCycle
 
@@ -32,6 +35,7 @@ namespace Managers
         private void Init()
         {
             UnitInfoDict = new();
+            UnitIndexListByTier = new();
             LoadDataFromJson();
         }
 
@@ -47,6 +51,12 @@ namespace Managers
             foreach (var data in unitCollection.units)      
             {
                 UnitInfoDict[data.Index] = data;
+                if (!UnitIndexListByTier.ContainsKey((UnitTier)data.Tier))
+                    UnitIndexListByTier[(UnitTier)data.Tier] = new List<int>();
+                
+               UnitIndexListByTier[(UnitTier)data.Tier].Add(data.Index);
+
+                
             }
             
             Debug.Log($"UnitDataManager: {UnitInfoDict.Count}개의 유닛 데이터를 로드했습니다.");
@@ -76,6 +86,28 @@ namespace Managers
             var randomItem = UnitInfoDict.ElementAt(Random.Range(0, UnitInfoDict.Count));
             return randomItem.Key; // index만 반환
         }
+        
+        
+        public List<int> GetUnitIndicesByTier(UnitTier tier)
+        {
+            if (UnitIndexListByTier.TryGetValue(tier, out var list))
+                return new List<int>(list); // 복사본 반환
+            return new List<int>();
+        }
+        
+        public int PickRandomUnitIndexByTier(UnitTier tier)
+        {
+            if (UnitIndexListByTier.TryGetValue(tier, out var list) && list.Count > 0)
+            {
+                int randomIndex = Random.Range(0, list.Count);
+                return list[randomIndex];
+            }
+            Debug.LogWarning($"[UnitDataManager] Tier {tier}에 해당하는 유닛이 없습니다.");
+            return -1; // 실패 시 -1 같은 실패 코드 리턴
+        }
+        
+        
+        
         
         
         

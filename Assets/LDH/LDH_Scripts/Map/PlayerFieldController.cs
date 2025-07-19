@@ -21,6 +21,8 @@ namespace PlayerField
         private List<GridSlot> mapSlot = new();
 
         public IReadOnlyList<GridSlot> MapSlot => mapSlot;
+
+        public List<UnitHolder> UnitHolders = new();
         // private List<Vector2> spawnList = new();  // 유닛을 배치할 수 있는 좌표 리스트
         // private List<bool> spawnListArray = new(); // 각 슬롯의 점유 여부
         
@@ -35,6 +37,9 @@ namespace PlayerField
         private int _yCount;
         public int MapXCount => _xCount + 2;
         public int MapYCount => _yCount + 2;
+        
+        
+        private string _unitHolderPrefabPath = "Prefabs/LDH_TestResource/UnitHolder"; // 유닛 홀더 경로
 
 
         public static void SwapHolderPosition(UnitHolder holder1, UnitHolder holder2)
@@ -112,35 +117,40 @@ namespace PlayerField
                     
                     //slot gameobject 생성
                     var gridSlot = Manager.Resources.Instantiate<GameObject>(gridBoxPrefabPath, slotPos, Quaternion.identity).GetComponent<GridSlot>();;
+
+                    gridSlot.SetupGridSlot(row, col, slotPos, type, null, new Vector3(SlotWidth, SlotHeight, 1), ComponentProvider.Get<InGameObject>(gameObject).uniqueID);
                     
-                    Debug.Log(gridSlot==null);
-                    
-                    gridSlot.SetupGridSlot(row, col, slotPos, type, new Vector3(SlotWidth, SlotHeight, 1), ComponentProvider.Get<InGameObject>(gameObject).uniqueID);
-                    
+                    UnitHolder holder = SpawnHolder(gridSlot);
+                    gridSlot.SetHolder(holder);
                     
                     mapSlot.Add(gridSlot);
-                   
-
+                    
+                    
                 }
             }
             Debug.Log("generate grid");
         }
-
-        public void SetSlotOccupied(int x, int y, bool isOccupied)
+        
+         
+        
+        private UnitHolder SpawnHolder(GridSlot spawnSlot)
         {
-            var slot = mapSlot.Find(s => s.Row == x && s.Column == y);
-            if (slot != null)
-            {
-                slot.IsOccupied = isOccupied;
-            }
-        }
+           
+            // 슬롯 위치 가져오기
+            Vector3 position = spawnSlot.SpawnPosition;
+            
+            Debug.Log($"생성할 위치 : {position}");
+            
+            // Photon 네트워크 Instantiate
+            var holder =  PhotonNetwork.Instantiate(_unitHolderPrefabPath, position, Quaternion.identity, 0).GetComponent<UnitHolder>();
+            holder.SetCurrentSlot(spawnSlot);
+            holder.ClearCurrentUnit();
+            
+            
+            //홀더 리스트에 추가
+            UnitHolders.Add(holder);
 
-        public void SetSlotOccupied(int slotIndex, bool isOccupied)
-        {
-            if (slotIndex >= 0 && slotIndex < mapSlot.Count)
-            {
-                mapSlot[slotIndex].IsOccupied = isOccupied;
-            }
+            return holder;
         }
         
         #endregion
