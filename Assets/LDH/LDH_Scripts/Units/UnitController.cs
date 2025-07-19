@@ -1,4 +1,3 @@
-using LDH.LDH_Scripts.Temp;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,10 +7,6 @@ using Photon.Pun;
 using PlayerField;
 using System;
 using System.Linq;
-
-// todo: IDamagable 수정(현재는 임시 클래스 사용 중)
-
-using IDamagable = LDH.LDH_Scripts.Temp.Temp_IDamagable;
 
 namespace Units
 {
@@ -136,7 +131,7 @@ namespace Units
                         
                         //공격 애니메이션 재생
                         _anim.SetTrigger("Attack");
-                        Attack(targetTransform.GetComponent<IDamagable>());
+                        Attack(targetTransform.GetComponent<IDamageable>());
                         
                         yield return WaitForAttackCooldown(targetTransform);
                         
@@ -152,17 +147,15 @@ namespace Units
                 yield return null;
             }
         }
-        
-        
-        //todo: monster stat 구현 후 가장 낮은 체력의 몬스터로 수정
+
         private Transform GetClosestTarget()
         {
-            return Utils.FindClosestTarget(transform.position, Stat.AttackRange, OverlapType.Circle, targetLayer);
+            return Utils.FindLowestHpMonster(transform.position, Stat.AttackRange, OverlapType.Circle, targetLayer);
         }
         
         private bool IsTargetAlive(Transform target)
         {
-            return target != null && target.TryGetComponent(out Temp_IDamagable _);
+            return target != null && target.TryGetComponent<IDamageable>(out IDamageable damagable);
         }
         
         private IEnumerator WaitForAttackCooldown(Transform target)
@@ -188,17 +181,41 @@ namespace Units
         /// 대상에게 일반 공격 실행 (현재는 로그 출력용)
         /// </summary>
         /// <param name="target">공격할 대상</param>
-        public void Attack(IDamagable target)
+        public void Attack(IDamageable target)
         {
-            TempMonster monster = target as TempMonster;
-            Debug.Log($"{monster.name} 을 공격합니다.");
+
+            float damage = CalcDamage();
+            var monster = target as MonsterStatusController;
+            
+            Debug.Log($"[유닛] : {monster.name} 을 공격합니다. 유닛이 넘겨주는 데미지 : {damage}");
+            target.TakeDamage(damage);
+            
         }
+
+        private float CalcDamage()
+        {
+           // 데미지 계산식 : (캐릭터 최종 공격력) X (1 + 캐릭터 공격력 증가율 %) X (1 - 적 최종 데미지 감소율) X (스킬이라면 스킬 계수)
+           // 유닛이 계산할 것 :( 캐릭터 최종 공격력) X (1 + 캐릭터 공격력 증가율 %)  X (스킬이라면 스킬 계수)
+           
+           //캐릭터 최종 공격력 = 캐릭터 공격력 X (1 + 캐릭터 돌파 레벨 X 0.05) => 돌파 레벨업 마다 공격력 5% 증가  //todo: 캐릭터 돌파 레벨
+           //캐릭터 공격력 = UnitStat.Attack
+           //캐릭터 공격력 증가율 = CardManager.Instance.AttakPower
+           //스킬 계수 : skill.Damage
+
+           int level = 0; //todo : 캐릭터 돌파 레벌
+           float finalAttack = Stat.Attack * (1 + level * 0.05f);
+           float damage = finalAttack * (1 + CardManager.Instance.AttackPower.Value) * Skill.Damage;
+
+
+           return damage;
+        }
+        
 
         /// <summary>
         /// 유닛 스킬 사용
         /// </summary>
         /// <param name="targets">대상 목록</param>
-        public void UseSkill(List<IDamagable> targets)
+        public void UseSkill(List<IDamageable> targets)
         {
             // Skill.Execute(this, targets);
         }
