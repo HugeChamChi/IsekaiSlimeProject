@@ -14,7 +14,7 @@ public class Map : MonoBehaviour
     public Player Owner;
 
     [Header("Wave")]
-    private static readonly string waveController = "Prefabs/WaveController";
+    private const string waveController = "Prefabs/WaveController";
     [SerializeField] private Transform spawnPoint;
 
     [Header("PlayerFieldController")] 

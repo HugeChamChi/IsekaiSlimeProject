@@ -6,21 +6,19 @@ using UnityEngine.UI;
 using Unity.VisualScripting;
 using UnityEditor.iOS;
 
-public class WaveUI_Controller
+public class UI_Controller
 {
     private UnityEngine.Transform root;
     private Canvas waveCanvas;
     public BossAppearsPanel BossAppearsPanel;
-    public WavePanel wavePanel;
-    public SettingPanel settingPanel;
+    public InGameUIPanel wavePanel;
 
     public void Init(UnityEngine.Transform _root)
     {        
         root = _root;
         CreateWaveCanvas();
-        BossAppearsPanel = Object.Instantiate(Resources.Load<BossAppearsPanel>("UI/BossAppearsPanel"), waveCanvas.transform);
-        settingPanel = Object.Instantiate(Resources.Load<SettingPanel>("UI/SettingPanel"), waveCanvas.transform);
-
+        BossAppearsPanel = Object.Instantiate(Resources.Load<BossAppearsPanel>("UI/BossAppearsPanel"), waveCanvas.transform);        
+        wavePanel = Object.Instantiate(Resources.Load<InGameUIPanel>("UI/InGameUIPanel"));
         wavePanel.Init(root.GetComponent<WaveController>());
     }
 

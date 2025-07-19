@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class WavePanel : MonoBehaviour
+public class InGameUIPanel : MonoBehaviour
 {
     private WaveController waveController;
 
     [SerializeField] WaveView waveView;
+    public SettingPanel settingPanel;
 
     public void Init(WaveController _waveController)
     {
         waveController = _waveController;
-
         Subscribe();
+        settingPanel = Instantiate(Resources.Load<SettingPanel>("UI/SettingPanel"), transform);
     }    
 
     private void OnDisable()
@@ -33,5 +34,10 @@ public class WavePanel : MonoBehaviour
         waveController.Info.CurWaveIdx.RemoveEvent(waveView.UpdateWaveText);
         waveController.Info.MonsterCount.RemoveEvent(waveView.UpdateMonsterCountText);
         waveController.Info.WaveTimer.RemoveEvent(waveView.UpdateTimerText);
+    }
+
+    public void OpenSetiingPanel()
+    {
+        settingPanel.gameObject.SetActive(true);
     }
 }

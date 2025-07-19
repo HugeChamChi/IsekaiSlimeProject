@@ -23,7 +23,7 @@ public class WaveController : MonoBehaviour
 {
     [SerializeField] private PhotonView pv;
 
-    public WaveUI_Controller uiController;
+    public UI_Controller uiController;
     public WaveInfo Info;
 
     [Header("Wave")]
@@ -44,7 +44,7 @@ public class WaveController : MonoBehaviour
         if(pv.IsMine)
         {
             MonsterStatusController.OnDied += MonsterDie;
-            uiController = new WaveUI_Controller();
+            uiController = new UI_Controller();
             uiController.Init(transform);
 
             Info = new();
