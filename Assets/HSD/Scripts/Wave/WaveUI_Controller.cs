@@ -11,12 +11,17 @@ public class WaveUI_Controller
     private UnityEngine.Transform root;
     private Canvas waveCanvas;
     public BossAppearsPanel BossAppearsPanel;
+    public WavePanel wavePanel;
+    public SettingPanel settingPanel;
 
     public void Init(UnityEngine.Transform _root)
     {        
         root = _root;
         CreateWaveCanvas();
-        BossAppearsPanel = Resources.Load<BossAppearsPanel>("UI/BossAppearsPanel");
+        BossAppearsPanel = Object.Instantiate(Resources.Load<BossAppearsPanel>("UI/BossAppearsPanel"), waveCanvas.transform);
+        settingPanel = Object.Instantiate(Resources.Load<SettingPanel>("UI/SettingPanel"), waveCanvas.transform);
+
+        wavePanel.Init(root.GetComponent<WaveController>());
     }
 
     private void CreateWaveCanvas()

@@ -2,35 +2,8 @@ using Managers;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using Util;
-
-//WaveIndex
-
-//Stage
-
-//Wave
-
-//WaveTime // 웨이브 진행시간
-
-//SpawnTime // 몬스터가 소환되는 총 시간
-
-//WaveGold // 몬스터에서 획득가능한 골드 량
-
-//Message // 웨이브 클리어 시 호출되는 이벤트 결정을 Enum으로 이벤트 관리
-
-//Monster // 스폰될 몬스터
-
-//Boss // 스폰될 보스
-
-//SpawnCount // 스폰될 몬스터의 수량
-
-//Interval = SpawnTime / SpawCount;
-
-//SpawnBossCount // 스폰될 보스 수
-
-//SpawnHP // 해당 웨이브 몬스터 당 체력
 
 [System.Serializable]
 public struct WaveData
@@ -51,30 +24,31 @@ public class WaveController : MonoBehaviour
     [SerializeField] private PhotonView pv;
 
     public WaveUI_Controller uiController;
+    public WaveInfo Info;
 
     [Header("Wave")]
     [SerializeField] private WaveData[] waveDatas;
-    private int curWaveIdx;
     private int curSpawnCount;
     private int curBossCount;
     private Coroutine waveRoutine;
+    private Coroutine waveTimerRoutine;
     private Coroutine nextWaveRoutine;
     private WaitUntil clearCondition;
 
     [SerializeField] private GameObject prefab;
     
     private const int maxCount = 100;
-    private int monsterCount;
 
     private void Start()
     {
-        clearCondition = new WaitUntil(() => monsterCount == 0);
-
         if(pv.IsMine)
         {
             MonsterStatusController.OnDied += MonsterDie;
             uiController = new WaveUI_Controller();
             uiController.Init(transform);
+
+            Info = new();
+            clearCondition = new WaitUntil(() => Info.MonsterCount.Value == 0);
         }
     }
 
@@ -101,14 +75,18 @@ public class WaveController : MonoBehaviour
                 waveRoutine = null;
             }
             waveRoutine = StartCoroutine(WaveRoutine());
+
+            if (waveTimerRoutine == null)
+                waveTimerRoutine = StartCoroutine(WaveTimerRoutine());
         }
-    }
+    }    
 
     private IEnumerator WaveRoutine()
     {
-        WaveData waveData = waveDatas[curWaveIdx];        
+        WaveData waveData = waveDatas[Info.CurWaveIdx.Value];
+        Info.WaveTimer.Value = waveData.WaveTime;
         curSpawnCount = 0;
-        curBossCount = waveDatas[curWaveIdx].SpawnBossCount;
+        curBossCount = waveDatas[Info.CurWaveIdx.Value].SpawnBossCount;
 
         yield return Utils.GetDelay(3f);
 
@@ -120,8 +98,7 @@ public class WaveController : MonoBehaviour
 
         if(curBossCount > 0)
         {
-             MonsterSpawnBossMonster(waveData.SpawnBoss);
-            
+             MonsterSpawnBossMonster(waveData.SpawnBoss);            
         }
 
         if(nextWaveRoutine != null)
@@ -133,15 +110,24 @@ public class WaveController : MonoBehaviour
 
         yield return Utils.GetDelay(waveData.WaveTime - waveData.SpawnTime);
 
-        if(curWaveIdx == waveDatas.Length - 1)
+        if(Info.CurWaveIdx.Value == waveDatas.Length - 1)
         {
             // 게임 클리어
         }
         else
         {
-            curWaveIdx++;
+            Info.CurWaveIdx.Value++;
             WaveStart();
-        }        
+        }
+    }
+
+    private IEnumerator WaveTimerRoutine()
+    {
+        while(true)
+        {
+            Info.WaveTimer.Value -= Time.deltaTime;
+            yield return null;
+        }
     }
 
     private IEnumerator NextWave()
@@ -155,32 +141,33 @@ public class WaveController : MonoBehaviour
     {
         if (!pv.IsMine) return;
 
-        monsterCount--;
+        Info.MonsterCount.Value--;
     }
 
     private void MonsterSpawn(string monsterName)
     {
         Manager.Resources.NetworkInstantiate<GameObject>(monsterName, transform.position, false, true);
-        monsterCount++;
+        MonsterCountAddAndGameOverCheck();
+    }
+
+    private void MonsterCountAddAndGameOverCheck()
+    {
+        Info.MonsterCount.Value++;
         curSpawnCount++;
 
-        if(monsterCount >= maxCount)
+        if (Info.MonsterCount.Value >= maxCount)
         {
             // 게임 오버
         }
     }
+
     private void MonsterSpawnBossMonster(string monsterName)
     {
-        GameObject boss = Manager.Resources.NetworkInstantiate<GameObject>(monsterName, transform.position, false, true);
-        monsterCount++;
-        curSpawnCount++;
+        GameObject boss = Manager.Resources.NetworkInstantiate<GameObject>(monsterName, transform.position, false, true);        
+
+        MonsterCountAddAndGameOverCheck();
 
         uiController.BossAppearsPanel.Show(boss.GetComponent<MonsterStat>());
-
-        if (monsterCount >= maxCount)
-        {
-            // 게임 오버
-        }        
     }
     private void OnDestroy()
     {
