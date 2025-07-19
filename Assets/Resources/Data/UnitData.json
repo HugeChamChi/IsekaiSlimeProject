@@ -10,7 +10,8 @@
       "Attack": 800,
       "AttackSpeed": 1,
       "AttackRange": 2.1,
-      "BuffRange": 0.0
+      "BuffRange": 0.0,
+      "SkillRangeType" : 1
     },
     {
       "Index": 202,
@@ -22,7 +23,86 @@
       "Attack": 600,
       "AttackSpeed": 0.2,
       "AttackRange": 2,
-      "BuffRange": 1.0
+      "BuffRange": 1.0,
+      "SkillRangeType" : 2
+    },
+    {
+      "Index": 206,
+      "Name" : "레어1",
+      "Tier" : 2,
+      "Type" : 2,
+      "Description" : "근위기사단의 창 잉그리드....",
+      "ModelFileName" : "file name...",
+      "Attack": 600,
+      "AttackSpeed": 0.2,
+      "AttackRange": 2,
+      "BuffRange": 1.0,
+      "SkillRangeType" : 2
+    },
+    {
+      "Index": 207,
+      "Name" : "레어2",
+      "Tier" : 2,
+      "Type" : 2,
+      "Description" : "근위기사단의 창 잉그리드....",
+      "ModelFileName" : "file name...",
+      "Attack": 600,
+      "AttackSpeed": 0.2,
+      "AttackRange": 2,
+      "BuffRange": 1.0,
+      "SkillRangeType" : 2
+    },
+    {
+      "Index": 211,
+      "Name" : "에픽1",
+      "Tier" : 3,
+      "Type" : 2,
+      "Description" : "근위기사단의 창 잉그리드....",
+      "ModelFileName" : "file name...",
+      "Attack": 600,
+      "AttackSpeed": 0.2,
+      "AttackRange": 2,
+      "BuffRange": 1.0,
+      "SkillRangeType" : 2
+    },
+    {
+      "Index": 212,
+      "Name" : "에픽2",
+      "Tier" : 3,
+      "Type" : 2,
+      "Description" : "근위기사단의 창 잉그리드....",
+      "ModelFileName" : "file name...",
+      "Attack": 600,
+      "AttackSpeed": 0.2,
+      "AttackRange": 2,
+      "BuffRange": 1.0,
+      "SkillRangeType" : 2
+    },
+    {
+      "Index": 216,
+      "Name" : "레전더리1",
+      "Tier" : 4,
+      "Type" : 2,
+      "Description" : "근위기사단의 창 잉그리드....",
+      "ModelFileName" : "file name...",
+      "Attack": 600,
+      "AttackSpeed": 0.2,
+      "AttackRange": 2,
+      "BuffRange": 1.0,
+      "SkillRangeType" : 2
+    },
+    {
+      "Index": 217,
+      "Name" : "레전더리2",
+      "Tier" : 4,
+      "Type" : 2,
+      "Description" : "근위기사단의 창 잉그리드....",
+      "ModelFileName" : "file name...",
+      "Attack": 600,
+      "AttackSpeed": 0.2,
+      "AttackRange": 2,
+      "BuffRange": 1.0,
+      "SkillRangeType" : 2
     }
   ]
 }

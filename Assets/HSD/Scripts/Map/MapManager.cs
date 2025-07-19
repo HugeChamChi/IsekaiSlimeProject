@@ -5,16 +5,19 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using Util;
 
 public class MapManager : MonoBehaviour
 {
     [Header("Map")]
     [SerializeField] private GameObject mapPrefab;
+
+    private string mapPath = "Prefabs/Map_Test";
     [SerializeField] private RenderTexture[] playTextures;
     private Player[] players;
 
     private static readonly Dictionary<Player, Map> maps = new Dictionary<Player, Map>();
-
+    
     [SerializeField] private float xInterval;
 
     private void Update()
@@ -38,11 +41,14 @@ public class MapManager : MonoBehaviour
         for (int i = 0; i < players.Length; i++)
         {
             map = Instantiate(mapPrefab, new Vector3(xInterval * i, 0), Quaternion.identity).GetComponent<Map>();
+            
+            // map = PhotonNetwork.Instantiate(mapPath, new Vector3(xInterval * i, 0), Quaternion.identity).GetComponent<Map>();
             map.Owner = players[i];
             maps.Add(players[i], map);
             
             //필드 매니저에 플레이어의 PlayerFieldController 등록 (추가)
             PlayerFieldManager.Instance.RegisterPlayerField(players[i].ActorNumber, map.fieldController);
+            map.fieldController.GenerateGridSlots();
         }
     }
 
@@ -54,9 +60,17 @@ public class MapManager : MonoBehaviour
         {
             if (players[i] == PhotonNetwork.LocalPlayer)
             {
-                maps[players[i]].Cam.depth = 1;
-                maps[players[i]].Cam.AddComponent<AudioListener>();
-                maps[players[i]].CreateWaveController();                   
+                Camera mapCam = maps[players[i]].Cam;
+                mapCam.depth = 1;
+                mapCam.AddComponent<AudioListener>();
+                var camRay = mapCam.AddComponent<CameraRay>(); //local player의 map에만 camera ray 추가
+                camRay.SetCamera(mapCam);  // 카메라 지정
+                
+                maps[players[i]].CreateWaveController();   
+                
+             
+                
+               
             }
             else
             {

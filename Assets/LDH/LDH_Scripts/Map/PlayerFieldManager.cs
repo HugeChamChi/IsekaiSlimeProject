@@ -98,6 +98,15 @@ namespace Managers
                 return null;
             }
         }
+
+        /// <summary>
+        /// 로컬 플레이어의 PlayerFieldController 반환
+        /// </summary>
+        public PlayerFieldController GetLocalFieldController()
+        {
+            int localActNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+            return GetFieldController(localActNumber);
+        }
         #endregion
 
 
