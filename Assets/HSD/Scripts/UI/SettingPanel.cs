@@ -10,6 +10,7 @@ public class SettingPanel : MonoBehaviour
     [SerializeField] Button gameExitButton;
     [SerializeField] Button infoButton;
     [SerializeField] Button allMuteButton;
+    [SerializeField] GameObject gameExitPanel;
 
     private void OnEnable()
     {
@@ -19,7 +20,7 @@ public class SettingPanel : MonoBehaviour
         sfxSlider.onValueChanged.AddListener(UpdateSFXSlider);
         bgmSlider.onValueChanged.AddListener(UpdateBGMSlider);
 
-        gameExitButton.onClick.AddListener(GameExit);
+        gameExitButton.onClick.AddListener(OpenGameExitPanel);
         //infoButton.onClick.AddListener(Info);
         allMuteButton.onClick.AddListener(AllMute);
     }
@@ -29,7 +30,7 @@ public class SettingPanel : MonoBehaviour
         sfxSlider.onValueChanged.RemoveListener(UpdateSFXSlider);
         bgmSlider.onValueChanged.RemoveListener(UpdateBGMSlider);
 
-        gameExitButton.onClick.RemoveListener(GameExit);
+        gameExitButton.onClick.RemoveListener(OpenGameExitPanel);
         //infoButton.onClick.RemoveListener(Info);
         allMuteButton.onClick.RemoveListener(AllMute);
     }
@@ -46,9 +47,19 @@ public class SettingPanel : MonoBehaviour
 
     public void Close() => gameObject.SetActive(false);
 
-    private void GameExit()
+    public void GameExit()
     {
         // 게임 나가기 로직
+    }
+
+    public void CloseGameExitPanel()
+    {
+        gameExitPanel.SetActive(false);
+    }
+
+    private void OpenGameExitPanel()
+    {
+        gameExitPanel.SetActive(true);
     }
 
     private void Info()
