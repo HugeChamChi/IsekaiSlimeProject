@@ -119,9 +119,12 @@ namespace PlayerField
                     var gridSlot = Manager.Resources.Instantiate<GameObject>(gridBoxPrefabPath, slotPos, Quaternion.identity).GetComponent<GridSlot>();;
 
                     gridSlot.SetupGridSlot(row, col, slotPos, type, null, new Vector3(SlotWidth, SlotHeight, 1), ComponentProvider.Get<InGameObject>(gameObject).uniqueID);
-                    
-                    UnitHolder holder = SpawnHolder(gridSlot);
-                    gridSlot.SetHolder(holder);
+
+                    if (type == SlotType.Inner)
+                    {
+                        UnitHolder holder = SpawnHolder(gridSlot);
+                        gridSlot.SetHolder(holder);
+                    }
                     
                     mapSlot.Add(gridSlot);
                     
@@ -141,8 +144,9 @@ namespace PlayerField
             
             Debug.Log($"생성할 위치 : {position}");
             
-            // Photon 네트워크 Instantiate
-            var holder =  PhotonNetwork.Instantiate(_unitHolderPrefabPath, position, Quaternion.identity, 0).GetComponent<UnitHolder>();
+            //Instantiate
+            var holder = Manager.Resources.Instantiate<GameObject>(_unitHolderPrefabPath, position, Quaternion.identity)
+                .GetComponent<UnitHolder>();
             holder.SetCurrentSlot(spawnSlot);
             holder.ClearCurrentUnit();
             

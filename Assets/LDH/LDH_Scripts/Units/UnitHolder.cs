@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Units
 {
-    public class UnitHolder : NetworkUnit
+    public class UnitHolder : MonoBehaviour
     {
         private string _unitPrefabPath = "Prefabs/LDH_TestResource/Unit";  // 소환할 유닛 경로
         
