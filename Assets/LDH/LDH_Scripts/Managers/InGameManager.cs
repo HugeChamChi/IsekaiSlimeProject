@@ -6,15 +6,13 @@ using UnityEngine;
 
 namespace Managers
 {
-    public class GameManager : Singleton<GameManager>
+    public class InGameManager : Singleton<InGameManager>
     {
         private int idCounter = 1000; // 시작 값 (원하면 1, 1000, 10000 등으로)
         public UnitHolder SelectedHolder { get; private set; }
 
         public event Action<UnitHolder> OnSelectedHolderChanged;
-
         
-
         
         public Dictionary<int, Transform> inGameObjects = new();
 
@@ -27,7 +25,7 @@ namespace Managers
         public void RegisterInGameObject(InGameObject obj)
         {
             inGameObjects[obj.uniqueID] = obj.transform;
-            Debug.Log($"Registered object {obj.name} with ID {obj.uniqueID}");
+            //Debug.Log($"Registered object {obj.name} with ID {obj.uniqueID}");
         }
         public Transform GetInGameObjectByID(int uniqueID)
         {

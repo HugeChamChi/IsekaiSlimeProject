@@ -105,8 +105,14 @@ namespace Managers
             Debug.LogWarning($"[UnitDataManager] Tier {tier}에 해당하는 유닛이 없습니다.");
             return -1; // 실패 시 -1 같은 실패 코드 리턴
         }
-        
-        
+
+
+        public int GetLegendaryIndex(int order) //0부터 시작
+        {
+            var legendaryList = GetUnitIndicesByTier(UnitTier.Legendary);
+            if (legendaryList.Count < order || order < 0) return -1;
+            return legendaryList[order];
+        }
         
         
         

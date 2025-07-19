@@ -22,15 +22,15 @@ using UnityEngine;
         
         private void Init()
         {
-            //자동으로 유니트 아이디 생성해서 gamemanager에 등록하기
-            uniqueID = GameManager.Instance.GenerateUniqueID();
-            GameManager.Instance.RegisterInGameObject(this);
+            //자동으로 유니크 아이디 생성해서 gamemanager에 등록하기
+            uniqueID = InGameManager.Instance.GenerateUniqueID();
+            InGameManager.Instance.RegisterInGameObject(this);
         }
         
         [PunRPC]
         public void SetParentRPC(int parentUniqueID)
         {
-            Transform parent = GameManager.Instance.GetInGameObjectByID(parentUniqueID);
+            Transform parent = InGameManager.Instance.GetInGameObjectByID(parentUniqueID);
             Transform child = transform;
             
             if (child == null || parent == null)

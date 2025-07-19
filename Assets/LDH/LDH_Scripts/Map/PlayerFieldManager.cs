@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using Photon.Pun;
 using PlayerField;
+using System;
 using Units;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Managers
@@ -38,10 +40,16 @@ namespace Managers
         // [SerializeField] private List<Transform> spawnPoints;   // (Legacy) 인원 수별 스폰 위치
         private UnitSpawner _unitSpawner;
         public UnitSpawner UnitSpanwer => _unitSpawner;
+
+        public Action<PlayerFieldController> OnRegisterLocalFieldcontroller;
+        
+        
+        public List<UnitCombination> UnitCombinations;
         
         #region Unity LifeCycle
         private void Awake()
         {
+            Debug.Log("초기화");
             //싱글톤 초기화
             if (Instance == null)
                 Instance = this;
@@ -78,9 +86,13 @@ namespace Managers
         public void RegisterPlayerField(int actorNumber, PlayerFieldController fieldController)
         {
             playerFields[actorNumber] = fieldController;
-            
-            if(actorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
-                _unitSpawner.SetSpawnPanel(fieldController);
+
+            if (actorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
+            {
+                OnRegisterLocalFieldcontroller?.Invoke(fieldController);
+                //_unitSpawner.SetSpawnPanel(fieldController);
+            }
+                
         }
         
         /// <summary>
