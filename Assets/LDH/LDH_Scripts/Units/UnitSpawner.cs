@@ -174,7 +174,7 @@ namespace Units
         #endregion
 
 
-        private List<UnitHolder> GetUnitHoldersByIndex(UnitTier tier, int unitIndex) //tier unitIndex와 일치하는 홀더 모두 가져오기
+        public List<UnitHolder> GetUnitHoldersByIndex(UnitTier tier, int unitIndex) //tier unitIndex와 일치하는 홀더 모두 가져오기
         {
             List<UnitHolder> holders = new();
             foreach (UnitHolder holder in PlayerFieldManager.Instance.GetLocalFieldController().UnitHolders)
@@ -227,25 +227,47 @@ namespace Units
                 MergeUnits(holders, tier+1);
         }
 
-        public void MergeEpicUnits()
+        public void MergeEpicUnits(int legendaryCombinationOrder)
         {
-            //필드에 있는 에픽 유닛 리스트 가져오기
-            List<UnitHolder> epicHolders = GetUnitHoldersByTier(UnitTier.Epic);
+            var combination = PlayerFieldManager.Instance.UnitCombinations[legendaryCombinationOrder];
 
-            if (epicHolders.Count < 5) return;
-            
-            UnitHolder firstHolder = epicHolders[0];
-           
-            // 기존 유닛 삭제
-            for (int i = 0; i < 5; i++)
+            List<UnitHolder> combinationHolders = new();
+          
+            foreach (var entry in combination.Entries)
             {
-                epicHolders[i].DeleteUnit();
+                var temp = GetUnitHoldersByIndex(entry.Tier, entry.UnitIndex);
+                Debug.Log(temp.Count);
+                
+                for (int i = 0; i < entry.RequiredCount; i++)
+                {
+                    
+                    combinationHolders.Add(temp[i]);
+                }
+            }
+
+            UnitHolder firstHolder = combinationHolders[0];
+
+            foreach (UnitHolder holder in combinationHolders)
+            {
+                holder.DeleteUnit();
             }
             
-            //첫번째 홀더 위치에 강화된 유닛 소한하기
-            int unitIndex = Manager.UnitData.PickRandomUnitIndexByTier(UnitTier.Legendary);
-            firstHolder.SpawnUnit(unitIndex);
+            // //필드에 있는 에픽 유닛 리스트 가져오기
+            // List<UnitHolder> epicHolders = GetUnitHoldersByTier(UnitTier.Epic);
+            //
+            // if (epicHolders.Count < 5) return;
             
+            // UnitHolder firstHolder = epicHolders[0];
+            
+            // 기존 유닛 삭제
+            // for (int i = 0; i < 5; i++)
+            // {
+            //     epicHolders[i].DeleteUnit();
+            // }
+            //
+            //첫번째 홀더 위치에 강화된 유닛 소한하기
+            int unitIndex = Manager.UnitData.GetLegendaryIndex(legendaryCombinationOrder);
+            firstHolder.SpawnUnit(unitIndex);
             
             _fieldController.NotifyUnitChanged();
             

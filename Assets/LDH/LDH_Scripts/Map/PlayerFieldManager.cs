@@ -44,6 +44,7 @@ namespace Managers
         public Action<PlayerFieldController> OnRegisterLocalFieldcontroller;
         
         
+        public List<UnitCombination> UnitCombinations;
         
         #region Unity LifeCycle
         private void Awake()

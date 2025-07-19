@@ -43,7 +43,9 @@ namespace PlayerField
         private string _unitHolderPrefabPath = "Prefabs/LDH_TestResource/UnitHolder"; // 유닛 홀더 경로
 
 
-        public event Action<int> OnEpicUnitCountChanged;
+        public List<Action<bool>> CanSpawnLegendary = new();
+        private Action<bool> spawnLegendary1;
+        private Action<bool> spawnLegendary2;
         
         
 
@@ -83,6 +85,11 @@ namespace PlayerField
             
             _xCount = PlayerFieldManager.Instance.XCount;
             _yCount = PlayerFieldManager.Instance.YCount;
+            
+            
+            CanSpawnLegendary.Add(spawnLegendary1);
+            CanSpawnLegendary.Add(spawnLegendary2);
+            
         }
 
 
@@ -165,9 +172,49 @@ namespace PlayerField
 
         public void NotifyUnitChanged()
         {
-            int epicCount = UnitHolders.Count(h => h.CurrentUnit != null && h.CurrentUnit.Tier == UnitTier.Epic);
-            OnEpicUnitCountChanged?.Invoke(epicCount);
+            CheckUnitCombinations();
+
+            // int epicCount = UnitHolders.Count(h => h.CurrentUnit != null && h.CurrentUnit.Tier == UnitTier.Epic);
+            //OnEpicUnitCountChanged?.Invoke(epicCount);
+
+        }
+
+
+        private void CheckUnitCombinations()
+        {
+            for (int i = 0; i < PlayerFieldManager.Instance.UnitCombinations.Count; i++)
+            {
+                bool result = CheckUnitCombination(i);
+                //Debug.Log($"조합{i} 체크 결과 : {result}");
+                CanSpawnLegendary[i]?.Invoke(result);
+            }
             
+        }
+
+        private bool CheckUnitCombination(int index)
+        {
+            if (index < 0 || index >= PlayerFieldManager.Instance.UnitCombinations.Count)
+            {
+                Debug.LogError("Combination - Out of Range");
+                return false;
+            }
+            var combination = PlayerFieldManager.Instance.UnitCombinations[index];
+            
+            //Debug.Log(combination.Entries.Count);
+            //Debug.Log(combination.Entries[1].UnitIndex);
+            foreach (var entry in combination.Entries)
+            {
+                var holders = PlayerFieldManager.Instance.UnitSpanwer.GetUnitHoldersByIndex(entry.Tier, entry.UnitIndex);
+                //Debug.Log($"{entry.Tier} {entry.UnitIndex} - 개수 : {holders.Count} / 필요개수 : {entry.RequiredCount}");
+                
+                if (holders.Count < entry.RequiredCount)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+
         }
         
         #region Gizmo
@@ -236,4 +283,5 @@ namespace PlayerField
 
       
     }
+    
 }

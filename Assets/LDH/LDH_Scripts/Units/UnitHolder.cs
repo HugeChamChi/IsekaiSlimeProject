@@ -93,7 +93,7 @@ namespace Units
         public void ShowSkillRange()
         {
             //todo: 공격 범위, 스킬 범위 보여주기(shader), 시간 등
-            Debug.Log(skillRangeSlots.Count);
+            //Debug.Log(skillRangeSlots.Count);
             if(currentUnit==null || skillRangeSlots.Count == 0) return;
             
             foreach (GridSlot gridSlot in skillRangeSlots)
@@ -123,7 +123,7 @@ namespace Units
             //Debug.Log("get skill range 호출");
             if (currentUnit == null || currentSlot == null)
             {
-                Debug.Log("current unit null or currentslot null");
+                //Debug.Log("current unit null or currentslot null");
                 skillRangeSlots.Clear();
                 
                 HideSkillRange();

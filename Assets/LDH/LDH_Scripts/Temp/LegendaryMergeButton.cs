@@ -9,6 +9,7 @@ using UnityEngine.UI;
 
 public class LegendaryMergeButton : MonoBehaviour
 {
+    public int legendaruOrder = 0; //0번째, 1번째 중 하나
     private Button _button;
 
     private void Start() => Init();
@@ -23,14 +24,14 @@ public class LegendaryMergeButton : MonoBehaviour
 
     private void SetupButtonEvent(PlayerFieldController fieldController)
     {
-        _button.onClick.AddListener(PlayerFieldManager.Instance.UnitSpanwer.MergeEpicUnits);
+        _button.onClick.AddListener(()=>PlayerFieldManager.Instance.UnitSpanwer.MergeEpicUnits(legendaruOrder));
         
-        fieldController.OnEpicUnitCountChanged += SetButtonInteractable;
+        fieldController.CanSpawnLegendary[legendaruOrder] += SetButtonInteractable;
     }
 
-    private void SetButtonInteractable(int currentEpicCount)
+    private void SetButtonInteractable(bool canMerge)
     {
-        _button.interactable = currentEpicCount >= 5;
+        _button.interactable = canMerge;
     }
     
 
