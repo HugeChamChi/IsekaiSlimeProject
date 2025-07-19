@@ -17,10 +17,10 @@ public class UI_Manager : DesignPattern.Singleton<UI_Manager>
         ultimate    = Instantiate(Resources.Load<Ultimate_Panel>("UI/Ultimate_Panel"), mainCanvas.transform);
         cardPanel   = Instantiate(Resources.Load<CardPanel>("UI/CardPanel"), mainCanvas.transform);
     }
-    
+
     /// <summary>
     /// 메인 켄버스 동적생성 함수
-    /// </summary>
+    /// </summary>   
     private void CreateMainCanvas()
     {
         mainCanvas = new GameObject("MainCanvas").AddComponent<Canvas>();
