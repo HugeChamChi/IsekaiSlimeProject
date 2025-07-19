@@ -9,13 +9,25 @@ public class UI_Manager : DesignPattern.Singleton<UI_Manager>
     private Canvas mainCanvas;
     public Ultimate_Panel ultimate;
     public CardPanel cardPanel;
-
+    
     private void Start()
     {
         CreateMainCanvas();
+        InitInGamePanel();
+    }
 
-        ultimate    = Instantiate(Resources.Load<Ultimate_Panel>("UI/Ultimate_Panel"), mainCanvas.transform);
-        cardPanel   = Instantiate(Resources.Load<CardPanel>("UI/CardPanel"), mainCanvas.transform);
+    public void InitInGamePanel()
+    {
+        ultimate = Instantiate(Resources.Load<Ultimate_Panel>("UI/Ultimate_Panel"), mainCanvas.transform);
+        cardPanel = Instantiate(Resources.Load<CardPanel>("UI/CardPanel"), mainCanvas.transform);
+    }
+
+    public void DestroyInGameUI()
+    {
+        Destroy(ultimate.gameObject);
+        ultimate = null;
+        Destroy(cardPanel.gameObject);
+        cardPanel = null;
     }
 
     /// <summary>

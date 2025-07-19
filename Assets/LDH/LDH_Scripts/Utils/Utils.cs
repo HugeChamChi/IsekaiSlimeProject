@@ -104,10 +104,13 @@ namespace Util
             }
         }
 
-        
+        public static readonly int inHash = Animator.StringToHash("In");
+        public static readonly int outHash = Animator.StringToHash("Out");
+
+
         //페이드 효과
         #region Fade Effect
-        
+
         /// <summary>
         /// 공통 Fade 처리 메서드.
         /// 대상의 color getter/setter를 받아 alpha 값을 보간하며 페이드 효과를 적용.

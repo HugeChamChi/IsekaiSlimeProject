@@ -2,13 +2,12 @@ using Managers;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Util;
 
 public class CardPanel : MonoBehaviour
 {
     [SerializeField] CardSlot[] slots;
-    private Animator anim;
-    private static readonly int inHash = Animator.StringToHash("In");
-    private static readonly int outHash = Animator.StringToHash("Out");
+    private Animator anim;    
 
     private void Awake()
     {
@@ -40,17 +39,17 @@ public class CardPanel : MonoBehaviour
         }
         gameObject.SetActive(true);
         SetupCards();
-        anim.SetTrigger(inHash);
+        anim.SetTrigger(Utils.inHash);
     }   
 
     private void CloseCardPanel()
     {
-        anim.ResetTrigger(inHash);
+        anim.ResetTrigger(Utils.inHash);
         for (int i = 0; i < slots.Length; i++)
         {
             slots[i].isSelect = true;
         }
-        anim.SetTrigger(outHash);
+        anim.SetTrigger(Utils.outHash);
     }
 
     private void SetupCards()

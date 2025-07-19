@@ -41,7 +41,7 @@ public struct WaveData
     public float SpawnTime;
     public ClearEventType EventType;
     public string SpawnMonster;
-    public string SpawnBoss;
+    public string SpawnBoss;    
     public int SpawnCount;
     public int SpawnBossCount;
 }
@@ -49,6 +49,8 @@ public struct WaveData
 public class WaveController : MonoBehaviour
 {
     [SerializeField] private PhotonView pv;
+
+    public WaveUI_Controller uiController;
 
     [Header("Wave")]
     [SerializeField] private WaveData[] waveDatas;
@@ -60,8 +62,7 @@ public class WaveController : MonoBehaviour
     private WaitUntil clearCondition;
 
     [SerializeField] private GameObject prefab;
-
-    [Header("")]
+    
     private const int maxCount = 100;
     private int monsterCount;
 
@@ -70,7 +71,11 @@ public class WaveController : MonoBehaviour
         clearCondition = new WaitUntil(() => monsterCount == 0);
 
         if(pv.IsMine)
+        {
             MonsterStatusController.OnDied += MonsterDie;
+            uiController = new WaveUI_Controller();
+            uiController.Init(transform);
+        }
     }
 
     private void Update()
@@ -114,7 +119,10 @@ public class WaveController : MonoBehaviour
         }
 
         if(curBossCount > 0)
-            MonsterSpawn(waveData.SpawnBoss);
+        {
+             MonsterSpawnBossMonster(waveData.SpawnBoss);
+            
+        }
 
         if(nextWaveRoutine != null)
         {
@@ -160,5 +168,23 @@ public class WaveController : MonoBehaviour
         {
             // 게임 오버
         }
+    }
+    private void MonsterSpawnBossMonster(string monsterName)
+    {
+        GameObject boss = Manager.Resources.NetworkInstantiate<GameObject>(monsterName, transform.position, false, true);
+        monsterCount++;
+        curSpawnCount++;
+
+        uiController.BossAppearsPanel.Show(boss.GetComponent<MonsterStat>());
+
+        if (monsterCount >= maxCount)
+        {
+            // 게임 오버
+        }        
+    }
+    private void OnDestroy()
+    {
+        if (pv.IsMine)
+            MonsterStatusController.OnDied -= MonsterDie;
     }
 }
