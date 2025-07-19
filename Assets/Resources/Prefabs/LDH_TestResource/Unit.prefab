@@ -95,9 +95,9 @@ GameObject:
   - component: {fileID: 264780490216556231}
   - component: {fileID: 5221198320689052460}
   - component: {fileID: 8090055858216181288}
-  - component: {fileID: 6473966714448134175}
   - component: {fileID: 1762821425609110763}
   - component: {fileID: 472774097811871306}
+  - component: {fileID: 3668740375464664590}
   m_Layer: 0
   m_Name: Unit
   m_TagString: Untagged
@@ -140,6 +140,7 @@ MonoBehaviour:
   <Type>k__BackingField: 0
   <Description>k__BackingField: 
   <ModelFileName>k__BackingField: 
+  <SkillRangeType>k__BackingField: 2
   Controller: {fileID: 8090055858216181288}
 --- !u!114 &8090055858216181288
 MonoBehaviour:
@@ -162,18 +163,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4096
   isLeftFacingSprite: 1
---- !u!114 &6473966714448134175
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2563347809932505990}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e0a5717c135c4da7b8c46e7c07704c65, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1762821425609110763
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -213,6 +202,19 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
+--- !u!114 &3668740375464664590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2563347809932505990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ed725a6356042abaa367460fa61914c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uniqueID: 0
 --- !u!1 &3695170740614145454
 GameObject:
   m_ObjectHideFlags: 0

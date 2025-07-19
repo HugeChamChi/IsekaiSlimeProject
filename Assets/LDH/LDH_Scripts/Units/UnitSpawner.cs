@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Managers;
 using Photon.Pun;
 using PlayerField;
+using Unit;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,9 +18,11 @@ namespace Units
         [Header("Field Settings")]
         [SerializeField] private PlayerFieldController _fieldController;  // 로컬 플레이어 필드 (현재 클라이언트 필드)
 
-        [Header("Unit Settings")]
+        [Header("Holder Setting")]
         // [SerializeField] private GameObject _unitPrefab;  // 소환할 유닛 프리팹
         private string _unitPrefabPath = "Prefabs/LDH_TestResource/Unit";  // 소환할 유닛 경로
+
+        
         
         [Header("UI")] 
         [SerializeField] private Button _summonButton;    // 소환 버튼
@@ -50,13 +53,13 @@ namespace Units
         //구독
         private void Subscribe()
         {
-            _summonButton.onClick.AddListener(Summon); //소환 버튼 이벤트 구독
+            _summonButton.onClick.AddListener(() =>Summon()); //소환 버튼 이벤트 구독
         }
 
         //구독 해제
         private void Unsubscribe()
         {
-            _summonButton.onClick.RemoveListener(Summon); //소환 버튼 이벤트 구독 해제
+            _summonButton.onClick.RemoveListener(() =>Summon()); //소환 버튼 이벤트 구독 해제
         }
         
         /// <summary>
@@ -77,10 +80,9 @@ namespace Units
         /// </summary>
         public int GetEmptySlotIndex()
         {
-            
-            for (int i = 0; i < _fieldController.SpawnList.Count; i++)
+            for (int i = 0; i < _fieldController.MapSlot.Count; i++)
             {
-                if (!_fieldController.SpawnListArray[i])
+                if (_fieldController.MapSlot[i].SlotType == SlotType.Inner && !_fieldController.MapSlot[i].IsOccupied)
                     return i;
             }
             return -1;
@@ -95,7 +97,7 @@ namespace Units
         /// 2) 빈 슬롯 탐색 → 없으면 경고 출력
         /// 3) Photon 네트워크 Instantiate 실행
         /// </summary>
-        private void Summon()
+        private void Summon(UnitTier tier = UnitTier.Common)
         {
             //todo: 보유 재화... 랑 소환 비용이랑 비교해서 처리해주기
             //소환할때마다.. 비용 올라가나..?
@@ -108,25 +110,115 @@ namespace Units
                 return;
             }
             
+            
             //랜덤 유닛 뽑기
-            int unitIndex = Manager.UnitData.PickRandomUnitIndex();
+            Debug.Log("랜덤 유닛 뽑기");
+            int unitIndex = Manager.UnitData.PickRandomUnitIndexByTier(tier);
+            SpawnUnit(tier, unitIndex, slotIndex);
             
-            // 슬롯 점유 상태 업데이트
-            _fieldController.SpawnListArray[slotIndex] = true;
             
-            // 슬롯 위치 가져오기
-            Vector3 position =  _fieldController.SpawnList[slotIndex];
-
             // Manager.Resources.NetworkInstantiate<GameObject>(_unitPrefabPath, position);
             
-            
-            // Photon 네트워크 Instantiate
-            //todo: 테스트중 → 추후 Manager.Resources.NetworkInstantiate 사용 가능한지 확인 필요 , 로직 변동 될 수 있음
-            PhotonNetwork.Instantiate(_unitPrefabPath, position, Quaternion.identity, 0, new object[] { unitIndex});
         }
+        
+       
+
+        // private void SpawnUnit()
+        // {
+        //     // // 슬롯 정보
+        //     // GridSlot spawnSlot = _fieldController.MapSlot[slotIndex];
+        //     // // 슬롯 위치 가져오기
+        //     // Vector3 position = spawnSlot.SpawnPosition;
+        //     //
+        //     // Debug.Log($"생성할 위치 : {position}");
+        //     //
+        //     // // Photon 네트워크 Instantiate
+        //     // //todo: 테스트중 → 추후 Manager.Resources.NetworkInstantiate 사용 가능한지 확인 필요 , 로직 변동 될 수 있음
+        //     // var holder =  PhotonNetwork.Instantiate(_unitHolderPrefabPath, position, Quaternion.identity, 0).GetComponent<UnitHolder>();
+        //     // holder.SetCurrentSlot(spawnSlot);
+        //     // holder.SpawnUnit(unitIndex);
+        //     //
+        //     //
+        //     // //홀더 리스트에 추가
+        //     // _fieldController.UnitHolders.Add(holder);
+        // }
+
+        private void SpawnUnit(UnitTier tier, int unitIndex, int emptySlotIndex)
+        {
+            UnitHolder holder = _fieldController.MapSlot[emptySlotIndex].Holder;
+            holder.SpawnUnit(unitIndex);
+            
+            if (tier == UnitTier.Epic)
+            {
+                return;
+            }
+            
+            List<UnitHolder> existingHolders = GetExistingHolders(tier, unitIndex);
+
+            if (existingHolders.Count >= 3)
+            { 
+                //합성 후 다음 등급의 유닛 소환
+                Composition(existingHolders, tier+1);
+            }
+        }
+        
 
         #endregion
 
+
+        private List<UnitHolder> GetExistingHolders(UnitTier tier, int unitIndex)
+        {
+            List<UnitHolder> holders = new();
+            foreach (UnitHolder holder in PlayerFieldManager.Instance.GetLocalFieldController().UnitHolders)
+            {
+                if(holder.CurrentUnit !=null && holder.CurrentUnit.Tier == tier && holder.CurrentUnit.Index == unitIndex)
+                    holders.Add(holder);
+            }
+
+            return holders;
+        }
+        
+        #region composition
+        
+        public void Composition(List<UnitHolder> holders, UnitTier tier)
+        {
+            if (tier > UnitTier.Epic)
+            {
+                Debug.Log("최대 티어 도달, 합성 중단.");
+                return;
+            }
+            
+            UnitHolder firstHolder = holders[0];
+           
+            // 기존 유닛 삭제
+            for (int i = 0; i < 3; i++)
+            {
+                holders[i].DeleteUnit();
+            }
+
+            //첫번째 홀더 위치에 강화된 유닛 소한하기
+            int unitIndex = Manager.UnitData.PickRandomUnitIndexByTier(tier);
+            firstHolder.SpawnUnit(unitIndex);
+            
+            
+            holders = GetExistingHolders(tier, unitIndex);
+            //필드에 같은 유닛이 2개보다 적은 경우, 2개인데 방금 생성된 유닛을 포함하는 경우는 재합성 대상이 아님
+            if(holders.Count >= 3)
+                Composition(holders, tier+1);
+            // //재합성 필요 여부 확인
+            // while (true)
+            // {
+            //    
+            //         
+            //     
+            //     
+            // }
+        }
+
+
+
+        #endregion
+      
 
 
         #region Legacy(미사용)
