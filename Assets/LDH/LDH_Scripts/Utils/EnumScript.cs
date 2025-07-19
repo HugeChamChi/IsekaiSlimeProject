@@ -18,6 +18,13 @@ namespace Card
         AttackPowerUp, GoldGainUp, AllEnemyDefenseDown, AttackSpeedUp
     }
 }
+namespace Monster
+{
+    public enum MonsterType
+    {
+        Common, Boss
+    }
+}
 
 public enum ClearEventType
 {

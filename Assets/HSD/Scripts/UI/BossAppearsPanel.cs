@@ -5,11 +5,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using Util;
 
-public class Ultimate_Panel : MonoBehaviour
+public class BossAppearsPanel : MonoBehaviour
 {
-    [SerializeField] TMP_Text charName;
-    [SerializeField] TMP_Text charNameEN;
-    [SerializeField] Image charImage;
+    [SerializeField] Image bossImage;
+    [SerializeField] TMP_Text bossAppearsText;
     private Animator anim;
 
     private void Awake()
@@ -17,9 +16,10 @@ public class Ultimate_Panel : MonoBehaviour
         anim = GetComponent<Animator>();
     }
 
-    public void ShowUltimate()
+    public void Show(MonsterStat stat)
     {
-        gameObject.SetActive(true);
         anim.SetTrigger(Utils.inHash);
+        bossImage.sprite = stat.icon;
+        bossAppearsText.text = stat.Name;
     }
 }
