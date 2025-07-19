@@ -12,14 +12,14 @@ namespace LDH.LDH_Scripts.Temp
         private void Awake()
         {
             
-            button.interactable = GameManager.Instance.SelectedHolder != null;
-            GameManager.Instance.OnSelectedHolderChanged += OnSelectedHolderChanged;
+            button.interactable = InGameManager.Instance.SelectedHolder != null;
+            InGameManager.Instance.OnSelectedHolderChanged += OnSelectedHolderChanged;
             button.onClick.AddListener(() =>
             {
-                if (GameManager.Instance.SelectedHolder != null)
+                if (InGameManager.Instance.SelectedHolder != null)
                 {
-                    GameManager.Instance.SelectedHolder.DeleteUnit();
-                    GameManager.Instance.ClearSelectedHolder();
+                    InGameManager.Instance.SelectedHolder.DeleteUnit();
+                    InGameManager.Instance.ClearSelectedHolder();
                 }
             });
         }
@@ -27,7 +27,7 @@ namespace LDH.LDH_Scripts.Temp
         
         private void OnSelectedHolderChanged(UnitHolder holder)
         {
-            button.interactable = holder != null;
+            button.interactable = (holder != null && holder.CurrentUnit!=null);
         }
 
     }

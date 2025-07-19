@@ -4,6 +4,7 @@ using Photon.Pun;
 using UnityEngine;
 using Managers;
 using System.Linq;
+using Unit;
 using Units;
 
 namespace PlayerField
@@ -41,6 +42,10 @@ namespace PlayerField
         
         private string _unitHolderPrefabPath = "Prefabs/LDH_TestResource/UnitHolder"; // 유닛 홀더 경로
 
+
+        public event Action<int> OnEpicUnitCountChanged;
+        
+        
 
         public static void SwapHolderPosition(UnitHolder holder1, UnitHolder holder2)
         {
@@ -142,8 +147,6 @@ namespace PlayerField
             // 슬롯 위치 가져오기
             Vector3 position = spawnSlot.SpawnPosition;
             
-            Debug.Log($"생성할 위치 : {position}");
-            
             //Instantiate
             var holder = Manager.Resources.Instantiate<GameObject>(_unitHolderPrefabPath, position, Quaternion.identity)
                 .GetComponent<UnitHolder>();
@@ -158,6 +161,14 @@ namespace PlayerField
         }
         
         #endregion
+
+
+        public void NotifyUnitChanged()
+        {
+            int epicCount = UnitHolders.Count(h => h.CurrentUnit != null && h.CurrentUnit.Tier == UnitTier.Epic);
+            OnEpicUnitCountChanged?.Invoke(epicCount);
+            
+        }
         
         #region Gizmo
 

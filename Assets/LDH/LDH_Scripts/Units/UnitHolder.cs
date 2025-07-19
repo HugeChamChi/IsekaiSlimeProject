@@ -32,7 +32,6 @@ namespace Units
         
         public void SetCurrentUnit(Unit unit)
         {
-            Debug.Log("Set Current unit 호출");
             currentUnit = unit;
             GetSkillRange();
         }
@@ -45,7 +44,6 @@ namespace Units
         
         public void SetCurrentSlot(GridSlot slot)
         {
-            Debug.Log("Set Current Slot 호출");
             currentSlot = slot;
             GetSkillRange();
         }
@@ -87,6 +85,8 @@ namespace Units
             
             SetCurrentUnit(unit.GetComponent<Unit>());
             
+            
+            //유닛 
         }
         
         //스킬 범위
@@ -120,7 +120,7 @@ namespace Units
 
         private void GetSkillRange()
         {
-            Debug.Log("get skill range 호출");
+            //Debug.Log("get skill range 호출");
             if (currentUnit == null || currentSlot == null)
             {
                 Debug.Log("current unit null or currentslot null");
@@ -159,17 +159,20 @@ namespace Units
 
         public void DeleteUnit()
         {
-            Debug.Log($"유닛 {currentUnit.Index} {currentUnit.Name} 판매!");
+            Debug.Log($"유닛 {currentUnit.Index} {currentUnit.Name} 삭제!");
             PhotonNetwork.Destroy(currentUnit.gameObject);
             
             //선택한 홀더 초기화
-            GameManager.Instance.ClearSelectedHolder();
+            InGameManager.Instance.ClearSelectedHolder();
             
             //현재 홀더의 current unit 초기화
             ClearCurrentUnit();
             
             //skill range 숨기기
             HideSkillRange();
+            
+            //유닛 변경을 알림
+            PlayerFieldManager.Instance.GetLocalFieldController().NotifyUnitChanged();
         }
         
         

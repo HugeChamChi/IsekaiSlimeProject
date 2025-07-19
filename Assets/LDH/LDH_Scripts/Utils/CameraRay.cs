@@ -42,15 +42,15 @@ namespace Util
             RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
                 
             //스킬 범위 가리기
-            if (GameManager.Instance.SelectedHolder!=null)
+            if (InGameManager.Instance.SelectedHolder!=null)
             {
-                GameManager.Instance.SelectedHolder.HideSkillRange();
-                GameManager.Instance.ClearSelectedHolder();
+                InGameManager.Instance.SelectedHolder.HideSkillRange();
+                InGameManager.Instance.ClearSelectedHolder();
             }
                 
             if (hit.collider != null && hit.transform.TryGetComponent<UnitHolder>(out UnitHolder holder))
             {
-                GameManager.Instance.SetSelectedHolder(holder);
+                InGameManager.Instance.SetSelectedHolder(holder);
 
             }
         }
@@ -59,12 +59,12 @@ namespace Util
 
         private void MouseButton()
         {
-            if (GameManager.Instance.SelectedHolder != null)
+            if (InGameManager.Instance.SelectedHolder != null)
             {
                 Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
                 RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
-                if (hit.collider != null && GameManager.Instance.SelectedHolder.transform != hit.transform)
+                if (hit.collider != null && InGameManager.Instance.SelectedHolder.transform != hit.transform)
                 {
                     _moveHolder = hit.collider.GetComponent<UnitHolder>();
                 }
@@ -83,17 +83,17 @@ namespace Util
 
                 if (hit.collider != null)
                 {
-                    if(GameManager.Instance.SelectedHolder?.transform == hit.collider.transform)
+                    if(InGameManager.Instance.SelectedHolder?.transform == hit.collider.transform)
                         //todo: 공격 범위, 스킬 범위 보여주기(shader), 시간 등
-                        GameManager.Instance.SelectedHolder?.ShowSkillRange();
+                        InGameManager.Instance.SelectedHolder?.ShowSkillRange();
                 }
             }
 
             else
             {
-                if (GameManager.Instance.SelectedHolder.CurrentUnit != null)
+                if (InGameManager.Instance.SelectedHolder.CurrentUnit != null)
                 {
-                    PlayerFieldController.SwapHolderPosition(GameManager.Instance.SelectedHolder, _moveHolder);
+                    PlayerFieldController.SwapHolderPosition(InGameManager.Instance.SelectedHolder, _moveHolder);
                 }
             }
             

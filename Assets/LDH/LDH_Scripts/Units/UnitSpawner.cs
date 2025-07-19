@@ -18,14 +18,20 @@ namespace Units
         [Header("Field Settings")]
         [SerializeField] private PlayerFieldController _fieldController;  // 로컬 플레이어 필드 (현재 클라이언트 필드)
 
-        [Header("Holder Setting")]
+        //[Header("Holder Setting")]
         // [SerializeField] private GameObject _unitPrefab;  // 소환할 유닛 프리팹
-        private string _unitPrefabPath = "Prefabs/LDH_TestResource/Unit";  // 소환할 유닛 경로
-
+        //private string _unitPrefabPath = "Prefabs/LDH_TestResource/Unit";  // 소환할 유닛 경로
+        
+        [Header("Unit Composition Setting")] 
+        [SerializeField] private int  _epicUnitsForLegendary = 5;  // 레전더리 등급 유닛 소환을 위해 필요한 에픽 유닛 개수
+        [SerializeField] private int _baseUnitsForMerge = 3; // 레전더리 제외 유닛들을 합성할 때 필요한 유닛 개수. 즉 보통 유닛 3개면 -> 레어 유닛 1개로 합성되는데 이때 이 유닛 '3'개를 가리키는 변수
         
         
         [Header("UI")] 
         [SerializeField] private Button _summonButton;    // 소환 버튼
+        
+        
+        
 
         //--- 코드 이동된 부분---//
         // [SerializeField] private List<Vector2> spawnList = new();          // 슬롯 좌표 목록
@@ -34,7 +40,7 @@ namespace Units
         #region Unity LifeCycle
 
         private void Awake() => Init();
-        // private void Start() => GenerateGridSlots();
+        private void Start() => Subscribe();
         private void OnDestroy() => Unsubscribe();
 
         #endregion
@@ -47,13 +53,14 @@ namespace Units
         /// </summary>
         private void Init()
         {
-            Subscribe();
+            
         }
 
         //구독
         private void Subscribe()
         {
             _summonButton.onClick.AddListener(() =>Summon()); //소환 버튼 이벤트 구독
+            PlayerFieldManager.Instance.OnRegisterLocalFieldcontroller += SetSpawnPanel;
         }
 
         //구독 해제
@@ -147,26 +154,27 @@ namespace Units
         {
             UnitHolder holder = _fieldController.MapSlot[emptySlotIndex].Holder;
             holder.SpawnUnit(unitIndex);
-            
-            if (tier == UnitTier.Epic)
-            {
-                return;
-            }
-            
-            List<UnitHolder> existingHolders = GetExistingHolders(tier, unitIndex);
 
-            if (existingHolders.Count >= 3)
-            { 
-                //합성 후 다음 등급의 유닛 소환
-                Composition(existingHolders, tier+1);
+            if (tier != UnitTier.Epic)
+            {
+                List<UnitHolder> existingHolders = GetUnitHoldersByIndex(tier, unitIndex);
+
+                if (existingHolders.Count >= _baseUnitsForMerge)
+                { 
+                    //합성 후 다음 등급의 유닛 소환
+                    MergeUnits(existingHolders, tier+1);
+                }
             }
+            
+            _fieldController.NotifyUnitChanged();
+           
         }
         
 
         #endregion
 
 
-        private List<UnitHolder> GetExistingHolders(UnitTier tier, int unitIndex)
+        private List<UnitHolder> GetUnitHoldersByIndex(UnitTier tier, int unitIndex) //tier unitIndex와 일치하는 홀더 모두 가져오기
         {
             List<UnitHolder> holders = new();
             foreach (UnitHolder holder in PlayerFieldManager.Instance.GetLocalFieldController().UnitHolders)
@@ -178,9 +186,20 @@ namespace Units
             return holders;
         }
         
+        private List<UnitHolder> GetUnitHoldersByTier(UnitTier tier)
+        {
+            List<UnitHolder> holders = new();
+            foreach (UnitHolder holder in PlayerFieldManager.Instance.GetLocalFieldController().UnitHolders)
+            {
+                if (holder.CurrentUnit != null && holder.CurrentUnit.Tier == tier)
+                    holders.Add(holder);
+            }
+
+            return holders;
+        }
         #region composition
         
-        public void Composition(List<UnitHolder> holders, UnitTier tier)
+        public void MergeUnits(List<UnitHolder> holders, UnitTier tier)
         {
             if (tier > UnitTier.Epic)
             {
@@ -201,20 +220,36 @@ namespace Units
             firstHolder.SpawnUnit(unitIndex);
             
             
-            holders = GetExistingHolders(tier, unitIndex);
+            //---재합성 체크하기---//
+            holders = GetUnitHoldersByIndex(tier, unitIndex);
             //필드에 같은 유닛이 2개보다 적은 경우, 2개인데 방금 생성된 유닛을 포함하는 경우는 재합성 대상이 아님
-            if(holders.Count >= 3)
-                Composition(holders, tier+1);
-            // //재합성 필요 여부 확인
-            // while (true)
-            // {
-            //    
-            //         
-            //     
-            //     
-            // }
+            if(holders.Count >= _baseUnitsForMerge)
+                MergeUnits(holders, tier+1);
         }
 
+        public void MergeEpicUnits()
+        {
+            //필드에 있는 에픽 유닛 리스트 가져오기
+            List<UnitHolder> epicHolders = GetUnitHoldersByTier(UnitTier.Epic);
+
+            if (epicHolders.Count < 5) return;
+            
+            UnitHolder firstHolder = epicHolders[0];
+           
+            // 기존 유닛 삭제
+            for (int i = 0; i < 5; i++)
+            {
+                epicHolders[i].DeleteUnit();
+            }
+            
+            //첫번째 홀더 위치에 강화된 유닛 소한하기
+            int unitIndex = Manager.UnitData.PickRandomUnitIndexByTier(UnitTier.Legendary);
+            firstHolder.SpawnUnit(unitIndex);
+            
+            
+            _fieldController.NotifyUnitChanged();
+            
+        }
 
 
         #endregion

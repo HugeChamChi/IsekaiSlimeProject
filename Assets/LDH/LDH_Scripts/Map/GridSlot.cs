@@ -45,7 +45,7 @@ namespace PlayerField
         
         public void SetParent(int parentUniqueID)
         {
-            Transform parent = GameManager.Instance.GetInGameObjectByID(parentUniqueID);
+            Transform parent = InGameManager.Instance.GetInGameObjectByID(parentUniqueID);
             Transform child = transform;
             
             if (child == null || parent == null)
