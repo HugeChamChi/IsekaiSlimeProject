@@ -6,7 +6,7 @@ using UnityEngine;
 //todo: IDamagable 수정
 using IDamagable = LDH.LDH_Scripts.Temp.Temp_IDamagable;
 //todo: IEffectable 수정
-using IEffectable =  LDH.LDH_Scripts.Temp.Temp_IEffectable;
+//using IEffectable =  LDH.LDH_Scripts.Temp.Temp_IEffectable;
 
 namespace Units
 {
@@ -17,7 +17,9 @@ namespace Units
         public float CoolDown;
         public Effect Effect;
 
-        public UnitSkill(string name, string description, float coolDown, EffectType effectType, float duration)
+        private Coroutine removeRoutine;
+
+        public UnitSkill(string name, string description, float coolDown, EffectType effectType, float duration, float amount)
         {
             Name = name;
             Description = description;
@@ -25,7 +27,7 @@ namespace Units
             Effect = effectType switch
             {
                 EffectType.Faint => new FaintEffect(duration),
-                EffectType.Slow => new SlowEffect(duration)
+                EffectType.Slow => new SlowEffect(duration, amount)
             };
         }
         
@@ -36,9 +38,13 @@ namespace Units
                 if (target is IEffectable effectTarget)
                 {
                     Effect?.Apply(effectTarget);
-                    caster.StartCoroutine(RemoveEffect(effectTarget, Effect));
-                }
-            
+                    if(removeRoutine != null)
+                    {
+                        caster.StopCoroutine(removeRoutine);
+                        removeRoutine = null;
+                    }
+                    removeRoutine = caster.StartCoroutine(RemoveEffect(effectTarget, Effect));
+                }            
             }
         }
         
