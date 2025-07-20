@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Unit;
+using Units;
 using UnityEngine;
 
 namespace Managers
@@ -136,15 +137,21 @@ namespace Managers
             public int Index;
             public string Name;
             public int Tier;
-            public int Type;
+            public int UnitType;
             public string Description;
+            public string SkillDescription;
             public string ModelFileName;
             public float Attack;
             public float AttackSpeed;
+            public int SkillDamage;
+            public float SkillDuration;
+            public float EffectDuration;
+            public float SkillCoolTime;
             public float AttackRange;
-            public float BuffRange;
             public int SkillRangeType;
 
+
+            public UnitSkill Skill;
 
             /// <summary>
             /// 복사 생성자: 다른 UnitInfo에서 값 복사.
@@ -154,15 +161,23 @@ namespace Managers
                 Index = original.Index;
                 Name = original.Name;
                 Tier = original.Tier;
-                Type = original.Type;
+                UnitType = original.UnitType;
                 Description = original.Description;
                 ModelFileName = original.ModelFileName;
                 Attack = original.Attack;
                 AttackSpeed = original.AttackSpeed;
                 AttackRange = original.AttackRange;
-                BuffRange = original.BuffRange;
                 SkillRangeType = original.SkillRangeType;
+
+                SkillDescription = original.SkillDescription;
+                SkillDamage = original.SkillDamage;
+                SkillDuration = original.SkillDuration;
+                EffectDuration = original.EffectDuration;
+                SkillCoolTime = original.SkillCoolTime;
+                
             }
+            
+            
 
             /// <summary>
             /// 현재 인스턴스의 깊은 복사본을 생성.

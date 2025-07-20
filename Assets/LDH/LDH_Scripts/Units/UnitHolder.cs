@@ -1,6 +1,7 @@
 using Managers;
 using Photon.Pun;
 using PlayerField;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unit;
@@ -23,6 +24,14 @@ namespace Units
         
 
         private List<GridSlot> skillRangeSlots = new();
+        private List<GridSlot> skillApplySlots = new();
+        public List<GridSlot> SkillApplySlots => skillApplySlots;
+
+
+        private void OnDestroy()
+        {
+            StopAllCoroutines();
+        }
 
 
         public void ChangeUnit(UnitHolder targetHolder)
@@ -104,7 +113,9 @@ namespace Units
 
         public void ShowSkillApplyRange()
         {
-            foreach (GridSlot gridSlot in skillRangeSlots.Where(g => g.SlotType == SlotType.Outer))
+            if (currentUnit == null || skillApplySlots.Count == 0) return;
+            
+            foreach (GridSlot gridSlot in skillApplySlots)
             {
                 gridSlot.SetColor(true);
             }
@@ -125,16 +136,18 @@ namespace Units
             {
                 //Debug.Log("current unit null or currentslot null");
                 skillRangeSlots.Clear();
+                skillApplySlots.Clear();
                 
                 HideSkillRange();
                 return;
             }
             
             skillRangeSlots.Clear();
+            skillApplySlots.Clear();
             
             // var offsetList = SkillRangePattern.Offsets[currentUnit.SkillRangeType];
             
-            var offsetList = SkillRangePattern.Offsets[testSkillRangeType]; //todo: 수정..?
+            var offsetList = SkillRangePattern.Offsets[currentUnit.SkillRangeType];
            
             var gridSlots = PlayerFieldManager.Instance.GetLocalFieldController().MapSlot;
             
@@ -147,11 +160,11 @@ namespace Units
                     if (gridSlot.Row == targetRow && gridSlot.Column == targetCol)
                     {
                         skillRangeSlots.Add(gridSlot);
+                        if(gridSlot.SlotType == SlotType.Outer)
+                            skillApplySlots.Add(gridSlot);
+                        
                     }
                 }
-                //var slot = gridSlots.FirstOrDefault(s => s.Row == targetRow && s.Column == targetCol);
-             
-             
                 
             }
 

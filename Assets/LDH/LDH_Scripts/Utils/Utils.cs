@@ -87,6 +87,36 @@ namespace Util
 
             return best;
         }
+        
+        public static Transform FindLowestHpMonster(Vector2 origin, float range, OverlapType type, LayerMask layerMask, float boxAngle = 0f, Vector2? boxSize = null,
+            Func<GameObject, bool> filter = null)
+        {
+            int count = GetTargets(origin, range, type, layerMask, boxAngle, boxSize, buffer);
+ 
+            Transform best = null;
+            float lowestHp = float.MaxValue;
+
+            for (int i = 0; i < count; i++)
+            {
+                var target = buffer[i].GetComponent<MonsterStatusController>();
+
+                if (target == null)
+                    continue;
+
+                if (filter != null && !filter(target.gameObject))
+                    continue;
+
+                if (target.CurHp.Value < lowestHp)
+                {
+                    lowestHp = target.CurHp.Value;
+                    best = target.transform;
+                }
+            }
+
+            return best;
+        }
+
+        
 
         public static int GetTargets(Vector2 origin, float range, OverlapType type, LayerMask layerMask, float boxAngle, Vector2? boxSize, Collider2D[] results)
         {            

@@ -140,6 +140,7 @@ MonoBehaviour:
   <Type>k__BackingField: 0
   <Description>k__BackingField: 
   <ModelFileName>k__BackingField: 
+  <UnitSprite>k__BackingField: {fileID: 0}
   <SkillRangeType>k__BackingField: 2
   Controller: {fileID: 8090055858216181288}
 --- !u!114 &8090055858216181288
@@ -268,7 +269,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: e4301d2dab5b2164089c7d3585ecb154, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
