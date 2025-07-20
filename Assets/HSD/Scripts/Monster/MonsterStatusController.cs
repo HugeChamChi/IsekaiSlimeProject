@@ -18,7 +18,7 @@ public class MonsterStatusController : MonoBehaviour, IDamageable
 
     public static event Action<PhotonView> OnDied;
 
-    private void Start()
+    private void Awake()
     {
         pv = GetComponent<PhotonView>();
         SetupStat();

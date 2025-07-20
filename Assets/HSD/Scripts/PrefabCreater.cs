@@ -10,7 +10,7 @@ public class PrefabCreater : MonoBehaviour
     public struct MonsterPrefabData
     {
         public RuntimeAnimatorController runtimeAnimatorControllers;
-        public MonsterStat monsterStats;
+        public MonsterStat monsterStat;
         public string monsterName;
         public int ID;
     }    
@@ -40,10 +40,11 @@ public class PrefabCreater : MonoBehaviour
             SpriteRenderer sr = obj.AddComponent<SpriteRenderer>();
             sr.sortingLayerName = "Monster";
 
-            monsterPrefabDatas[i].monsterStats.ID = monsterPrefabDatas[i].ID;
-            monsterStatusController.baseStat = monsterPrefabDatas[i].monsterStats;
+            monsterPrefabDatas[i].monsterStat.ID = monsterPrefabDatas[i].ID;
+            monsterPrefabDatas[i].monsterStat.name = $"{monsterPrefabDatas[i].ID}_{monsterPrefabDatas[i].monsterName}_Data";
+            monsterStatusController.baseStat = monsterPrefabDatas[i].monsterStat;
 
-            string savePath = $"{path}/{monsterPrefabDatas[i].monsterName}.prefab";
+            string savePath = $"{path}/{monsterPrefabDatas[i].ID}_{monsterPrefabDatas[i].monsterName}.prefab";
 
             PrefabUtility.SaveAsPrefabAsset(obj, savePath);
 
