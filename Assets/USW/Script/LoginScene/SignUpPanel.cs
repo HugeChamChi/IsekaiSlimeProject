@@ -1,3 +1,4 @@
+// SignUpPanel.cs - 색상 코드 제거 버전
 using Firebase.Auth;
 using Firebase.Extensions;
 using System.Collections;
@@ -9,23 +10,22 @@ using System;
 
 public class SignUpPanel : MonoBehaviour
 {
-    [Header("Panel References")] 
+    [Header("Panel References")]
     [SerializeField] GameObject loginPanel;
 
-    [Header("Input Fields")] 
+    [Header("Input Fields")]
     [SerializeField] TMP_InputField emailInput;
     [SerializeField] TMP_InputField passInput;
     [SerializeField] TMP_InputField passConfirmInput;
 
-    [Header("Buttons")] 
+    [Header("Buttons")]
     [SerializeField] Button signUpButton;
     [SerializeField] Button cancelButton;
-    [SerializeField] Button emailCheckButton; // 이메일 중복체크 버튼
+
+    [Header("UI Feedback")]
+    [SerializeField] TMP_Text statusText;
 
     private bool isSigningUp = false;
-    private bool isEmailChecking = false;
-    private bool isEmailVerified = false; // 이메일 중복체크 완료 여부
-    private string verifiedEmail = ""; // 중복체크 완료된 이메일
 
     private void Awake()
     {
@@ -35,176 +35,20 @@ public class SignUpPanel : MonoBehaviour
 
     private void SetupButtonListeners()
     {
-        if (signUpButton != null)
-            signUpButton.onClick.AddListener(SignUp);
-        
-        if (cancelButton != null)
-            cancelButton.onClick.AddListener(Cancel);
-        
-        if (emailCheckButton != null)
-            emailCheckButton.onClick.AddListener(CheckEmailDuplication);
-
-        // 이메일 입력 필드가 변경되면 체크 상태 리셋
-        if (emailInput != null)
-            emailInput.onValueChanged.AddListener(OnEmailInputChanged);
+        signUpButton.onClick.AddListener(SignUp);
+        cancelButton.onClick.AddListener(Cancel);
     }
 
     private void ResetUI()
     {
         isSigningUp = false;
-        isEmailChecking = false;
-        isEmailVerified = false;
-        verifiedEmail = "";
-
-        if (signUpButton != null)
-        {
-            signUpButton.interactable = false; // 초기에는 비활성화 (이메일 체크 완료 후 활성화)
-            var signUpText = signUpButton.GetComponentInChildren<TMP_Text>();
-            if (signUpText != null)
-                signUpText.text = "회원가입";
-        }
-
-        if (emailCheckButton != null)
-        {
-            emailCheckButton.interactable = true;
-            var checkText = emailCheckButton.GetComponentInChildren<TMP_Text>();
-            if (checkText != null)
-                checkText.text = "중복확인";
-        }
-    }
-
-    private void OnEmailInputChanged(string newEmail)
-    {
-        // 이메일이 변경되면 중복체크 상태 리셋
-        if (verifiedEmail != newEmail.Trim())
-        {
-            isEmailVerified = false;
-            verifiedEmail = "";
-            UpdateSignUpButtonState();
-
-            // 중복확인 버튼 텍스트 리셋
-            if (emailCheckButton != null)
-            {
-                var checkText = emailCheckButton.GetComponentInChildren<TMP_Text>();
-                if (checkText != null)
-                    checkText.text = "중복확인";
-            }
-        }
-    }
-
-    private void UpdateSignUpButtonState()
-    {
-        // 이메일 중복체크가 완료된 경우에만 회원가입 버튼 활성화
-        if (signUpButton != null)
-            signUpButton.interactable = !isSigningUp;
-    }
-
-    #region 이메일 중복체크
-
-    private void CheckEmailDuplication()
-    {
-        if (emailInput == null)
-        {
-            ShowPopup("이메일 입력 필드를 찾을 수 없습니다");
-            return;
-        }
-
-        string email = emailInput.text.Trim();
-
-        // 이메일 형식 검증
-        if (!IsValidEmailFormat(email))
-        {
-            ShowPopup("올바른 이메일 형식을 입력해주세요");
-            return;
-        }
-
-        if (isEmailChecking)
-        {
-            return; // 이미 체크 중이면 중복 실행 방지
-        }
-
-        isEmailChecking = true;
+        UpdateStatusText("회원가입 정보를 입력해주세요");
         
-        if (emailCheckButton != null)
-        {
-            emailCheckButton.interactable = false;
-            var checkText = emailCheckButton.GetComponentInChildren<TMP_Text>();
-            if (checkText != null)
-                checkText.text = "확인중...";
-        }
-
-        // 임시 계정 생성 시도로 이메일 중복 체크
-        FirebaseAuth.DefaultInstance.CreateUserWithEmailAndPasswordAsync(email, "DummyPassword")
-            .ContinueWithOnMainThread(task =>
-            {
-                ResetEmailCheckUI();
-
-                if (task.IsCanceled)
-                {
-                    ShowPopup("이메일 확인이 취소되었습니다");
-                    return;
-                }
-
-                if (task.IsFaulted)
-                {
-                    // 오류 발생 - 이메일이 이미 존재하는 경우
-                    string errorMessage = task.Exception?.GetBaseException()?.Message ?? "";
-
-                    if (errorMessage.ToLower().Contains("email-already-in-use") ||
-                        errorMessage.ToLower().Contains("email already in use") ||
-                        errorMessage.ToLower().Contains("already in use by another account"))
-                    {
-                        ShowPopup("이미 존재하는 이메일입니다");
-                    }
-                    else
-                    {
-                        ShowPopup(GetUserFriendlyErrorFromMessage(errorMessage));
-                    }
-                    return;
-                }
-
-                // 성공 - 사용 가능한 이메일이므로 즉시 삭제
-                FirebaseUser tempUser = task.Result.User;
-
-                // 임시 계정 삭제
-                tempUser.DeleteAsync().ContinueWithOnMainThread(deleteTask =>
-                {
-                    if (deleteTask.IsCompletedSuccessfully)
-                    {
-                        // 이메일 사용 가능
-                        isEmailVerified = true;
-                        verifiedEmail = email;
-                        UpdateSignUpButtonState();
-
-                        ShowPopup("사용 가능한 이메일입니다!");
-
-                        if (emailCheckButton != null)
-                        {
-                            var checkText = emailCheckButton.GetComponentInChildren<TMP_Text>();
-                            if (checkText != null)
-                                checkText.text = "확인완료";
-                        }
-                    }
-                    else
-                    {
-                        // 삭제 실패 - 경고 메시지
-                        Debug.LogError($"임시 계정 삭제 실패: {deleteTask.Exception?.GetBaseException()?.Message}");
-                        ShowPopup("이메일 확인 과정에서 오류가 발생했습니다. 다시 시도해주세요.");
-                    }
-                });
-            });
+        signUpButton.interactable = true;
+        signUpButton.GetComponentInChildren<TMP_Text>().text = "회원가입";
     }
 
-    private void ResetEmailCheckUI()
-    {
-        isEmailChecking = false;
-        if (emailCheckButton != null)
-            emailCheckButton.interactable = true;
-    }
-
-    #endregion
-
-    #region 이메일 형식 검증
+    #region 이메일 형식 검증 (로컬)
 
     private bool IsValidEmailFormat(string email)
     {
@@ -229,19 +73,6 @@ public class SignUpPanel : MonoBehaviour
 
     private void SignUp()
     {
-        if (emailInput == null)
-        {
-            ShowPopup("이메일 입력 필드를 찾을 수 없습니다");
-            return;
-        }
-
-        // 이메일 중복체크 완료 여부 확인
-        if (!isEmailVerified || verifiedEmail != emailInput.text.Trim())
-        {
-            ShowPopup("이메일 중복 확인을 먼저 완료해주세요");
-            return;
-        }
-
         // 입력 검증
         if (!ValidateInputs())
         {
@@ -250,18 +81,13 @@ public class SignUpPanel : MonoBehaviour
 
         // 회원가입 진행
         isSigningUp = true;
-        
-        if (signUpButton != null)
-        {
-            signUpButton.interactable = false;
-            var signUpText = signUpButton.GetComponentInChildren<TMP_Text>();
-            if (signUpText != null)
-                signUpText.text = "가입 중...";
-        }
+        signUpButton.interactable = false;
+        signUpButton.GetComponentInChildren<TMP_Text>().text = "가입 중...";
+        UpdateStatusText("회원가입 진행 중...");
 
-        // Firebase 회원가입 시도
+        // Firebase 회원가입 시도 
         string email = emailInput.text.Trim();
-        string password = passInput != null ? passInput.text : "";
+        string password = passInput.text;
 
         FirebaseAuth.DefaultInstance.CreateUserWithEmailAndPasswordAsync(email, password)
             .ContinueWithOnMainThread(task =>
@@ -274,7 +100,7 @@ public class SignUpPanel : MonoBehaviour
 
                 if (task.IsFaulted)
                 {
-                    // Firebase 오류 처리
+                    // Firebase 오류 처리 (이메일 중복 포함)
                     string errorMessage = HandleFirebaseException(task.Exception);
                     HandleSignUpResult(false, errorMessage);
                     return;
@@ -282,15 +108,22 @@ public class SignUpPanel : MonoBehaviour
 
                 // 회원가입 성공
                 FirebaseUser user = task.Result.User;
+                UpdateStatusText("회원가입이 완료되었습니다!");
+                
+                // GameManager에 사용자 정보 저장
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.SetUserInfo(user);
+                }
 
-                ShowCelebrationPopup();
-
-                // 회원가입 후 즉시 로그아웃 (GameManager 호출 없이)
-                // Firebase CreateUser는 자동 로그인하므로 바로 로그아웃 처리
+                // 회원가입 후 로그아웃 (로그인 화면에서 다시 로그인하도록)
                 FirebaseAuth.DefaultInstance.SignOut();
                 
-                // 로그아웃 완료 후 로그인 화면으로 이동
-                StartCoroutine(WaitForSignOutComplete());
+                ResetSignUpUI();
+                gameObject.SetActive(false); 
+                loginPanel.SetActive(true);  
+                
+                ShowCelebrationPopup();
             });
     }
 
@@ -312,14 +145,12 @@ public class SignUpPanel : MonoBehaviour
     {
         if (string.IsNullOrEmpty(errorMessage))
             return "알 수 없는 오류가 발생했습니다";
-
+            
         errorMessage = errorMessage.ToLower();
-
-        if (errorMessage.Contains("email-already-in-use") || 
-            errorMessage.Contains("email already in use") ||
-            errorMessage.Contains("already in use by another account"))
+        
+        if (errorMessage.Contains("email-already-in-use") || errorMessage.Contains("email already in use"))
         {
-            return "이미 존재하는 이메일입니다";
+            return "이미 사용 중인 이메일입니다. 다른 이메일을 사용해주세요.";
         }
         else if (errorMessage.Contains("invalid-email"))
         {
@@ -335,18 +166,18 @@ public class SignUpPanel : MonoBehaviour
         }
         else if (errorMessage.Contains("too-many-requests"))
         {
-            return "너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요";
+            return "너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요.";
         }
         else
         {
-            return "오류가 발생했습니다. 다시 시도해주세요";
+            return $"인증 오류: {errorMessage}";
         }
     }
 
     private void HandleSignUpResult(bool success, string message)
     {
         ResetSignUpUI();
-        ShowPopup(message);
+        UpdateStatusText(message);
     }
 
     #endregion
@@ -355,29 +186,27 @@ public class SignUpPanel : MonoBehaviour
 
     private bool ValidateInputs()
     {
-        if (emailInput == null || passInput == null || passConfirmInput == null)
-        {
-            ShowPopup("입력 필드를 찾을 수 없습니다");
-            return false;
-        }
-
         // 이메일 형식 검증
         string email = emailInput.text.Trim();
         if (!IsValidEmailFormat(email))
         {
+            UpdateStatusText("올바른 이메일 형식을 입력해주세요");
             ShowPopup("올바른 이메일 형식을 입력해주세요");
+            
             return false;
         }
 
         // 비밀번호 검증
         if (string.IsNullOrEmpty(passInput.text))
         {
+            UpdateStatusText("비밀번호를 입력해주세요");
             ShowPopup("비밀번호를 입력해주세요");
             return false;
         }
 
         if (passInput.text.Length < 6)
         {
+            UpdateStatusText("비밀번호는 6자리 이상이어야 합니다");
             ShowPopup("비밀번호는 6자리 이상이어야 합니다");
             return false;
         }
@@ -385,6 +214,7 @@ public class SignUpPanel : MonoBehaviour
         // 비밀번호 확인
         if (passInput.text != passConfirmInput.text)
         {
+            UpdateStatusText("비밀번호가 일치하지 않습니다");
             ShowPopup("비밀번호가 일치하지 않습니다");
             return false;
         }
@@ -396,118 +226,52 @@ public class SignUpPanel : MonoBehaviour
 
     #region UI 관리
 
+    private void UpdateStatusText(string message)
+    {
+        if (statusText != null)
+        {
+            statusText.text = message;
+        }
+        Debug.Log($"[회원가입 상태] {message}");
+    }
+
     private void ResetSignUpUI()
     {
         isSigningUp = false;
-        
-        if (signUpButton != null)
-        {
-            signUpButton.interactable = isEmailVerified; // 이메일 체크 상태에 따라
-            var signUpText = signUpButton.GetComponentInChildren<TMP_Text>();
-            if (signUpText != null)
-                signUpText.text = "회원가입";
-        }
+        signUpButton.interactable = true;
+        signUpButton.GetComponentInChildren<TMP_Text>().text = "회원가입";
     }
 
     private void Cancel()
     {
         ResetInputs();
-        
-        if (loginPanel != null)
-        {
-            loginPanel.SetActive(true);
-            gameObject.SetActive(false);
-        }
+        loginPanel.SetActive(true);
+        gameObject.SetActive(false);
     }
 
     private void ResetInputs()
     {
-        if (emailInput != null) emailInput.text = "";
-        if (passInput != null) passInput.text = "";
-        if (passConfirmInput != null) passConfirmInput.text = "";
+        emailInput.text = "";
+        passInput.text = "";
+        passConfirmInput.text = "";
         ResetUI();
-    }
-
-    private IEnumerator WaitForSignOutAndReturnToLogin()
-    {
-        // 로그아웃 완료까지 기다리기 (최대 3초)
-        float waitTime = 0f;
-        const float maxWaitTime = 3f;
-        
-        while (FirebaseAuth.DefaultInstance.CurrentUser != null && waitTime < maxWaitTime)
-        {
-            yield return new WaitForSeconds(0.1f);
-            waitTime += 0.1f;
-        }
-        
-        // 추가 안전 대기
-        yield return new WaitForSeconds(0.5f);
-        
-        // UI 상태 리셋
-        ResetSignUpUI();
-        
-        // 로그인 화면으로 이동
-        if (loginPanel != null)
-        {
-            gameObject.SetActive(false);
-            loginPanel.SetActive(true);
-            
-            // LoginPanel 상태도 리셋 (혹시 모를 상태 이상 방지)
-            LoginPanel loginPanelScript = loginPanel.GetComponent<LoginPanel>();
-            if (loginPanelScript != null)
-            {
-                // LoginPanel의 상태 리셋 (필요하다면)
-                Debug.Log("회원가입 완료 - 로그인 화면으로 이동");
-            }
-        }
-    }
-
-    private IEnumerator WaitForSignOutComplete()
-    {
-        // 로그아웃 완료까지 기다리기 (최대 3초)
-        float waitTime = 0f;
-        const float maxWaitTime = 3f;
-        
-        while (FirebaseAuth.DefaultInstance.CurrentUser != null && waitTime < maxWaitTime)
-        {
-            yield return new WaitForSeconds(0.1f);
-            waitTime += 0.1f;
-        }
-        
-        // 추가 안전 대기
-        yield return new WaitForSeconds(0.5f);
-        
-        // UI 상태 리셋
-        ResetSignUpUI();
-        
-        // 로그인 화면으로 이동
-        if (loginPanel != null)
-        {
-            gameObject.SetActive(false);
-            loginPanel.SetActive(true);
-            
-            Debug.Log("회원가입 완료 - 로그인 화면으로 이동");
-        }
     }
 
     private IEnumerator ReturnToLoginAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-
+        
         // 입력 필드 초기화
         ResetInputs();
-
+        
         // 로그인 화면으로 이동
-        if (loginPanel != null)
-        {
-            loginPanel.SetActive(true);
-            gameObject.SetActive(false);
-        }
+        loginPanel.SetActive(true);
+        gameObject.SetActive(false);
     }
 
     #endregion
 
-    #region 팝업 관련 메서드
+    #region  팝업 관련 메서드 추가
 
     private void ShowPopup(string message)
     {
@@ -515,21 +279,13 @@ public class SignUpPanel : MonoBehaviour
         {
             PopupManager.Instance.ShowPopup(message);
         }
-        else
-        {
-            Debug.LogWarning($"PopupManager를 찾을 수 없습니다: {message}");
-        }
     }
-
+    
     private void ShowCelebrationPopup()
     {
         if (PopupManager.Instance != null)
         {
-            PopupManager.Instance.ShowPopup("회원가입 성공!");
-        }
-        else
-        {
-            Debug.Log("회원가입 성공!");
+            PopupManager.Instance.ShowPopup(" 회원가입 성공!");
         }
     }
 
