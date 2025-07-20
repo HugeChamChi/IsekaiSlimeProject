@@ -307,7 +307,7 @@ public class SettingPanels : MonoBehaviour
     {
         if (bgmValueText != null)
         {
-            bgmValueText.text = Mathf.RoundToInt(bgmVolume * 100).ToString();
+            bgmValueText.text = Mathf.RoundToInt(bgmVolume).ToString();
         }
     }
     
@@ -315,7 +315,7 @@ public class SettingPanels : MonoBehaviour
     {
         if (sfxValueText != null)
         {
-            sfxValueText.text = Mathf.RoundToInt(sfxVolume * 100).ToString();
+            sfxValueText.text = Mathf.RoundToInt(sfxVolume).ToString();
         }
     }
     
