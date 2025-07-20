@@ -1,15 +1,13 @@
-using Managers;
 using Photon.Pun;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
-using Util;
+using UnityEngine.U2D;
 
 
 public class BaseMonster : NetworkUnit, IPunObservable
 {
-    [SerializeField] private Rigidbody2D rb;
+    private Rigidbody2D rb;
+    private SpriteRenderer sr;
 
     [Header("Patrol")]
     [SerializeField] private float distance;
@@ -17,10 +15,14 @@ public class BaseMonster : NetworkUnit, IPunObservable
     private Coroutine moveRoutine;
 
     [Header("Status")]
-    [SerializeField] private MonsterStatusController status;    
+    private MonsterStatusController status;
 
     private void Start()
     {
+        sr      = GetComponent<SpriteRenderer>();
+        rb      = GetComponent<Rigidbody2D>();
+        status  = GetComponent<MonsterStatusController>();
+
         SetupPoints();
 
         moveRoutine = StartCoroutine(MoveRoutine());
@@ -28,8 +30,8 @@ public class BaseMonster : NetworkUnit, IPunObservable
 
     private void OnEnable()
     {
-        if (points[0] != Vector2.zero && moveRoutine == null)
-            StartCoroutine(MoveRoutine());
+        //if (points[0] != Vector2.zero && moveRoutine == null)
+        //    StartCoroutine(MoveRoutine());
     }
 
     private void OnDisable()
@@ -41,10 +43,13 @@ public class BaseMonster : NetworkUnit, IPunObservable
     {
         Vector2 origin = transform.position;
 
-        points[0] = origin + new Vector2(0, distance);
-        points[1] = origin + new Vector2(distance, distance);
-        points[2] = origin + new Vector2(distance, 0);
-        points[3] = origin + new Vector2(0, 0);
+        points = new Vector2[]
+        {
+            origin + new Vector2(distance, 0),
+            origin + new Vector2(distance, -distance),
+            origin + new Vector2(0, -distance),
+            origin + new Vector2(0, 0)
+        };
     }
 
     private IEnumerator MoveRoutine()
@@ -54,6 +59,10 @@ public class BaseMonster : NetworkUnit, IPunObservable
         while (true)
         {
             Vector2 target = points[index];
+
+            Vector2 direction = (target - (Vector2)transform.position).normalized;
+
+            sr.flipX = direction.x < 0;
 
             while (Vector2.Distance(transform.position, target) > 0.1f)
             {
@@ -77,7 +86,7 @@ public class BaseMonster : NetworkUnit, IPunObservable
             stream.SendNext(transform.position);
             stream.SendNext(transform.rotation);
         }
-        else if(stream.IsReading)
+        else if (stream.IsReading)
         {
             transform.position = (Vector3)stream.ReceiveNext();
             transform.rotation = (Quaternion)stream.ReceiveNext();

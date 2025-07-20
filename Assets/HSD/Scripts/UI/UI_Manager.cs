@@ -10,6 +10,7 @@ public class UI_Manager : DesignPattern.Singleton<UI_Manager>
     public Ultimate_Panel ultimate;
     public CardPanel cardPanel;
     public CharacterInfoPanel characterInfoPanel;
+    public WarningMessagePanel warningMessagePanel;
 
     private void Start()
     {
@@ -22,13 +23,15 @@ public class UI_Manager : DesignPattern.Singleton<UI_Manager>
         ultimate = Instantiate(Resources.Load<Ultimate_Panel>("UI/Ultimate_Panel"), mainCanvas.transform);
         cardPanel = Instantiate(Resources.Load<CardPanel>("UI/CardPanel"), mainCanvas.transform);
         characterInfoPanel = Instantiate(Resources.Load<CharacterInfoPanel>("UI/CharacterInfoPanel"), mainCanvas.transform);
+        warningMessagePanel = Instantiate(Resources.Load<WarningMessagePanel>("UI/WarningMessagePanel"), mainCanvas.transform);
     }
 
     public void DestroyInGameUI()
     {
-        Destroy(ultimate.gameObject);           ultimate = null;
-        Destroy(cardPanel.gameObject);          cardPanel = null;
-        Destroy(characterInfoPanel.gameObject); characterInfoPanel = null;
+        Destroy(ultimate.gameObject);               ultimate = null;
+        Destroy(cardPanel.gameObject);              cardPanel = null;
+        Destroy(characterInfoPanel.gameObject);     characterInfoPanel = null;
+        Destroy(warningMessagePanel.gameObject);    warningMessagePanel = null;
     }
 
     /// <summary>
