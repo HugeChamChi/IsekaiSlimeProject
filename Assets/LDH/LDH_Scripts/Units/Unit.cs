@@ -39,6 +39,12 @@ namespace Units
         //private void Awake() => Init();
 
         //private void Start() { }
+        
+        private void OnDestroy()
+        {
+            StopAllCoroutines();
+        }
+
 
         #endregion
         
@@ -57,12 +63,13 @@ namespace Units
             Index = info.Index;
             Name = info.Name;
             Tier = (UnitTier)info.Tier;
-            Type = (UnitType)info.Type;
+            Type = (UnitType)info.UnitType;
             Description = info.Description;
             ModelFileName = info.ModelFileName;
             SkillRangeType = (SkillRangeType)info.SkillRangeType;
             
             Controller.InitData(info);
+            
             
             Debug.Log($"[Unit] 초기화 완료! 이름: {Name}");
             

@@ -12,7 +12,7 @@ namespace Units
                 SkillRangeType.Short1,
                 new[] { new Vector2Int(0, 1), new Vector2Int(1, 0), new Vector2Int(0, -1), new Vector2Int(-1, 0) }
             },
-            { SkillRangeType.Short2, new[] { new Vector2Int(-1, 0), new Vector2Int(1, 0) } },
+            { SkillRangeType.Short2, new[] { new Vector2Int(0, -1), new Vector2Int(0, 1) } },
             {
                 SkillRangeType.Long1,
                 new[]
