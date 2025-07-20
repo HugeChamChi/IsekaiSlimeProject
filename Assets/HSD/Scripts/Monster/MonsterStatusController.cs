@@ -7,7 +7,7 @@ using UnityEngine;
 public class MonsterStatusController : MonoBehaviour, IDamageable
 {
     [Header("Stat")]
-    [SerializeField] private MonsterStat baseStat;
+    public MonsterStat baseStat;
     public Stat<float, float> Health = new Stat<float, float>((a, b) => a + b, value => value);
     public Stat<float, float> Speed = new Stat<float, float>((a, b) => a + b, value => value);
     public Stat<float, float> Defense = new Stat<float, float>((a, b) => a + b, value => value / 100);
