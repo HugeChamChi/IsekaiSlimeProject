@@ -158,6 +158,21 @@ public class LoginPanel : MonoBehaviourPun
             });
     }
 
+    // 회원가입 후 자동 로그인을 위한 메서드
+    public void SetCredentialsAndLogin(string email, string password)
+    {
+        emailInput.text = email;
+        passInput.text = password;
+        
+        StartCoroutine(DelayedAutoLogin());
+    }
+
+    private IEnumerator DelayedAutoLogin()
+    {
+        yield return new WaitForSeconds(0.5f);
+        Login();
+    }
+
     private IEnumerator DelayedPhotonConnect()
     {
         yield return new WaitForSeconds(0.5f);
@@ -278,10 +293,16 @@ public class LoginPanel : MonoBehaviourPun
         {
             Debug.Log("커스텀 프로퍼티 설정 중...");
             
-            var customProps = GameManager.Instance.GetUserCustomProperties();
-            PhotonNetwork.LocalPlayer.SetCustomProperties(customProps);
+            // 기존 프로퍼티 완전 정리 후 새로 설정
+            var emptyProps = new ExitGames.Client.Photon.Hashtable();
+            emptyProps["firebaseUID"] = null;
+            emptyProps["email"] = null;
+            emptyProps["displayName"] = null;
+            emptyProps["loginTime"] = null;
+            PhotonNetwork.LocalPlayer.SetCustomProperties(emptyProps);
             
-            StartCoroutine(WaitForCustomPropertiesSet());
+            // 잠시 대기 후 새 프로퍼티 설정
+            StartCoroutine(SetNewCustomProperties());
         }
         else
         {
@@ -289,10 +310,25 @@ public class LoginPanel : MonoBehaviourPun
         }
     }
 
+    private IEnumerator SetNewCustomProperties()
+    {
+        yield return new WaitForSeconds(0.3f);
+        
+        if (GameManager.Instance != null && PhotonNetwork.IsConnected && PhotonNetwork.LocalPlayer != null)
+        {
+            var customProps = GameManager.Instance.GetUserCustomProperties();
+            PhotonNetwork.LocalPlayer.SetCustomProperties(customProps);
+            
+            Debug.Log($"새 커스텀 프로퍼티 설정 완료 - UID: {GameManager.Instance.UserID}");
+            
+            StartCoroutine(WaitForCustomPropertiesSet());
+        }
+    }
+
     private IEnumerator WaitForCustomPropertiesSet()
     {
         float waitTime = 0f;
-        const float maxWait = 5f;
+        const float maxWait = 8f; // 시간 연장
         
         while (waitTime < maxWait)
         {
@@ -307,15 +343,30 @@ public class LoginPanel : MonoBehaviourPun
                     CheckLoginComplete();
                     yield break;
                 }
+                else
+                {
+                    Debug.LogWarning($"UID 불일치 - 예상: {GameManager.Instance?.UserID}, 실제: {setUID}");
+                    
+                    // 불일치 시 재시도
+                    if (waitTime > 3f) // 3초 후에도 불일치면 강제 재설정
+                    {
+                        Debug.Log("UID 불일치로 인한 강제 재설정");
+                        var customProps = GameManager.Instance.GetUserCustomProperties();
+                        PhotonNetwork.LocalPlayer.SetCustomProperties(customProps);
+                    }
+                }
             }
             
-            yield return new WaitForSeconds(0.1f);
-            waitTime += 0.1f;
+            yield return new WaitForSeconds(0.2f);
+            waitTime += 0.2f;
         }
         
         Debug.LogError("커스텀 프로퍼티 설정 시간 초과");
         UpdateStatusText("사용자 정보 동기화 실패");
-        ResetLoginUI();
+        
+        // 시간 초과시에도 일단 진행 (로그인은 성공했으니까)
+        isCustomPropertiesSet = true;
+        CheckLoginComplete();
     }
 
     private void CheckLoginComplete()
@@ -334,13 +385,133 @@ public class LoginPanel : MonoBehaviourPun
             emailInput.text = "";
             passInput.text = "";
             
-            StartCoroutine(LoadLobbyScene());
+            StartCoroutine(CheckAllSystemsReadyAndMoveToLobby());
         }
     }
 
+    private IEnumerator CheckAllSystemsReadyAndMoveToLobby()
+    {
+        UpdateStatusText("시스템 준비 확인 중...");
+        
+        // 1. Firebase Database 초기화 대기
+        yield return StartCoroutine(WaitForFirebaseDatabase());
+        
+        // 2. GameManager 완전 준비 대기
+        yield return StartCoroutine(WaitForGameManagerReady());
+        
+        // 3. UserManager 준비 대기 (선택사항)
+        yield return StartCoroutine(WaitForUserManagerReady());
+        
+        // 4. 최종 상태 확인
+        if (AreAllSystemsReady())
+        {
+            UpdateStatusText("모든 시스템 준비 완료 - 로비로 이동 중...");
+            
+            emailInput.text = "";
+            passInput.text = "";
+            
+            yield return new WaitForSeconds(0.5f);
+            SceneManager.LoadScene("LobbyScene");
+        }
+        else
+        {
+            UpdateStatusText("시스템 준비 실패");
+            ShowPopup("시스템 초기화에 실패했습니다. 다시 시도해주세요.");
+            ResetLoginUI();
+        }
+    }
+
+    private IEnumerator WaitForFirebaseDatabase()
+    {
+        float waitTime = 0f;
+        const float maxWait = 10f;
+        
+        while (waitTime < maxWait)
+        {
+            // Firebase Database 초기화 확인
+            if (FirebaseManager.IsFullyInitialized())
+            {
+                Debug.Log("✅ Firebase Database 준비 완료");
+                yield break;
+            }
+            
+            // IsDatabaseReady만 확인 (Database가 실패해도 진행)
+            if (FirebaseManager.IsFirebaseReady && FirebaseManager.IsAuthReady)
+            {
+                Debug.LogWarning("Firebase Database 실패했지만 진행 (로컬 모드)");
+                yield break;
+            }
+            
+            yield return new WaitForSeconds(0.1f);
+            waitTime += 0.1f;
+        }
+        
+        Debug.LogWarning("Firebase Database 초기화 타임아웃 - 로컬 모드로 진행");
+    }
+
+    private IEnumerator WaitForGameManagerReady()
+    {
+        float waitTime = 0f;
+        const float maxWait = 5f;
+        
+        while (waitTime < maxWait)
+        {
+            // GameManager 완전 준비 확인
+            if (GameManager.Instance != null && 
+                GameManager.Instance.IsFirebaseLoggedIn && 
+                GameManager.Instance.IsPhotonConnected &&
+                !string.IsNullOrEmpty(GameManager.Instance.UserID))
+            {
+                Debug.Log("✅ GameManager 완전 준비 완료");
+                yield break;
+            }
+            
+            yield return new WaitForSeconds(0.1f);
+            waitTime += 0.1f;
+        }
+        
+        Debug.LogError("GameManager 준비 타임아웃");
+    }
+
+    private IEnumerator WaitForUserManagerReady()
+    {
+        float waitTime = 0f;
+        const float maxWait = 5f;
+        
+        while (waitTime < maxWait)
+        {
+            // UserManager 존재 확인 (없어도 진행)
+            if (UserManager.Instance != null)
+            {
+                Debug.Log("✅ UserManager 준비 완료");
+                yield break;
+            }
+            
+            yield return new WaitForSeconds(0.1f);
+            waitTime += 0.1f;
+        }
+        
+        Debug.LogWarning("UserManager 타임아웃 - 없어도 진행");
+    }
+
+    private bool AreAllSystemsReady()
+    {
+        // 필수 조건들
+        bool gameManagerReady = GameManager.Instance != null && 
+                               GameManager.Instance.IsFirebaseLoggedIn && 
+                               GameManager.Instance.IsPhotonConnected &&
+                               !string.IsNullOrEmpty(GameManager.Instance.UserID);
+        
+        bool firebaseReady = FirebaseManager.IsFirebaseReady && FirebaseManager.IsAuthReady;
+        
+        bool loginStatesReady = isFirebaseLoggedIn && isPhotonConnected && isCustomPropertiesSet;
+        
+        return gameManagerReady && firebaseReady && loginStatesReady;
+    }
+    
     private IEnumerator LoadLobbyScene()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1f);
         SceneManager.LoadScene("LobbyScene");
     }
 
@@ -371,6 +542,9 @@ public class LoginPanel : MonoBehaviourPun
         if (GameManager.Instance != null)
         {
             GameManager.Instance.SetPhotonConnectionStatus(true);
+            
+            // 연결 직후 강제 동기화
+            GameManager.Instance.ForceSyncFirebasePhoton();
         }
         
         StartCoroutine(DelayedSetupCustomProperties());
@@ -378,7 +552,8 @@ public class LoginPanel : MonoBehaviourPun
 
     private IEnumerator DelayedSetupCustomProperties()
     {
-        yield return new WaitForSeconds(0.3f);
+        // 조금 더 길게 대기
+        yield return new WaitForSeconds(0.5f);
         SetupPhotonCustomProperties();
     }
 
@@ -433,15 +608,6 @@ public class LoginPanel : MonoBehaviourPun
         ResetLoginUI();
     }
 
-    // IMatchmakingCallbacks
-    public void OnFriendListUpdate(System.Collections.Generic.List<FriendInfo> friendList) { }
-    public void OnCreatedRoom() { }
-    public void OnCreateRoomFailed(short returnCode, string message) { }
-    public void OnJoinedRoom() { }
-    public void OnJoinRoomFailed(short returnCode, string message) { }
-    public void OnJoinRandomFailed(short returnCode, string message) { }
-    public void OnLeftRoom() { }
-
     private IEnumerator ReconnectToPhoton()
     {
         UpdateStatusText("Photon 재연결 중...");
@@ -489,5 +655,4 @@ public class LoginPanel : MonoBehaviourPun
             PopupManager.Instance.ShowPopup(message);
         }
     }
-    
 }
