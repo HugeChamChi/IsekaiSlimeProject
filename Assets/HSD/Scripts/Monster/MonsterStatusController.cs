@@ -39,8 +39,11 @@ public class MonsterStatusController : MonoBehaviour, IDamageable
         float defence = DefenseMultiply.Value == 0 ? 1 - Defense.Value : 1 - ((1 + DefenseMultiply.Value / 100) * Defense.Value);
 
         damage *= defence;
+        
+        Debug.Log($"[Monster] 몬스터한테 적용되는 최종 데미지 : {damage}");
 
         CurHp.Value -= damage;
+        Debug.Log($"[Monster] current hp = {CurHp.Value}");
 
         if (CurHp.Value <= 0)
         {

@@ -70,6 +70,7 @@ namespace Units
                 {
 
                     float damage = caster.Controller.CalcDamage(true);
+                    Debug.Log($"[skill] 유닛이 넘겨주는 데미지 : {damage}");
                     target.TakeDamage(damage);
                 }
 

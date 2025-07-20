@@ -45,7 +45,7 @@ public class WaveController : MonoBehaviour
         {
             MonsterStatusController.OnDied += MonsterDie;
             uiController = new UI_Controller();
-            uiController.Init(transform);
+            //uiController.Init(transform);
 
             Info = new();
             clearCondition = new WaitUntil(() => Info.MonsterCount.Value == 0);
@@ -92,7 +92,7 @@ public class WaveController : MonoBehaviour
 
         while (waveData.SpawnCount != curSpawnCount)
         {
-            MonsterSpawn(waveData.SpawnMonster);
+            MonsterSpawn($"Monster/{waveData.SpawnMonster}");
             yield return Utils.GetDelay(waveData.SpawnTime / waveData.SpawnCount);
         }
 

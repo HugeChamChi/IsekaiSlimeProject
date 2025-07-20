@@ -40,23 +40,24 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8772742289094167048}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d1b61ca20cdad0542a32e5a0c8655260, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   pv: {fileID: -3540162939166955448}
+  Info: {}
   waveDatas:
   - WaveCount: 0
     WaveIdx: 1
     WaveTime: 10
     SpawnTime: 10
     EventType: 0
-    SpawnMonster: 11
+    SpawnMonster: 101_MushroomSlime
     SpawnBoss: 11
     SpawnCount: 10
     SpawnBossCount: 1
-  testPrefab: {fileID: 2578002554422532683, guid: 07f7d6d0109b9274aa6485dc62864890, type: 3}
+  prefab: {fileID: 5775738285970614779, guid: 258aabf0b8f19c14685f7e79352befe2, type: 3}
 --- !u!114 &-3540162939166955448
 MonoBehaviour:
   m_ObjectHideFlags: 0
