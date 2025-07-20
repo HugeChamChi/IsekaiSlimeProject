@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: TestMat
-  m_Shader: {fileID: 4800000, guid: cfc70bb3a989dd245aaf8e77903ca3d7, type: 3}
+  m_Shader: {fileID: 4800000, guid: f5229a59ad85a05498c2692c0038b057, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
@@ -61,6 +61,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OuterOutlineNoiseTexture:
+        m_Texture: {fileID: 2800000, guid: cd21d0de17dcd734691f79979be13330, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _RainbowMask:
@@ -258,7 +262,7 @@ Material:
     - _MetalHighlightDensity: 1
     - _OuterOutlineDistortionToggle: 0
     - _OuterOutlineFade: 1
-    - _OuterOutlineWidth: 0.04
+    - _OuterOutlineWidth: 0.1
     - _PixelateFade: 1
     - _PixelatePixelDensity: 16
     - _PixelsPerUnit: 100
@@ -417,7 +421,7 @@ Material:
     - _MetalNoiseDistortionSpeed: {r: -0.05, g: -0.05, b: 0, a: 0}
     - _MetalNoiseScale: {r: 0.25, g: 0.25, b: 0, a: 0}
     - _MetalNoiseSpeed: {r: 0.05, g: 0.05, b: 0, a: 0}
-    - _OuterOutlineColor: {r: 0, g: 0, b: 0, a: 1}
+    - _OuterOutlineColor: {r: 1, g: 0.70456123, b: 0, a: 1}
     - _OuterOutlineDistortionIntensity: {r: 0.01, g: 0.01, b: 0, a: 0}
     - _OuterOutlineNoiseScale: {r: 4, g: 4, b: 0, a: 0}
     - _OuterOutlineNoiseSpeed: {r: 0, g: 0.1, b: 0, a: 0}

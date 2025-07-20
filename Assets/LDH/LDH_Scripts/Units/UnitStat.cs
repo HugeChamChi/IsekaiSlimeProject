@@ -25,12 +25,7 @@ namespace Units
         /// </summary>
         [field:SerializeField] public float AttackRange { get; private set; }
  
-        /// <summary>
-        /// 버프 범위 (유닛 중심 기준 반지름)
-        /// </summary>
-        [field:SerializeField] public float BuffRange { get; private set; }
-
-        
+  
         //초당 공격횟수 = AttackSpeed
         //딜레이(쿨타임..?) 일반 공격 쿨타임..? 1초당 attack speed 만큼 => 1번 공격 후 1/attackspeed 만큼 딜레이
         public float AttackDelay => 1 / AttackSpeed;
@@ -43,12 +38,11 @@ namespace Units
         /// <param name="attackRange">공격 범위</param>
         /// <param name="attackSpeed">공격 속도</param>
         /// <param name="buffRange">버프 범위</param>
-        public UnitStat(float attack,  float attackSpeed, float attackRange, float buffRange)
+        public UnitStat(float attack,  float attackSpeed, float attackRange)
         {
             Attack = attack;
-            AttackRange = attackRange;
+            AttackRange = attackRange / 100f;
             AttackSpeed = attackSpeed;
-            BuffRange = buffRange;
         }
 
         public UnitStat() { }
@@ -77,12 +71,5 @@ namespace Units
             AttackSpeed = value;
         }
 
-        /// <summary>
-        /// 버프 범위 값을 갱신한다.
-        /// </summary>
-        public void SetBuffRange(float value)
-        {
-            BuffRange = value;
-        }
     }
 }

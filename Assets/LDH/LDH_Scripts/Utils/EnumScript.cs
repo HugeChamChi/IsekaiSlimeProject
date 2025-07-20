@@ -43,10 +43,13 @@ public enum StatType
 namespace Unit
 {
     public enum UnitTier { Common = 1, Rare, Epic, Legendary }
-    public enum UnitType { RangeAttack, SpeedDebuff, ArmorDebuff, AttackSpeedBuff, AttackPowerBuff }
-    public enum EffectType { Faint, Slow }
+    public enum UnitType { RangeAttack = 1, Faint = 2, MoveSpeedBuff = 3 }
+    public enum EffectType { None = 1, Faint, Slow }
     
-    public enum SkillRangeType {Short1, Short2, Long1, Long2}       
+    public enum SkillRangeType {Short1 = 1, Short2, Long1, Long2}
+    
+    public enum OutlineType {None, Skill, Select}
+    
 }
 
 namespace PlayerField
