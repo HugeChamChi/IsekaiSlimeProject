@@ -4,7 +4,7 @@ using UnityEngine;
 
 
 //todo: IEffectable 수정
-using IEffectable =  LDH.LDH_Scripts.Temp.Temp_IEffectable;
+//using IEffectable =  LDH.LDH_Scripts.Temp.Temp_IEffectable;
 namespace Units
 {
 
@@ -12,6 +12,7 @@ namespace Units
     {
         public EffectType Type;
         public float Duration;
+        
 
         protected Effect(EffectType type, float duration)
         {
@@ -26,6 +27,7 @@ namespace Units
 
         public virtual void Remove(IEffectable target)
         {
+            
         }
 
     }

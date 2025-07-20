@@ -5,6 +5,10 @@ using UnityEditor;
 using UnityEngine;
 using Util;
 
+//todo: IDamagable 수정
+using IDamagable = LDH.LDH_Scripts.Temp.Temp_IDamagable;
+//todo: IEffectable 수정
+//using IEffectable =  LDH.LDH_Scripts.Temp.Temp_IEffectable;
 
 namespace Units
 {
@@ -21,7 +25,7 @@ namespace Units
 
         private WaitForSeconds skillIntervalWait; // 스킬 지속 시간 내 스킬 사용 상태에서 스킬 적용간의 간격.. 잠깐 딜레이주는 시간
         private float skillIntervalTime = 0.5f;
-
+        private Coroutine removeRoutine;
         private int skillCount;
         public UnitSkill(string description, int damage, float duration, float coolTime, EffectType effectType, float effectDuration)
         {
@@ -32,12 +36,22 @@ namespace Units
             CoolTime = coolTime;
             Effect = effectType switch
             {
-                EffectType.Faint => new FaintEffect(effectDuration),
-                EffectType.Slow => new SlowEffect(effectDuration),
+                EffectType.Faint => new FaintEffect(duration),
+                EffectType.Slow => new SlowEffect(duration, amount)
                 EffectType.None => null
-                
             };
 
+                if (target is IEffectable effectTarget)
+                {
+                    Effect?.Apply(effectTarget);
+                    if(removeRoutine != null)
+                    {
+                        caster.StopCoroutine(removeRoutine);
+                        removeRoutine = null;
+                    }
+                    removeRoutine = caster.StartCoroutine(RemoveEffect(effectTarget, Effect));
+                }            
+            }
             skillIntervalWait = new WaitForSeconds(skillIntervalTime);
         }
         

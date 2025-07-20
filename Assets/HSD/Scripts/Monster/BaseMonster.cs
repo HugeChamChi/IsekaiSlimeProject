@@ -16,6 +16,9 @@ public class BaseMonster : NetworkUnit, IPunObservable
 
     [Header("Status")]
     private MonsterStatusController status;
+    [Space]
+
+    private int index = 0;
 
     private void Start()
     {
@@ -32,11 +35,15 @@ public class BaseMonster : NetworkUnit, IPunObservable
     {
         //if (points[0] != Vector2.zero && moveRoutine == null)
         //    StartCoroutine(MoveRoutine());
+
+        status.isFaint.AddEvent(Faint);
     }
 
     private void OnDisable()
     {
         moveRoutine = null;
+
+        status.isFaint.RemoveEvent(Faint);
     }
 
     private void SetupPoints()
@@ -52,10 +59,28 @@ public class BaseMonster : NetworkUnit, IPunObservable
         };
     }
 
-    private IEnumerator MoveRoutine()
+    private void Faint(bool isFaint)
     {
-        int index = 0;
+        if (isFaint)
+            StopMove();
+        else
+            ReStartMove();
+    }
 
+    private void StopMove()
+    {
+        if (moveRoutine != null)
+            StopCoroutine(moveRoutine);
+    }
+
+    private void ReStartMove()
+    {
+        if(moveRoutine == null)
+            moveRoutine = StartCoroutine(MoveRoutine());
+    }
+
+    private IEnumerator MoveRoutine()
+    {       
         while (true)
         {
             Vector2 target = points[index];
