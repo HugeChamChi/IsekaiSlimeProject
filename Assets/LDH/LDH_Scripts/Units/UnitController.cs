@@ -125,7 +125,7 @@ namespace Units
             
             //스킬 정보 초기화
             Skill = new UnitSkill(info.SkillDescription, info.SkillDamage, info.SkillDuration, info.SkillCoolTime,
-                (EffectType)(info.UnitType), info.EffectDuration);
+                (EffectType)(info.UnitType), info.EffectDuration, info.EffectAmount);
 
             attackCoolTime = 1f / info.AttackSpeed;
             skillCoolTime = info.SkillCoolTime;

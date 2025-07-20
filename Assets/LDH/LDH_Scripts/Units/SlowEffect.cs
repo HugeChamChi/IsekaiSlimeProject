@@ -1,8 +1,7 @@
 using LDH.LDH_Scripts.Temp;
 using Unit;
+using UnityEngine;
 
-//todo: IEffectable 수정
-//using IEffectable =  LDH.LDH_Scripts.Temp.Temp_IEffectable;
 namespace Units
 {
     public class SlowEffect : Effect
@@ -16,6 +15,7 @@ namespace Units
 
         public override void Apply(IEffectable target)
         {
+            Debug.Log($"[Slow Effect] : {Amount} 이속 감소");
             target.Apply(Type, Amount);
         }
 

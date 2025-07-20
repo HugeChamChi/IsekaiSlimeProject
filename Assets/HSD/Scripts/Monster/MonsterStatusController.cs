@@ -70,8 +70,11 @@ public class MonsterStatusController : MonoBehaviour, IDamageable, IEffectable
                 isFaint.Value = true;
                 break;
             case EffectType.Slow:
+                
                 float slowAmount = Speed.Value * (amount / 100);
                 Speed.AddModifier(slowAmount, "Slow");
+                
+                Debug.Log($"[Monster] 이속 적용 {amount} - 실제 스피드 {Speed.Value}");
                 break;
         }
     }

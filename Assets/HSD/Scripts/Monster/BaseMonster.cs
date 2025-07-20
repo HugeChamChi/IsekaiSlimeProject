@@ -35,7 +35,7 @@ public class BaseMonster : NetworkUnit, IPunObservable
     {
         //if (points[0] != Vector2.zero && moveRoutine == null)
         //    StartCoroutine(MoveRoutine());
-
+        status ??= GetComponent<MonsterStatusController>();
         status.isFaint.AddEvent(Faint);
     }
 
