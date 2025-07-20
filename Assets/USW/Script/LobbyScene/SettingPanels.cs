@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
 
-public class SettingPanel : MonoBehaviour
+public class SettingPanels : MonoBehaviour
 {
     [Header("Tab Buttons")]
     [SerializeField] private Button graphicTabButton;

@@ -37,7 +37,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     
     [Header("Settings Panel")]
     [SerializeField] private GameObject settingPanel;
-    [SerializeField] private SettingPanel settingPanelScript; 
+    [SerializeField] private SettingPanels settingPanelScript; 
     
     private string currentRoomCode = "0000";
     private bool isInRoom = false;
