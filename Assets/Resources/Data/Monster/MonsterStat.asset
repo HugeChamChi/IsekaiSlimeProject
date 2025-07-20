@@ -16,7 +16,7 @@ MonoBehaviour:
   Name: 
   icon: {fileID: 0}
   MonsterType: 0
-  Hp: 0
+  Hp: 1000
   MoveSpeed: 5
   Defense: 0
   DropGold: 0

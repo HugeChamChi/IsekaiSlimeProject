@@ -42,8 +42,11 @@ public class MonsterStatusController : MonoBehaviour, IDamageable, IEffectable
         float defence = DefenseMultiply.Value == 0 ? 1 - Defense.Value : 1 - ((1 + DefenseMultiply.Value / 100) * Defense.Value);
 
         damage *= defence;
+        
+        Debug.Log($"[Monster] 몬스터한테 적용되는 최종 데미지 : {damage}");
 
         CurHp.Value -= damage;
+        Debug.Log($"[Monster] current hp = {CurHp.Value}");
 
         if (CurHp.Value <= 0)
         {
@@ -67,8 +70,11 @@ public class MonsterStatusController : MonoBehaviour, IDamageable, IEffectable
                 isFaint.Value = true;
                 break;
             case EffectType.Slow:
+                
                 float slowAmount = Speed.Value * (amount / 100);
                 Speed.AddModifier(slowAmount, "Slow");
+                
+                Debug.Log($"[Monster] 이속 적용 {amount} - 실제 스피드 {Speed.Value}");
                 break;
         }
     }

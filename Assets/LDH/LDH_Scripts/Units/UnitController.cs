@@ -125,7 +125,7 @@ namespace Units
             
             //스킬 정보 초기화
             Skill = new UnitSkill(info.SkillDescription, info.SkillDamage, info.SkillDuration, info.SkillCoolTime,
-                (EffectType)(info.UnitType), info.EffectDuration);
+                (EffectType)(info.UnitType), info.EffectDuration, info.EffectAmount);
 
             attackCoolTime = 1f / info.AttackSpeed;
             skillCoolTime = info.SkillCoolTime;
@@ -232,7 +232,8 @@ namespace Units
 
            int level = 0; //todo : 캐릭터 돌파 레벌
            float finalAttack = Stat.Attack * (1 + level * 0.05f);
-           float damage = finalAttack * (1 + CardManager.Instance.AttackPower.Value) * (isSkill ? Skill.Damage : 1);
+           Debug.Log($"final Attack : {finalAttack}, cardmanager attack power : {CardManager.Instance.AttackPower.Value}, skill 계수 : {(isSkill ? Skill.Damage/100f : 1)}");
+           float damage = finalAttack * (CardManager.Instance.AttackPower.Value) * (isSkill ? Skill.Damage/100f : 1);
 
 
            return damage;

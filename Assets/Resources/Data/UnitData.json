@@ -14,8 +14,9 @@
       "SkillDuration" : 0,
       "EffectDuration" : 0,
       "SkillCoolTime" : 10,
-      "AttackRange": 100,
-      "SkillRangeType" : 1
+      "AttackRange": 300,
+      "SkillRangeType" : 1,
+      "EffectAmount" : 0
       
     },
     {
@@ -32,8 +33,27 @@
       "SkillDuration" : 0,
       "EffectDuration" : 0.5,
       "SkillCoolTime" : 10,
-      "AttackRange": 100,
-      "SkillRangeType" : 1
+      "AttackRange": 300,
+      "SkillRangeType" : 1,
+      "EffectAmount" : 0
+    },
+    {
+      "Index": 203,
+      "Name" : "다리아",
+      "Tier" : 1,
+      "UnitType" : 3,
+      "Description" : "왕궁 거리 뒷골목의 주인인 마녀 다리아입니다. 세간에는 그녀가 7대영웅이었다는 미신이 돌고 있습니다.",
+      "SkillDescription" : "적에게 저주를 걸어 정신 혼란 상태에 빠트립니다. 이동속도가 20% 감소합니다.",
+      "ModelFileName" : "file name...",
+      "Attack": 150,
+      "AttackSpeed": 1.2,
+      "SkillDamage" : 10,
+      "SkillDuration" : 5,
+      "EffectDuration" : 0.3,
+      "SkillCoolTime" : 10,
+      "AttackRange": 300,
+      "SkillRangeType" : 2,
+      "EffectAmount" : 20
     },
     {
       "Index": 206,
@@ -49,8 +69,9 @@
       "SkillDuration" : 0,
       "EffectDuration" : 0,
       "SkillCoolTime" : 10,
-      "AttackRange": 100,
-      "SkillRangeType" : 1
+      "AttackRange": 300,
+      "SkillRangeType" : 1,
+      "EffectAmount" : 0
     },
     {
       "Index": 207,
@@ -66,8 +87,9 @@
       "SkillDuration" : 0,
       "EffectDuration" : 0,
       "SkillCoolTime" : 10,
-      "AttackRange": 100,
-      "SkillRangeType" : 1
+      "AttackRange": 300,
+      "SkillRangeType" : 1,
+      "EffectAmount" : 0
     },
     {
       "Index": 211,
@@ -83,8 +105,9 @@
       "SkillDuration" : 0,
       "EffectDuration" : 0,
       "SkillCoolTime" : 10,
-      "AttackRange": 100,
-      "SkillRangeType" : 1
+      "AttackRange": 300,
+      "SkillRangeType" : 1,
+      "EffectAmount" : 0
     },
     {
       "Index": 212,
@@ -100,8 +123,9 @@
       "SkillDuration" : 0,
       "EffectDuration" : 0,
       "SkillCoolTime" : 10,
-      "AttackRange": 100,
-      "SkillRangeType" : 1
+      "AttackRange": 300,
+      "SkillRangeType" : 1,
+      "EffectAmount" : 0
     },
     {
       "Index": 213,
@@ -117,8 +141,9 @@
       "SkillDuration" : 0,
       "EffectDuration" : 0,
       "SkillCoolTime" : 10,
-      "AttackRange": 100,
-      "SkillRangeType" : 1
+      "AttackRange": 300,
+      "SkillRangeType" : 1,
+      "EffectAmount" : 0
     },
     {
       "Index": 216,
@@ -134,8 +159,9 @@
       "SkillDuration" : 0,
       "EffectDuration" : 0,
       "SkillCoolTime" : 10,
-      "AttackRange": 100,
-      "SkillRangeType" : 1
+      "AttackRange": 300,
+      "SkillRangeType" : 1,
+      "EffectAmount" : 0
     },
     {
       "Index": 217,
@@ -151,8 +177,9 @@
       "SkillDuration" : 0,
       "EffectDuration" : 0,
       "SkillCoolTime" : 10,
-      "AttackRange": 100,
-      "SkillRangeType" : 1
+      "AttackRange": 300,
+      "SkillRangeType" : 1,
+      "EffectAmount" : 0
     }
   ]
 }

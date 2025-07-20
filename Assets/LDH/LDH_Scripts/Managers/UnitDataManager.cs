@@ -149,9 +149,8 @@ namespace Managers
             public float SkillCoolTime;
             public float AttackRange;
             public int SkillRangeType;
-
-
-            public UnitSkill Skill;
+            public float EffectAmount;
+            
 
             /// <summary>
             /// 복사 생성자: 다른 UnitInfo에서 값 복사.
@@ -174,7 +173,9 @@ namespace Managers
                 SkillDuration = original.SkillDuration;
                 EffectDuration = original.EffectDuration;
                 SkillCoolTime = original.SkillCoolTime;
-                
+
+                EffectAmount = original.EffectAmount;
+
             }
             
             

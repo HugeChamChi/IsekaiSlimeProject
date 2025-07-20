@@ -5,10 +5,6 @@ using UnityEditor;
 using UnityEngine;
 using Util;
 
-//todo: IDamagable 수정
-using IDamagable = LDH.LDH_Scripts.Temp.Temp_IDamagable;
-//todo: IEffectable 수정
-//using IEffectable =  LDH.LDH_Scripts.Temp.Temp_IEffectable;
 
 namespace Units
 {
@@ -25,9 +21,9 @@ namespace Units
 
         private WaitForSeconds skillIntervalWait; // 스킬 지속 시간 내 스킬 사용 상태에서 스킬 적용간의 간격.. 잠깐 딜레이주는 시간
         private float skillIntervalTime = 0.5f;
-        private Coroutine removeRoutine;
+
         private int skillCount;
-        public UnitSkill(string description, int damage, float duration, float coolTime, EffectType effectType, float effectDuration)
+        public UnitSkill(string description, int damage, float duration, float coolTime, EffectType effectType, float effectDuration, float amount = 0)
         {
       
             Description = description;
@@ -36,22 +32,12 @@ namespace Units
             CoolTime = coolTime;
             Effect = effectType switch
             {
-                EffectType.Faint => new FaintEffect(duration),
-                EffectType.Slow => new SlowEffect(duration, amount)
+                EffectType.Faint => new FaintEffect(effectDuration),
+                EffectType.Slow => new SlowEffect(effectDuration, amount),
                 EffectType.None => null
+                
             };
 
-                if (target is IEffectable effectTarget)
-                {
-                    Effect?.Apply(effectTarget);
-                    if(removeRoutine != null)
-                    {
-                        caster.StopCoroutine(removeRoutine);
-                        removeRoutine = null;
-                    }
-                    removeRoutine = caster.StartCoroutine(RemoveEffect(effectTarget, Effect));
-                }            
-            }
             skillIntervalWait = new WaitForSeconds(skillIntervalTime);
         }
         
@@ -83,8 +69,17 @@ namespace Units
                 foreach (var target in GetTargetListInSkillRange(currentHolder, caster))
                 {
 
+                    //데미지
                     float damage = caster.Controller.CalcDamage(true);
                     target.TakeDamage(damage);
+                    
+                    //디버프
+                    if (target is IEffectable effectTarget)
+                    {
+                        Effect?.Apply(effectTarget);
+                        caster.StartCoroutine(RemoveEffect(effectTarget, Effect));
+                    }
+                    
                 }
 
 
@@ -97,17 +92,6 @@ namespace Units
             
             yield return null;
             holder.HideSkillRange();
-            
-            // foreach (var target in targets) {
-            //     // target.TakeDamage(caster.Stat.Attack * 1.5f);  // 예: 스킬은 1.5배 데미지
-            //
-            //     if (target is IEffectable effectTarget)
-            //     {
-            //         Effect?.Apply(effectTarget);
-            //         caster.StartCoroutine(RemoveEffect(effectTarget, Effect));
-            //     }
-            //
-            // }
         }
 
         
@@ -133,10 +117,10 @@ namespace Units
             return targets;
         }
         
-        // private IEnumerator RemoveEffect(IEffectable target, Effect effect) {
-        //     yield return new WaitForSeconds(effect.Duration);
-        //     effect.Remove(target);
-        // }
+        private IEnumerator RemoveEffect(IEffectable target, Effect effect) {
+            yield return new WaitForSeconds(effect.Duration);
+            effect.Remove(target);
+        }
 
 
         #region Legacy
