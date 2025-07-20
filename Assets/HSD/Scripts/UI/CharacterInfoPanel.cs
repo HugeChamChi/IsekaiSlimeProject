@@ -22,6 +22,7 @@ public class CharacterInfoPanel : MonoBehaviour
 
     public void Show(Units.Unit info)
     {
+        gameObject.SetActive(true);
         //characterImage.sprite = info.UnitSprite;
         characterName.text = info.Name;
         characterDescription.text = info.Description;
