@@ -16,7 +16,7 @@ public class BaseMonster : NetworkUnit, IPunObservable
     private Vector2[] points = new Vector2[4];
     private Coroutine moveRoutine;
 
-    [Header("Stat")]
+    [Header("Status")]
     [SerializeField] private MonsterStatusController status;    
 
     private void Start()

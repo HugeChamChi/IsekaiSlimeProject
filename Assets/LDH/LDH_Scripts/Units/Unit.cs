@@ -1,5 +1,6 @@
 using Managers;
 using Photon.Pun;
+using System.Collections;
 using Unit;
 using UnityEngine;
 using Util;
@@ -22,7 +23,8 @@ namespace Units
         [field: SerializeField] public UnitType Type { get; private set; }
         [field: SerializeField] public string Description { get; private set; }
         [field: SerializeField] public string ModelFileName { get; private set; }
-
+        [field: SerializeField] public SpriteRenderer UnitSprite { get; private set; }
+        [field: SerializeField] public SkillRangeType SkillRangeType { get; set; } //todo :  setter private으로 바꾸기
         /// <summary>
         /// 유닛의 컨트롤러 컴포넌트 (Stat, Animator, Attack, Skill 관리)
         /// </summary>
@@ -58,6 +60,7 @@ namespace Units
             Type = (UnitType)info.Type;
             Description = info.Description;
             ModelFileName = info.ModelFileName;
+            SkillRangeType = (SkillRangeType)info.SkillRangeType;
             
             Controller.InitData(info);
             
@@ -99,6 +102,40 @@ namespace Units
             InitData(unitInfo);
         }
         #endregion
+
+
+        public void ChangePosition(UnitHolder holder)
+        {
+            //transform.parent = holder.transform; //rpc 적용
+            int holderID = ComponentProvider.Get<InGameObject>(holder.gameObject).uniqueID;
+            ComponentProvider.Get<PhotonView>(gameObject).RPC("SetParentRPC", RpcTarget.All, holderID);
+
+            Vector2 dir = holder.transform.position - transform.position;
+            Controller.UpdateSpriteFlip(dir);
+            StartCoroutine(MoveCorutone(holder.transform.position));
+        }
+
+
+        private IEnumerator MoveCorutone(Vector2 endPos)
+        {
+            float current = 0f;
+            float percent = 0f;
+
+            Vector2 starPos = transform.position;
+
+            while (percent<1.0f)
+            {
+                current += Time.deltaTime;
+                percent = current / 0.3f;
+
+                Vector2 lerpPos = Vector2.Lerp(starPos, endPos, percent);
+                transform.position = lerpPos;
+                yield return null;
+
+            }
+            
+        }
+        
         
         #region Legacy(미사용)
         private void SetPositionScale()
@@ -119,7 +156,6 @@ namespace Units
         
 
         #endregion
-
-
+        
     }
 }

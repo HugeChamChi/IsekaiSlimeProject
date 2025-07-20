@@ -1,0 +1,188 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8902327593066158971
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8853607050100431336}
+  - component: {fileID: 168000123681295882}
+  m_Layer: 0
+  m_Name: AnimationCreater
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8853607050100431336
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8902327593066158971}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -164.73651, y: 620.9093, z: -15.94104}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &168000123681295882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8902327593066158971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a368298aa0044b4e8c97c007cfca676, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clipInfos:
+  - sprites:
+    - {fileID: 21300000, guid: 113acccba3571d740b68a997c5c85387, type: 3}
+    - {fileID: 21300000, guid: 745fed36a038a0040a4d2dc67e242d30, type: 3}
+    - {fileID: 21300000, guid: fc8ad4c073a1ba44cb3b19d1e2a986e8, type: 3}
+    - {fileID: 21300000, guid: 470a1c80f4e526247845cfe7c15d9a8b, type: 3}
+    monsterName: MushroomSlime
+    clipName: Idle
+  - sprites:
+    - {fileID: 21300000, guid: 890d78a829af55a47875e274def960d4, type: 3}
+    - {fileID: 21300000, guid: a3808cb088629ff4ca653c2931dedf81, type: 3}
+    - {fileID: 21300000, guid: a6c84a980e3221a4795cd046af11bf4e, type: 3}
+    - {fileID: 21300000, guid: 9ea7efe7aa0a5da46b9a6e79b68fa91b, type: 3}
+    monsterName: ThornSlime
+    clipName: Idle
+  - sprites:
+    - {fileID: 21300000, guid: 56c6aa6bae3260e44986dc7cb56597d8, type: 3}
+    - {fileID: 21300000, guid: 1e029e446ae28c54892fb9934325bf56, type: 3}
+    - {fileID: 21300000, guid: 50ea6f1c5e3e6584dab87427bda9afa9, type: 3}
+    - {fileID: 21300000, guid: a1c8fc12568f5234080d0e4b8bfe2ed2, type: 3}
+    monsterName: MudSlime
+    clipName: Idle
+  - sprites:
+    - {fileID: 21300000, guid: 49458707f34ee69468a2e6c6f976c902, type: 3}
+    - {fileID: 21300000, guid: c90c48a8031290140bf157139f19a3fb, type: 3}
+    - {fileID: 21300000, guid: d75d744c2e99303479d31010d00ffff4, type: 3}
+    - {fileID: 21300000, guid: bcdb532bb77ed9b4e84897c53933e51f, type: 3}
+    monsterName: FireSlime
+    clipName: Idle
+  - sprites:
+    - {fileID: 21300000, guid: b3711a59445527c44a76c2a709a21534, type: 3}
+    - {fileID: 21300000, guid: bca2b3e62a11bf64e9da7b5e8c3857da, type: 3}
+    - {fileID: 21300000, guid: 35b185424e4f27945902f443ae0911a7, type: 3}
+    - {fileID: 21300000, guid: 0060da9c414b1544d85263b6e8d74f3e, type: 3}
+    monsterName: PurplumSlime
+    clipName: Idle
+  - sprites:
+    - {fileID: 21300000, guid: e551a3826321a524985292199cf410b3, type: 3}
+    - {fileID: 21300000, guid: 5fa3e07bb41e4a94b90e87cb62cf8196, type: 3}
+    - {fileID: 21300000, guid: ad2e763c9b2328c428de2fe2d0f228ed, type: 3}
+    - {fileID: 21300000, guid: f9016bb644b00634f8a2e1fb5faccc3e, type: 3}
+    monsterName: DevilSlime
+    clipName: Idle
+  - sprites:
+    - {fileID: 21300000, guid: 81af6409d9daa6644ad4aa5ce6439f88, type: 3}
+    - {fileID: 21300000, guid: 4ed45c286a2925744a5e3d1ccb73be48, type: 3}
+    - {fileID: 21300000, guid: 90e262789e8ee7b46ba31ccb01279c2f, type: 3}
+    - {fileID: 21300000, guid: 7d42804741fe5a04eaf859a88358d735, type: 3}
+    monsterName: EvoltSlime
+    clipName: Idle
+  - sprites:
+    - {fileID: 21300000, guid: 99771e5652adc2c46a718ca3ce3204f2, type: 3}
+    - {fileID: 21300000, guid: 414d01a38e50cb3499a39b5ff1eb28bb, type: 3}
+    - {fileID: 21300000, guid: 38b36b7dfa079a347b22031d54a36134, type: 3}
+    - {fileID: 21300000, guid: 812d76c20dcdad54fa9019b0794bfc27, type: 3}
+    monsterName: MudGelSlime
+    clipName: Idle
+  - sprites:
+    - {fileID: 21300000, guid: b0d1c95a7430d6e4fac32178f0a5baeb, type: 3}
+    - {fileID: 21300000, guid: e13faba6a8699484399003c6a0d88f7a, type: 3}
+    - {fileID: 21300000, guid: b1e434007c5e691449721a205da987e2, type: 3}
+    - {fileID: 21300000, guid: 87dc9b777e89c4e4c9928f39bf99b716, type: 3}
+    monsterName: UnlimitedSlime
+    clipName: Idle
+  - sprites:
+    - {fileID: 21300000, guid: 014de57d3ba2dde47a22122df3dc64eb, type: 3}
+    - {fileID: 21300000, guid: 0d115cfe157035944ba50a5192d4211f, type: 3}
+    - {fileID: 21300000, guid: 45a4980e796d56841a33d42c4865e872, type: 3}
+    - {fileID: 21300000, guid: d5011986f38000448891d3ff2393d99d, type: 3}
+    monsterName: OneEyeSlime
+    clipName: Idle
+  - sprites:
+    - {fileID: 21300000, guid: 7e84ad18ee0ba6f408407c60460e5e4d, type: 3}
+    - {fileID: 21300000, guid: 27c0b75baed73974892d5e1383bb4fb8, type: 3}
+    - {fileID: 21300000, guid: e17a897db2c942b489eb741d7b19fd59, type: 3}
+    - {fileID: 21300000, guid: 40ebea0b2b1619c4494a015a27639a96, type: 3}
+    monsterName: VoidSlime
+    clipName: Idle
+  - sprites:
+    - {fileID: 21300000, guid: af763f647fa6c4748a0dcc80869dd15c, type: 3}
+    - {fileID: 21300000, guid: 0172e690d77a4024f9058da25fac2c17, type: 3}
+    - {fileID: 21300000, guid: bdca9049656e7c14cbd31eca159bbc78, type: 3}
+    - {fileID: 21300000, guid: 610806035350b664b8e2aa1eef43581b, type: 3}
+    monsterName: SuccubusSlime
+    clipName: Idle
+  - sprites:
+    - {fileID: 21300000, guid: f87a1dbbdb4b66d4ca4e2273f6ed9547, type: 3}
+    - {fileID: 21300000, guid: 7fa56a6f5bbc4f64b834cf9dc80f94f0, type: 3}
+    - {fileID: 21300000, guid: e64f3eb221a71f8439a54f1a8621587e, type: 3}
+    - {fileID: 21300000, guid: ea963ee90b4854147970ca479cc2934c, type: 3}
+    monsterName: IgnoranceSlime
+    clipName: Idle
+  - sprites:
+    - {fileID: 21300000, guid: 5b091dfa2bab8bb4cb8b7b867d7b95b5, type: 3}
+    - {fileID: 21300000, guid: 95ef57e94b79dad4da920beaedbccfbc, type: 3}
+    - {fileID: 21300000, guid: 04503511bb6bdd64a99b74eb23d46a27, type: 3}
+    - {fileID: 21300000, guid: 1a088b822caee464d892a779a8ffc5ac, type: 3}
+    monsterName: MummySlime
+    clipName: Idle
+  - sprites:
+    - {fileID: 21300000, guid: ed76499c23d166d45b82e0c7fe6f644d, type: 3}
+    - {fileID: 21300000, guid: 6ee0f08c1ad4b3b45ba0358f14eb46e4, type: 3}
+    - {fileID: 21300000, guid: 5471907536ce0b54fb0e3f12ed62bcde, type: 3}
+    - {fileID: 21300000, guid: 217b7c55fa9f6d0458448459343c8c50, type: 3}
+    monsterName: OmenSlime
+    clipName: Idle
+  - sprites:
+    - {fileID: 21300000, guid: 0e00cd01aeebb3a46980ecba6074d2bb, type: 3}
+    - {fileID: 21300000, guid: 00f54d78da3dff6428ae3e261a936f86, type: 3}
+    - {fileID: 21300000, guid: f338ae6ecd5ca674a9471759ced178f9, type: 3}
+    - {fileID: 21300000, guid: 1ed0074ab1cb435429ad211e91ef8fbf, type: 3}
+    monsterName: PoisonCoreSlime
+    clipName: Idle
+  - sprites:
+    - {fileID: 21300000, guid: 4b7c33038949f5b46b4ae43d30c793ad, type: 3}
+    - {fileID: 21300000, guid: 94256000b7a903749aadddccc31a8808, type: 3}
+    - {fileID: 21300000, guid: 85675376e51e22b49861b367a049daff, type: 3}
+    - {fileID: 21300000, guid: cfdd6164499f0c644b4ab1de95b392d6, type: 3}
+    monsterName: MithrilSlime
+    clipName: Idle
+  - sprites:
+    - {fileID: 21300000, guid: a527ad10d22088a45801657567c7031d, type: 3}
+    - {fileID: 21300000, guid: 406df3289929e064eb4ab14e3c74bf50, type: 3}
+    - {fileID: 21300000, guid: 6a3c52a0b829105489023bf6cd4d8e81, type: 3}
+    - {fileID: 21300000, guid: 0c71e31dc2ddbb2468b5c2fe468e7867, type: 3}
+    monsterName: DeepSeaSlime
+    clipName: Idle
+  - sprites:
+    - {fileID: 21300000, guid: 9cf01d9f38f4ee942b8d209ba4a428ed, type: 3}
+    - {fileID: 21300000, guid: 0b333e75f31780e4886515d951888fa4, type: 3}
+    - {fileID: 21300000, guid: 008d3526a04936e45b4a1869480e320e, type: 3}
+    - {fileID: 21300000, guid: 02e29c45c9ce9c04ea3d6a842fb01a60, type: 3}
+    monsterName: RuinCoreSlime
+    clipName: Idle
+  - sprites:
+    - {fileID: 21300000, guid: 1b863f5e680066348b933661c288e811, type: 3}
+    - {fileID: 21300000, guid: 3f7941a74a9b1eb46845d7adc5b8de80, type: 3}
+    - {fileID: 21300000, guid: e4bc278f1e1ca374ca26de4364392a0d, type: 3}
+    - {fileID: 21300000, guid: d3a2670a1c2c2934fab17ff4e5a61bcd, type: 3}
+    monsterName: HellYetiSlime
+    clipName: Idle
+  fameRate: 10
