@@ -195,7 +195,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
         if (isInRoom && PhotonNetwork.IsMasterClient)
         {
-            PhotonNetwork.LoadLevel("TestScene");
+            PhotonNetwork.LoadLevel("LDH_TestScene");
         }
     }
 
