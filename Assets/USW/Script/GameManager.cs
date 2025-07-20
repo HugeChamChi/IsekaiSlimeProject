@@ -1,26 +1,27 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using Firebase.Auth;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
-using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
     private static GameManager instance;
     public static GameManager Instance { get { return instance; } }
 
-    // 사용자 정보
     public string UserID { get; private set; }
     public string UserEmail { get; private set; }
     public string UserName { get; private set; }
     public bool IsLoggedIn { get; private set; }
 
-    // 연결 상태
     public bool IsFirebaseLoggedIn { get; private set; }
     public bool IsPhotonConnected { get; private set; }
 
     private bool isUserInfoSet = false;
+    private bool isCleaningUp = false;
 
     private void Awake()
     {
@@ -39,6 +40,8 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         StartCoroutine(SetupFirebaseAuthListener());
+        
+        FirebaseManager.OnUserLoggedOut += OnFirebaseUserLoggedOut;
     }
 
     private IEnumerator SetupFirebaseAuthListener()
@@ -69,27 +72,41 @@ public class GameManager : MonoBehaviour
         {
             FirebaseManager.Auth.StateChanged -= OnFirebaseAuthStateChanged;
         }
+        
+        FirebaseManager.OnUserLoggedOut -= OnFirebaseUserLoggedOut;
     }
 
     private void OnFirebaseAuthStateChanged(object sender, System.EventArgs eventArgs)
     {
+        if (isCleaningUp) return;
+        
         FirebaseAuth auth = sender as FirebaseAuth;
         if (auth != null)
         {
             if (auth.CurrentUser != null)
             {
                 SetUserInfo(auth.CurrentUser);
+                
+                // TokenSystem null 체크 강화
+                StartCoroutine(NotifyTokenSystemAfterDelay());
             }
             else
             {
-                ClearUserInfo();
+                Debug.Log("Firebase 로그아웃 감지됨");
+                PerformLogoutCleanup();
             }
         }
+    }
+    
+    private void OnFirebaseUserLoggedOut()
+    {
+        Debug.Log("Firebase 로그아웃 이벤트 수신");
+        PerformLogoutCleanup();
     }
 
     public void SetUserInfo(FirebaseUser user)
     {
-        if (user != null)
+        if (user != null && !isCleaningUp)
         {
             UserID = user.UserId;
             UserEmail = user.Email;
@@ -100,17 +117,50 @@ public class GameManager : MonoBehaviour
             
             Debug.Log($"사용자 정보 설정: {UserName} ({UserEmail})");
             Debug.Log($"Firebase UID: {UserID}");
+            
+            StartCoroutine(NotifyTokenSystemAfterDelay());
         }
-        else
+        else if (!isCleaningUp)
         {
             Debug.LogWarning("잘못된 사용자 정보");
             ClearUserInfo();
         }
     }
+    
+    private IEnumerator NotifyTokenSystemAfterDelay()
+    {
+        float waitTime = 0f;
+        while (waitTime < 5f)
+        {
+            // TokenSystem null 체크 강화
+            try
+            {
+                if (TokenSystem.Instance != null && 
+                    TokenSystem.Instance.gameObject != null && 
+                    !TokenSystem.Instance.Equals(null))
+                {
+                    TokenSystem.Instance.OnUserLoggedIn();
+                    Debug.Log("TokenSystem에 로그인 알림 완료");
+                    yield break;
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"TokenSystem 알림 실패: {e.Message}");
+            }
+            
+            yield return new WaitForSeconds(0.1f);
+            waitTime += 0.1f;
+        }
+        
+        Debug.LogWarning("TokenSystem을 찾을 수 없습니다");
+    }
 
     public void ClearUserInfo()
     {
-        Debug.Log("사용자 정보 초기화");
+        if (isCleaningUp) return;
+        
+        Debug.Log("사용자 정보 초기화 시작");
         
         UserID = null;
         UserEmail = null;
@@ -119,6 +169,67 @@ public class GameManager : MonoBehaviour
         IsFirebaseLoggedIn = false;
         IsPhotonConnected = false;
         isUserInfoSet = false;
+        
+        Debug.Log("사용자 정보 초기화 완료");
+    }
+    
+    private void PerformLogoutCleanup()
+    {
+        if (isCleaningUp) return;
+        
+        isCleaningUp = true;
+        Debug.Log("로그아웃 정리 시작");
+        
+        ClearUserInfo();
+        
+        if (PhotonNetwork.IsConnected)
+        {
+            Debug.Log("Photon 연결 해제 시작");
+            
+            // 커스텀 프로퍼티 완전 정리
+            if (PhotonNetwork.LocalPlayer != null)
+            {
+                var emptyProps = new ExitGames.Client.Photon.Hashtable();
+                emptyProps["firebaseUID"] = null;
+                emptyProps["email"] = null;
+                emptyProps["displayName"] = null;
+                emptyProps["loginTime"] = null;
+                PhotonNetwork.LocalPlayer.SetCustomProperties(emptyProps);
+                Debug.Log("Photon 커스텀 프로퍼티 정리 완료");
+            }
+            
+            PhotonNetwork.Disconnect();
+        }
+        
+        // TokenSystem null 체크 강화
+        try
+        {
+            if (TokenSystem.Instance != null && 
+                TokenSystem.Instance.gameObject != null && 
+                !TokenSystem.Instance.Equals(null))
+            {
+                TokenSystem.Instance.OnUserLoggedOut();
+                Debug.Log("TokenSystem에 로그아웃 알림");
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"TokenSystem 로그아웃 알림 실패: {e.Message}");
+        }
+        
+        ResetGameState();
+        
+        Debug.Log("로그아웃 정리 완료");
+        isCleaningUp = false;
+    }
+    
+    private void ResetGameState()
+    {
+        Debug.Log("게임 상태 리셋");
+        
+        PlayerPrefs.DeleteKey("TempGameData");
+        PlayerPrefs.DeleteKey("CurrentSession");
+        PlayerPrefs.Save();
     }
 
     public void SetPhotonConnectionStatus(bool connected)
@@ -130,25 +241,24 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log($"Photon 연결 상태: {(connected ? "연결됨" : "연결 해제됨")}");
             
-            if (connected)
+            if (connected && !isCleaningUp)
             {
                 CheckFirebasePhotonSync();
             }
         }
     }
 
-    // Firebase와 Photon UID 동기화 확인
     private void CheckFirebasePhotonSync()
     {
-        if (!IsLoggedIn)
+        if (!IsLoggedIn || isCleaningUp)
         {
-            Debug.LogWarning("Firebase 로그인 상태가 아님");
+            Debug.LogWarning("Firebase 로그인 상태가 아니거나 정리 중");
             return;
         }
 
         bool allSynced = true;
+        bool needsForceSync = false;
 
-        // AuthValues 동기화 확인
         if (PhotonNetwork.AuthValues != null)
         {
             string photonUserId = PhotonNetwork.AuthValues.UserId;
@@ -160,15 +270,16 @@ public class GameManager : MonoBehaviour
             {
                 Debug.LogError($"AuthValues 불일치 - Firebase: {UserID}, Photon: {photonUserId}");
                 allSynced = false;
+                needsForceSync = true;
             }
         }
         else
         {
             Debug.LogWarning("PhotonNetwork.AuthValues가 null");
             allSynced = false;
+            needsForceSync = true;
         }
 
-        // 커스텀 프로퍼티 동기화 확인
         if (PhotonNetwork.LocalPlayer != null)
         {
             if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("firebaseUID"))
@@ -182,12 +293,14 @@ public class GameManager : MonoBehaviour
                 {
                     Debug.LogError($"커스텀 프로퍼티 불일치 - Firebase: {UserID}, CustomProp: {customUID}");
                     allSynced = false;
+                    needsForceSync = true;
                 }
             }
             else
             {
                 Debug.LogWarning("커스텀 프로퍼티에 firebaseUID 없음");
                 allSynced = false;
+                needsForceSync = true;
             }
         }
         else
@@ -196,12 +309,43 @@ public class GameManager : MonoBehaviour
             allSynced = false;
         }
 
+        // 불일치 발견 시 자동 강제 동기화
+        if (needsForceSync && PhotonNetwork.IsConnected)
+        {
+            Debug.Log("동기화 불일치 감지 - 강제 동기화 시작");
+            StartCoroutine(ForcePhotonSync());
+        }
+
         Debug.Log($"전체 동기화 상태: {(allSynced ? "성공" : "실패")}");
+    }
+
+    private IEnumerator ForcePhotonSync()
+    {
+        yield return new WaitForSeconds(0.5f);
+        
+        if (!isCleaningUp && PhotonNetwork.IsConnected && !string.IsNullOrEmpty(UserID))
+        {
+            Debug.Log("강제 동기화 실행");
+            
+            // AuthValues 강제 업데이트
+            PhotonNetwork.AuthValues = new AuthenticationValues(UserID);
+            PhotonNetwork.NickName = GetPhotonPlayerName();
+            
+            // 커스텀 프로퍼티 강제 업데이트
+            var customProps = GetUserCustomProperties();
+            PhotonNetwork.LocalPlayer.SetCustomProperties(customProps);
+            
+            Debug.Log($"강제 동기화 완료 - UID: {UserID}");
+            
+            // 1초 후 재확인
+            yield return new WaitForSeconds(1f);
+            CheckFirebasePhotonSync();
+        }
     }
 
     public string GetPhotonPlayerName()
     {
-        if (!isUserInfoSet)
+        if (!isUserInfoSet || isCleaningUp)
         {
             Debug.LogWarning("사용자 정보가 설정되지 않음");
             return "Guest";
@@ -212,7 +356,7 @@ public class GameManager : MonoBehaviour
 
     public ExitGames.Client.Photon.Hashtable GetUserCustomProperties()
     {
-        if (!isUserInfoSet)
+        if (!isUserInfoSet || isCleaningUp)
         {
             Debug.LogError("사용자 정보가 설정되지 않은 상태에서 커스텀 프로퍼티 요청");
             return new ExitGames.Client.Photon.Hashtable();
@@ -240,14 +384,14 @@ public class GameManager : MonoBehaviour
 
     public bool IsFullyLoggedIn()
     {
-        return IsFirebaseLoggedIn && IsPhotonConnected && !string.IsNullOrEmpty(UserID) && isUserInfoSet;
+        return IsFirebaseLoggedIn && IsPhotonConnected && !string.IsNullOrEmpty(UserID) && isUserInfoSet && !isCleaningUp;
     }
 
     public string GenerateUserToken()
     {
-        if (string.IsNullOrEmpty(UserID))
+        if (string.IsNullOrEmpty(UserID) || isCleaningUp)
         {
-            Debug.LogWarning("UserID가 없어서 토큰 생성 불가");
+            Debug.LogWarning("UserID가 없거나 정리 중이어서 토큰 생성 불가");
             return null;
         }
         
@@ -255,9 +399,14 @@ public class GameManager : MonoBehaviour
         return $"{UserID}_{timestamp}";
     }
 
-    // Firebase-Photon 동기화 강제 실행
     public void ForceSyncFirebasePhoton()
     {
+        if (isCleaningUp)
+        {
+            Debug.LogWarning("정리 중이어서 동기화를 수행할 수 없습니다");
+            return;
+        }
+        
         Debug.Log("Firebase-Photon 강제 동기화 시작");
         
         if (!IsLoggedIn)
@@ -272,23 +421,55 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // AuthValues 재설정
         PhotonNetwork.AuthValues = new AuthenticationValues(UserID);
         PhotonNetwork.NickName = GetPhotonPlayerName();
         
-        // 커스텀 프로퍼티 재설정
         var customProps = GetUserCustomProperties();
         PhotonNetwork.LocalPlayer.SetCustomProperties(customProps);
         
         Debug.Log("강제 동기화 완료");
-        
-        // 동기화 결과 확인
         StartCoroutine(CheckSyncResult());
     }
 
     private IEnumerator CheckSyncResult()
     {
         yield return new WaitForSeconds(1f);
-        CheckFirebasePhotonSync();
+        if (!isCleaningUp)
+        {
+            CheckFirebasePhotonSync();
+        }
+    }
+    
+    public void UpdateUserName(string newUserName)
+    {
+        if (!string.IsNullOrEmpty(newUserName) && !isCleaningUp)
+        {
+            UserName = newUserName;
+        
+            if (PhotonNetwork.IsConnected)
+            {
+                PhotonNetwork.NickName = newUserName;
+            }
+        
+            Debug.Log($"사용자 이름 업데이트: {newUserName}");
+        }
+    }
+    
+    public void DestroyManager()
+    {
+        Debug.Log("매니저 완전 제거 시작");
+        
+        if (!isCleaningUp)
+        {
+            PerformLogoutCleanup();
+        }
+        
+        if (instance == this)
+        {
+            instance = null;
+        }
+        
+        Destroy(gameObject);
+        Debug.Log("매니저 완전 제거 완료");
     }
 }
