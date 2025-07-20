@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 4365439760264287623}
   - component: {fileID: 9019156012654975009}
   - component: {fileID: -6677247739324063644}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: 120_HellYetiSlime
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,9 +94,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a11334fbe18c54b40921ac28998d64f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
   distance: 5
-  status: {fileID: 3645552002972451375, guid: 603fa5c6e6bb6654e92bcbf6545aafd0, type: 3}
 --- !u!114 &5049013894410958433
 MonoBehaviour:
   m_ObjectHideFlags: 0

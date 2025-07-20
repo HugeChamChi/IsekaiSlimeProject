@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 3879320967075240572}
   - component: {fileID: 7403771121801634685}
   - component: {fileID: 3711083594291417296}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: 105_MithrilSlime
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -93,9 +93,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a11334fbe18c54b40921ac28998d64f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
   distance: 5
-  status: {fileID: 3645552002972451375, guid: 603fa5c6e6bb6654e92bcbf6545aafd0, type: 3}
 --- !u!114 &4484896682965312820
 MonoBehaviour:
   m_ObjectHideFlags: 0

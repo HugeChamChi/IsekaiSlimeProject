@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 3466576744661699802}
   - component: {fileID: 3672930848170168623}
   - component: {fileID: -4320510639504720276}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: 104_FireSlime
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,9 +94,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a11334fbe18c54b40921ac28998d64f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
   distance: 5
-  status: {fileID: 3645552002972451375}
 --- !u!114 &3645552002972451375
 MonoBehaviour:
   m_ObjectHideFlags: 0

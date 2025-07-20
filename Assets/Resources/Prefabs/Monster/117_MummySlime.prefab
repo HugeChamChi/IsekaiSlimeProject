@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 8594120382413742059}
   - component: {fileID: 6117429178033985208}
   - component: {fileID: 4508657778087152033}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: 117_MummySlime
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,9 +94,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a11334fbe18c54b40921ac28998d64f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
   distance: 5
-  status: {fileID: 3645552002972451375, guid: 603fa5c6e6bb6654e92bcbf6545aafd0, type: 3}
 --- !u!114 &915319783638009993
 MonoBehaviour:
   m_ObjectHideFlags: 0
