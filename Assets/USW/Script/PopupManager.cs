@@ -1,22 +1,22 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class PopupManager : MonoBehaviour
 {
-    /// <summary>
-    /// 간단한 팝업
-    /// PopupManager.Instance.ShowPopup("메시지 내용");
-    /// 자동으로 닫히는 팝업
-    /// PopupManager.Instance.ShowPopupWithAutoClose("3초 후 닫힘", 3f);
-    /// 수동으로 닫기
-    /// PopupManager.Instance.ClosePopup(); 
-    /// </summary>
-    
     [Header("UI Elements")]
     [SerializeField] TMP_Text statusText;
     [SerializeField] Button closeButton;
     [SerializeField] Canvas canvas;
+    
+    [Header("Confirmation Popup")]
+    [SerializeField] GameObject confirmationPanel;
+    [SerializeField] TMP_Text confirmationText;
+    [SerializeField] Button yesButton;
+    [SerializeField] Button noButton;
     
     private static PopupManager instance;
     public static PopupManager Instance 
@@ -30,6 +30,9 @@ public class PopupManager : MonoBehaviour
             return instance;
         } 
     }
+    
+    private Action onYesCallback;
+    private Action onNoCallback;
     
     private void Awake()
     {
@@ -49,19 +52,41 @@ public class PopupManager : MonoBehaviour
             return;
         }
 
-        // 버튼 리스너 설정
+        SetupButtons();
+        gameObject.SetActive(false);
+    }
+    
+    private void SetupButtons()
+    {
         if (closeButton != null)
         {
             closeButton.onClick.AddListener(ClosePopup);
         }
         
-        gameObject.SetActive(false);
+        if (yesButton != null)
+        {
+            yesButton.onClick.AddListener(() => {
+                onYesCallback?.Invoke();
+                ClosePopup();
+            });
+        }
+        
+        if (noButton != null)
+        {
+            noButton.onClick.AddListener(() => {
+                onNoCallback?.Invoke();
+                ClosePopup();
+            });
+        }
+        
+        if (confirmationPanel != null)
+        {
+            confirmationPanel.SetActive(false);
+        }
     }
 
-    // 프리팹에서 자동으로 PopupManager 생성
     private static void CreatePopupManager()
     {
-        // Resources 폴더에서 프리팹 로드
         GameObject popupPrefab = Resources.Load<GameObject>("PopupManager");
         
         if (popupPrefab != null)
@@ -69,11 +94,16 @@ public class PopupManager : MonoBehaviour
             GameObject popupGO = Instantiate(popupPrefab);
             popupGO.name = "PopupManager"; 
         }
+        else
+        {
+            Debug.LogError("PopupManager 프리팹을 찾을 수 없습니다. Resources 폴더에 있는지 확인하세요.");
+        }
     }
     
-    // 팝업 보여주기
     public void ShowPopup(string message)
     {
+        HideConfirmationPanel();
+        
         if (statusText != null)
         {
             statusText.text = message;
@@ -82,21 +112,81 @@ public class PopupManager : MonoBehaviour
         gameObject.SetActive(true);
     }
 
-    // 팝업 닫기
+    public void ShowConfirmationPopup(string message, Action onYes, Action onNo = null)
+    {
+        onYesCallback = onYes;
+        onNoCallback = onNo;
+        
+        if (confirmationText != null)
+        {
+            confirmationText.text = message;
+        }
+        
+        ShowConfirmationPanel();
+        gameObject.SetActive(true);
+    }
+    
+    private void ShowConfirmationPanel()
+    {
+        if (confirmationPanel != null)
+        {
+            confirmationPanel.SetActive(true);
+        }
+        
+        if (statusText != null && statusText.transform.parent != null)
+        {
+            statusText.transform.parent.gameObject.SetActive(false);
+        }
+    }
+    
+    private void HideConfirmationPanel()
+    {
+        if (confirmationPanel != null)
+        {
+            confirmationPanel.SetActive(false);
+        }
+        
+        if (statusText != null && statusText.transform.parent != null)
+        {
+            statusText.transform.parent.gameObject.SetActive(true);
+        }
+    }
+
     public void ClosePopup()
     {
+        onYesCallback = null;
+        onNoCallback = null;
+        
+        CancelInvoke(nameof(ClosePopup));
+        
         gameObject.SetActive(false);
     }
 
-    // 자동으로 닫히는 팝업
     public void ShowPopupWithAutoClose(string message, float duration = 3f)
     {
         ShowPopup(message);
         
-        // 기존 Invoke 취소 후 새로 설정
         CancelInvoke(nameof(ClosePopup));
         Invoke(nameof(ClosePopup), duration);
     }
     
+    public void ShowLoadingPopup(string message = "처리 중...")
+    {
+        ShowPopup(message);
+        
+        if (closeButton != null)
+        {
+            closeButton.interactable = false;
+        }
+    }
     
+    public void HideLoadingPopup()
+    {
+        if (closeButton != null)
+        {
+            closeButton.interactable = true;
+        }
+        
+        ClosePopup();
+    }
 }

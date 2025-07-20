@@ -1,367 +1,577 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Firebase.Database;
+using Firebase.Extensions;
 using TMPro;
 
 public class TokenSystem : MonoBehaviour
 {
+    [Header("UI Elements")]
+    [SerializeField] private Image tokenFillImage;
+    [SerializeField] private TextMeshProUGUI tokenCountText;
+    [SerializeField] private TextMeshProUGUI regenTimeText;
+    [SerializeField] private Button testButton;
+    
     [Header("Token Settings")]
     [SerializeField] private int maxTokens = 100;
-    [SerializeField] private int tokensPerUse = 10;
-    [SerializeField] private float rechargeTimeMinutes = 10f;
+    [SerializeField] private int tokenRegenRate = 1;
+    [SerializeField] private float regenIntervalMinutes = 10f;
     
-    [Header("UI Components")]
-    [SerializeField] private Image tokenFillImage; 
-    [SerializeField] private TextMeshProUGUI tokenText; 
-    [SerializeField] private TextMeshProUGUI timeLeftText; 
-    [SerializeField] private Button useTokenButton; 
+    private static TokenSystem instance;
+    public static TokenSystem Instance { get { return instance; } }
     
-    [Header("Animation Settings")]
-    [SerializeField] private float animationDuration = 1f;
-    [SerializeField] private AnimationCurve animationCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+    private DatabaseReference userTokenRef;
+    private DatabaseReference tokenRequestRef;
+    private DatabaseReference globalSettingsRef;
     
-    private int currentTokens;
-    private float timeUntilNextRecharge;
-    private bool isRecharging = false;
-    private Coroutine animationCoroutine;
-    private Coroutine rechargeCoroutine;
+    private bool isInitialized = false;
+    private int currentTokens = 100;
+    private long lastServerUpdateTime = 0;
+    private bool isProcessingRequest = false;
+    
+    private Coroutine regenTimerCoroutine; // 코루틴 참조 저장용
+    
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+    }
     
     private void Start()
     {
-        InitializeTokenSystem();
-        SetupUI();
+        SetupTestButton();
+        StartCoroutine(InitializeSecureTokenSystem());
     }
     
-    private void InitializeTokenSystem()
+    private void SetupTestButton()
     {
-        currentTokens = maxTokens;
-        timeUntilNextRecharge = 0f;
-        
-        // 저장된 데이터가 있다면 불러오기 (PlayerPrefs 사용)
-        LoadTokenData();
-        
-        UpdateUI();
-        
-        // 리차지가 필요한 경우 코루틴 시작
-        if (currentTokens < maxTokens)
+        if (testButton != null)
         {
-            StartRechargeCoroutine();
+            testButton.onClick.RemoveAllListeners();
+            testButton.onClick.AddListener(() => RequestUseTokens(10));
         }
     }
     
-    private void SetupUI()
+    private IEnumerator InitializeSecureTokenSystem()
     {
-        if (useTokenButton != null)
+        Debug.Log("보안 토큰 시스템 초기화 시작");
+        
+        // Firebase 준비 대기
+        while (!FirebaseManager.IsFullyInitialized())
         {
-            useTokenButton.onClick.AddListener(UseTokens);
+            yield return new WaitForSeconds(0.1f);
         }
         
-        UpdateButtonInteractable();
+        // 사용자 로그인 대기
+        while (!FirebaseManager.IsUserLoggedIn())
+        {
+            yield return new WaitForSeconds(0.1f);
+        }
+        
+        string userID = FirebaseManager.GetCurrentUserID();
+        if (!string.IsNullOrEmpty(userID))
+        {
+            // 참조 설정
+            userTokenRef = FirebaseManager.Database.GetReference($"users/{userID}/tokens");
+            tokenRequestRef = FirebaseManager.Database.GetReference($"users/{userID}/tokenRequests");
+            globalSettingsRef = FirebaseManager.Database.GetReference("globalSettings/tokenSettings");
+            
+            // 글로벌 설정 로드
+            yield return StartCoroutine(LoadGlobalSettings());
+            
+            // 토큰 데이터 로드
+            LoadSecureTokenData();
+            
+            // 토큰 요청 처리 리스너 설정
+            SetupTokenRequestProcessor();
+        }
+        
+        isInitialized = true;
+        Debug.Log("보안 토큰 시스템 초기화 완료");
     }
     
-    public void UseTokens()
+    private IEnumerator LoadGlobalSettings()
     {
-        if (currentTokens < tokensPerUse)
+        bool settingsLoaded = false;
+        
+        globalSettingsRef.GetValueAsync().ContinueWithOnMainThread(task =>
         {
-            Debug.Log($"토큰이 부족합니다. 현재: {currentTokens}, 필요: {tokensPerUse}");
+            if (task.IsCompletedSuccessfully && task.Result.Exists)
+            {
+                var settings = task.Result.Value as System.Collections.IDictionary;
+                if (settings != null)
+                {
+                    if (settings.Contains("maxTokens"))
+                        maxTokens = Convert.ToInt32(settings["maxTokens"]);
+                    
+                    if (settings.Contains("regenIntervalMinutes"))
+                        regenIntervalMinutes = Convert.ToSingle(settings["regenIntervalMinutes"]);
+                    
+                    if (settings.Contains("regenRate"))
+                        tokenRegenRate = Convert.ToInt32(settings["regenRate"]);
+                }
+            }
+            settingsLoaded = true;
+        });
+        
+        while (!settingsLoaded)
+        {
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+    
+    private void LoadSecureTokenData()
+    {
+        if (userTokenRef == null) return;
+        
+        userTokenRef.GetValueAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompletedSuccessfully)
+            {
+                var snapshot = task.Result;
+                if (snapshot.Exists)
+                {
+                    var data = snapshot.Value as System.Collections.IDictionary;
+                    if (data != null)
+                    {
+                        if (data.Contains("currentTokens"))
+                            currentTokens = Convert.ToInt32(data["currentTokens"]);
+                        
+                        if (data.Contains("lastUpdateTime"))
+                            lastServerUpdateTime = Convert.ToInt64(data["lastUpdateTime"]);
+                        
+                        UpdateUI();
+                        
+                        // 서버에 업데이트 요청 (오프라인 회복 계산은 서버에서)
+                        RequestTokenUpdate();
+                    }
+                }
+                else
+                {
+                    CreateSecureInitialData();
+                }
+            }
+            else
+            {
+                Debug.LogError("토큰 데이터 로드 실패");
+                CreateSecureInitialData();
+            }
+        });
+        
+        // 토큰 데이터 변화 감지
+        userTokenRef.ValueChanged += OnTokenDataChanged;
+    }
+    
+    private void OnTokenDataChanged(object sender, ValueChangedEventArgs args)
+    {
+        if (args.DatabaseError != null)
+        {
+            Debug.LogError("토큰 데이터 변화 감지 오류: " + args.DatabaseError.Message);
             return;
         }
         
-        // 토큰 사용
-        int previousTokens = currentTokens;
-        currentTokens -= tokensPerUse;
-        
-     
-        StartTokenAnimation(previousTokens, currentTokens);
-        
-      
-        if (!isRecharging && currentTokens < maxTokens)
+        var data = args.Snapshot.Value as System.Collections.IDictionary;
+        if (data != null)
         {
-            StartRechargeCoroutine();
-        }
-        
-        // 데이터 저장
-        SaveTokenData();
-        
-        UpdateButtonInteractable();
-        
-    }
-    
-    private void StartTokenAnimation(int fromTokens, int toTokens)
-    {
-        if (animationCoroutine != null)
-        {
-            StopCoroutine(animationCoroutine);
-        }
-        
-        animationCoroutine = StartCoroutine(AnimateTokenFill(fromTokens, toTokens));
-    }
-    
-    private IEnumerator AnimateTokenFill(int fromTokens, int toTokens)
-    {
-        float startTime = Time.time;
-        float fromFillAmount = (float)fromTokens / maxTokens;
-        float toFillAmount = (float)toTokens / maxTokens;
-        
-        while (Time.time - startTime < animationDuration)
-        {
-            float progress = (Time.time - startTime) / animationDuration;
-            float curveValue = animationCurve.Evaluate(progress);
+            int newTokens = data.Contains("currentTokens") ? Convert.ToInt32(data["currentTokens"]) : currentTokens;
             
-            
-            float currentFillAmount = Mathf.Lerp(fromFillAmount, toFillAmount, curveValue);
-            if (tokenFillImage != null)
+            if (newTokens != currentTokens)
             {
-                tokenFillImage.fillAmount = currentFillAmount;
+                currentTokens = newTokens;
+                UpdateUI();
             }
             
-           
-            int displayTokens = Mathf.RoundToInt(Mathf.Lerp(fromTokens, toTokens, curveValue));
-            UpdateTokenText(displayTokens);
-            
-            yield return null;
+            if (data.Contains("lastUpdateTime"))
+                lastServerUpdateTime = Convert.ToInt64(data["lastUpdateTime"]);
         }
-        
-        // 최종 값 설정
-        if (tokenFillImage != null)
-        {
-            tokenFillImage.fillAmount = toFillAmount;
-        }
-        UpdateTokenText(toTokens);
-        
-        animationCoroutine = null;
     }
     
-    private void StartRechargeCoroutine()
+    private void CreateSecureInitialData()
     {
-        if (rechargeCoroutine != null)
+        FirebaseManager.GetServerTimestamp((serverTime) =>
         {
-            StopCoroutine(rechargeCoroutine);
-        }
-        
-        isRecharging = true;
-        
-        // 시간이 설정되지 않았다면 새로운 리차지 시작
-        if (timeUntilNextRecharge <= 0)
-        {
-            timeUntilNextRecharge = rechargeTimeMinutes * 60f;
-        }
-        
-        rechargeCoroutine = StartCoroutine(RechargeTokens());
+            var requestData = new Dictionary<string, object>
+            {
+                ["updateRequest"] = serverTime,
+                ["initialSetup"] = true
+            };
+            
+            tokenRequestRef.SetValueAsync(requestData);
+        });
     }
     
-    private IEnumerator RechargeTokens()
+    private void SetupTokenRequestProcessor()
     {
-        while (currentTokens < maxTokens)
+        // 토큰 요청 처리 (이 부분이 "서버" 역할)
+        tokenRequestRef.ValueChanged += ProcessTokenRequests;
+    }
+    
+    private void ProcessTokenRequests(object sender, ValueChangedEventArgs args)
+    {
+        if (isProcessingRequest) return;
+        if (args.DatabaseError != null) return;
+        if (!args.Snapshot.Exists) return;
+        
+        isProcessingRequest = true;
+        
+        var requestData = args.Snapshot.Value as System.Collections.IDictionary;
+        if (requestData == null)
         {
-            // 타이머 업데이트
-            while (timeUntilNextRecharge > 0)
-            {
-                timeUntilNextRecharge -= Time.deltaTime;
-                UpdateTimeLeftText();
-                yield return null;
-            }
-            
-            // 토큰 충전
-            if (currentTokens < maxTokens)
-            {
-                int previousTokens = currentTokens;
-                currentTokens++;
-                
-                
-                StartTokenAnimation(previousTokens, currentTokens);
-                
-            
-                timeUntilNextRecharge = rechargeTimeMinutes * 60f;
-                
-             
-                SaveTokenData();
-                
-                UpdateButtonInteractable();
-                
-            }
+            isProcessingRequest = false;
+            return;
         }
         
-        // 모든 토큰이 충전되면 리차지 종료
-        isRecharging = false;
-        timeUntilNextRecharge = 0;
-        UpdateTimeLeftText();
-        SaveTokenData();
+        FirebaseManager.GetServerTimestamp((serverTime) =>
+        {
+            ProcessServerSideTokenLogic(requestData, serverTime);
+        });
+    }
+    
+    private void ProcessServerSideTokenLogic(System.Collections.IDictionary requestData, long serverTime)
+    {
+        // 현재 토큰 데이터 가져오기
+        userTokenRef.GetValueAsync().ContinueWithOnMainThread(task =>
+        {
+            if (!task.IsCompletedSuccessfully)
+            {
+                isProcessingRequest = false;
+                return;
+            }
+            
+            var currentData = task.Result.Value as System.Collections.IDictionary;
+            if (currentData == null)
+            {
+                isProcessingRequest = false;
+                return;
+            }
+            
+            int tokens = currentData.Contains("currentTokens") ? Convert.ToInt32(currentData["currentTokens"]) : maxTokens;
+            long lastRegenTime = currentData.Contains("lastRegenTime") ? Convert.ToInt64(currentData["lastRegenTime"]) : serverTime;
+            
+            // 서버 시간 기반 토큰 회복 계산
+            long timeDiff = serverTime - lastRegenTime;
+            double minutesPassed = timeDiff / (1000.0 * 60.0); // 밀리초를 분으로 변환
+            int tokensToAdd = (int)(minutesPassed / regenIntervalMinutes) * tokenRegenRate;
+            
+            if (tokensToAdd > 0)
+            {
+                tokens = Mathf.Min(tokens + tokensToAdd, maxTokens);
+                lastRegenTime = serverTime;
+            }
+            
+            // 토큰 사용 요청 처리
+            if (requestData.Contains("useTokenRequest"))
+            {
+                int tokensToUse = Convert.ToInt32(requestData["useTokenRequest"]);
+                if (tokens >= tokensToUse)
+                {
+                    tokens -= tokensToUse;
+                    Debug.Log($"토큰 사용: -{tokensToUse} (남은 {tokens})");
+                }
+                else
+                {
+                    Debug.Log($"토큰 부족: 필요={tokensToUse}, 보유={tokens}");
+                }
+            }
+            
+            // 업데이트된 토큰 데이터 저장
+            var updatedData = new Dictionary<string, object>
+            {
+                ["currentTokens"] = tokens,
+                ["maxTokens"] = maxTokens,
+                ["lastUpdateTime"] = serverTime,
+                ["lastRegenTime"] = lastRegenTime
+            };
+            
+            userTokenRef.SetValueAsync(updatedData).ContinueWithOnMainThread(saveTask =>
+            {
+                if (saveTask.IsCompletedSuccessfully)
+                {
+                    // 요청 정리
+                    tokenRequestRef.RemoveValueAsync();
+                }
+                
+                isProcessingRequest = false;
+            });
+        });
+    }
+    
+    public void RequestUseTokens(int amount)
+    {
+        if (!isInitialized || isProcessingRequest)
+        {
+            Debug.LogWarning("토큰 시스템이 준비되지 않았거나 처리 중입니다");
+            return;
+        }
         
-        rechargeCoroutine = null;
+        if (currentTokens < amount)
+        {
+            Debug.Log($"토큰 부족: 필요={amount}, 보유={currentTokens}");
+            return;
+        }
+        
+        // 서버에 토큰 사용 요청
+        FirebaseManager.GetServerTimestamp((serverTime) =>
+        {
+            var requestData = new Dictionary<string, object>
+            {
+                ["useTokenRequest"] = amount,
+                ["requestTime"] = serverTime
+            };
+            
+            tokenRequestRef.SetValueAsync(requestData);
+        });
+    }
+    
+    // 호환성을 위한 즉시 확인 메서드 (기존 코드용)
+    public bool UseTokens(int amount)
+    {
+        if (!isInitialized)
+        {
+            Debug.LogWarning("토큰 시스템이 준비되지 않았습니다");
+            return false;
+        }
+        
+        if (currentTokens < amount)
+        {
+            return false;
+        }
+        
+        // 즉시 토큰 사용 요청 (서버 처리)
+        RequestUseTokens(amount);
+        return true; // 요청 성공 (실제 토큰 차감은 서버에서)
+    }
+    
+    // 콜백 방식 토큰 사용 
+    public void UseTokensWithCallback(int amount, System.Action<bool> onComplete)
+    {
+        if (!isInitialized)
+        {
+            onComplete?.Invoke(false);
+            return;
+        }
+        
+        if (currentTokens < amount)
+        {
+            onComplete?.Invoke(false);
+            return;
+        }
+        
+        int tokensBeforeRequest = currentTokens;
+        RequestUseTokens(amount);
+        
+        // 토큰 변화 감지를 위한 코루틴 시작
+        StartCoroutine(WaitForTokenChange(tokensBeforeRequest, amount, onComplete));
+    }
+    
+    private IEnumerator WaitForTokenChange(int originalTokens, int requestedAmount, System.Action<bool> onComplete)
+    {
+        float timeout = 5f; // 5초 타임아웃
+        float elapsed = 0f;
+        
+        while (elapsed < timeout)
+        {
+            // 토큰이 줄어들었으면 성공
+            if (currentTokens == originalTokens - requestedAmount)
+            {
+                onComplete?.Invoke(true);
+                yield break;
+            }
+            
+            // 토큰이 그대로면 아직 처리 중
+            yield return new WaitForSeconds(0.1f);
+            elapsed += 0.1f;
+        }
+        
+        // 타임아웃 시 실패로 처리
+        onComplete?.Invoke(false);
+    }
+    
+    public void RequestTokenUpdate()
+    {
+        if (!isInitialized || isProcessingRequest)
+            return;
+        
+        // 서버에 토큰 업데이트 요청
+        FirebaseManager.GetServerTimestamp((serverTime) =>
+        {
+            var requestData = new Dictionary<string, object>
+            {
+                ["updateRequest"] = serverTime
+            };
+            
+            tokenRequestRef.SetValueAsync(requestData);
+        });
     }
     
     private void UpdateUI()
     {
-        UpdateTokenFill();
-        UpdateTokenText(currentTokens);
-        UpdateTimeLeftText();
-    }
-    
-    private void UpdateTokenFill()
-    {
+        if (tokenCountText != null)
+        {
+            tokenCountText.text = $"{currentTokens}/{maxTokens}";
+        }
+        
         if (tokenFillImage != null)
         {
-            tokenFillImage.fillAmount = (float)currentTokens / maxTokens;
-        }
-    }
-    
-    private void UpdateTokenText(int displayTokens)
-    {
-        if (tokenText != null)
-        {
-            tokenText.text = $"{displayTokens} / {maxTokens}";
-        }
-    }
-    
-    private void UpdateTimeLeftText()
-    {
-        if (timeLeftText != null)
-        {
-            if (isRecharging && timeUntilNextRecharge > 0)
-            {
-                int minutes = Mathf.FloorToInt(timeUntilNextRecharge / 60f);
-                int seconds = Mathf.FloorToInt(timeUntilNextRecharge % 60f);
-                timeLeftText.text = $"Time left {minutes:00}:{seconds:00}";
-            }
-            else
-            {
-                timeLeftText.text = "Time left 00:00";
-            }
-        }
-    }
-    
-    private void UpdateButtonInteractable()
-    {
-        if (useTokenButton != null)
-        {
-            useTokenButton.interactable = currentTokens >= tokensPerUse;
-        }
-    }
-    
-    #region Save/Load System
-    
-    private void SaveTokenData()
-    {
-        PlayerPrefs.SetInt("CurrentTokens", currentTokens);
-        PlayerPrefs.SetFloat("TimeUntilNextRecharge", timeUntilNextRecharge);
-        PlayerPrefs.SetString("LastSaveTime", System.DateTime.Now.ToBinary().ToString());
-        PlayerPrefs.Save();
-    }
-    
-    private void LoadTokenData()
-    {
-        if (PlayerPrefs.HasKey("CurrentTokens"))
-        {
-            currentTokens = PlayerPrefs.GetInt("CurrentTokens", maxTokens);
-            timeUntilNextRecharge = PlayerPrefs.GetFloat("TimeUntilNextRecharge", 0f);
-            
-            // 오프라인 시간 계산
-            if (PlayerPrefs.HasKey("LastSaveTime"))
-            {
-                string lastSaveTimeString = PlayerPrefs.GetString("LastSaveTime");
-                if (long.TryParse(lastSaveTimeString, out long lastSaveTimeBinary))
-                {
-                    System.DateTime lastSaveTime = System.DateTime.FromBinary(lastSaveTimeBinary);
-                    double offlineSeconds = (System.DateTime.Now - lastSaveTime).TotalSeconds;
-                    
-                    ProcessOfflineTime(offlineSeconds);
-                }
-            }
-        }
-    }
-    
-    private void ProcessOfflineTime(double offlineSeconds)
-    {
-        if (currentTokens >= maxTokens || offlineSeconds <= 0)
-            return;
-        
-        // 남은 리차지 시간 차감
-        if (timeUntilNextRecharge > 0)
-        {
-            timeUntilNextRecharge -= (float)offlineSeconds;
+            float fillAmount = (float)currentTokens / maxTokens;
+            tokenFillImage.fillAmount = fillAmount;
         }
         
-        // 오프라인 동안 충전된 토큰 계산
-        while (timeUntilNextRecharge <= 0 && currentTokens < maxTokens)
-        {
-            currentTokens++;
-            timeUntilNextRecharge += rechargeTimeMinutes * 60f;
-        }
-        
-        // 최대 토큰 수 제한
+        // 실시간 타이머 시작/중지 관리
+        ManageRegenTimerCoroutine();
+    }
+    
+    // 코루틴 관리 메서드
+    private void ManageRegenTimerCoroutine()
+    {
+        // 토큰이 풀이면 타이머 중지
         if (currentTokens >= maxTokens)
         {
-            currentTokens = maxTokens;
-            timeUntilNextRecharge = 0;
+            if (regenTimerCoroutine != null)
+            {
+                StopCoroutine(regenTimerCoroutine);
+                regenTimerCoroutine = null;
+            }
+            
+            if (regenTimeText != null)
+                regenTimeText.text = "FULL";
+            
+            return;
+        }
+        
+        // 토큰이 부족하면 타이머 시작 (이미 실행 중이 아닐 때만)
+        if (regenTimerCoroutine == null)
+        {
+            regenTimerCoroutine = StartCoroutine(RegenTimerCoroutine());
         }
     }
     
-    #endregion
-    
-    #region Public Methods (디버깅용)
-    
-    [ContextMenu("Add 10 Tokens")]
-    public void AddTokensForTesting()
+    // 1초마다 실행되는 코루틴
+    private IEnumerator RegenTimerCoroutine()
     {
-        int previousTokens = currentTokens;
-        currentTokens = Mathf.Min(currentTokens + 10, maxTokens);
-        StartTokenAnimation(previousTokens, currentTokens);
-        SaveTokenData();
+        while (currentTokens < maxTokens)
+        {
+            UpdateRegenTimerDisplay();
+            yield return new WaitForSeconds(1f); // 1초마다 실행
+        }
+        
+        // 토큰이 풀이 되면 자동 종료
+        if (regenTimeText != null)
+            regenTimeText.text = "FULL";
+        
+        regenTimerCoroutine = null;
     }
     
-    [ContextMenu("Reset Tokens")]
-    public void ResetTokens()
+    // 개선된 타이머 표시 메서드 (서버 요청 없이 로컬 계산)
+    private void UpdateRegenTimerDisplay()
     {
-        currentTokens = maxTokens;
-        timeUntilNextRecharge = 0;
-        isRecharging = false;
+        if (regenTimeText == null || lastServerUpdateTime == 0) 
+            return;
         
-        if (rechargeCoroutine != null)
+        // 로컬 시간으로 계산 (서버 요청 없음)
+        long currentTimeMillis = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        long timeSinceLastRegen = currentTimeMillis - lastServerUpdateTime;
+        double minutesSinceRegen = timeSinceLastRegen / (1000.0 * 60.0);
+        double minutesUntilNext = regenIntervalMinutes - (minutesSinceRegen % regenIntervalMinutes);
+        
+        if (minutesUntilNext <= 0)
         {
-            StopCoroutine(rechargeCoroutine);
-            rechargeCoroutine = null;
+            // 서버에 업데이트 요청 (토큰 회복 시간이 됨)
+            RequestTokenUpdate();
+            return;
+        }
+        
+        int minutes = Mathf.Max(0, (int)minutesUntilNext);
+        int seconds = Mathf.Max(0, (int)((minutesUntilNext - minutes) * 60));
+        
+        regenTimeText.text = $"{minutes:D2}:{seconds:D2}";
+    }
+    
+    public void OnUserLoggedIn()
+    {
+        if (!isInitialized)
+        {
+            StartCoroutine(InitializeSecureTokenSystem());
+        }
+        else
+        {
+            RequestTokenUpdate();
+        }
+    }
+    
+    public void OnUserLoggedOut()
+    {
+        // 코루틴 정지
+        StopAllCoroutines();
+        
+        // 리스너 해제
+        if (userTokenRef != null)
+            userTokenRef.ValueChanged -= OnTokenDataChanged;
+        
+        if (tokenRequestRef != null)
+            tokenRequestRef.ValueChanged -= ProcessTokenRequests;
+        
+        userTokenRef = null;
+        tokenRequestRef = null;
+        globalSettingsRef = null;
+        
+        isInitialized = false;
+        currentTokens = maxTokens;
+        lastServerUpdateTime = 0;
+        isProcessingRequest = false;
+        
+        // 타이머 코루틴 정리
+        if (regenTimerCoroutine != null)
+        {
+            StopCoroutine(regenTimerCoroutine);
+            regenTimerCoroutine = null;
         }
         
         UpdateUI();
-        SaveTokenData();
     }
     
-    #endregion
+    // 읽기 전용 메서드들
+    public int GetCurrentTokens() => currentTokens;
+    public int GetMaxTokens() => maxTokens;
+    public bool HasEnoughTokens(int amount) => currentTokens >= amount;
     
-    private void OnApplicationPause(bool pauseStatus)
+    // 서버 기반 남은 시간 확인 (분 단위)
+    public float GetMinutesUntilNextRegen()
     {
-        if (pauseStatus)
-        {
-            SaveTokenData();
-        }
-        else
-        {
-            LoadTokenData();
-            UpdateUI();
-            
-            if (currentTokens < maxTokens && !isRecharging)
-            {
-                StartRechargeCoroutine();
-            }
-        }
+        if (currentTokens >= maxTokens || lastServerUpdateTime == 0)
+            return 0f;
+        
+        DateTime lastUpdateDateTime = DateTimeOffset.FromUnixTimeMilliseconds(lastServerUpdateTime).DateTime;
+        DateTime now = DateTime.UtcNow;
+        
+        TimeSpan timeSinceUpdate = now - lastUpdateDateTime;
+        double minutesSinceUpdate = timeSinceUpdate.TotalMinutes;
+        double minutesUntilNext = regenIntervalMinutes - (minutesSinceUpdate % regenIntervalMinutes);
+        
+        return Mathf.Max(0f, (float)minutesUntilNext);
     }
     
-    private void OnApplicationFocus(bool hasFocus)
+    // 관리자용 (테스트)
+    [ContextMenu("토큰 업데이트 요청")]
+    public void DebugRequestUpdate()
     {
-        if (!hasFocus)
-        {
-            SaveTokenData();
-        }
-        else
-        {
-            LoadTokenData();
-            UpdateUI();
-            
-            if (currentTokens < maxTokens && !isRecharging)
-            {
-                StartRechargeCoroutine();
-            }
-        }
+        RequestTokenUpdate();
+    }
+    
+    [ContextMenu("10개 토큰 사용 요청")]
+    public void DebugUseTokens()
+    {
+        RequestUseTokens(10);
     }
 }
