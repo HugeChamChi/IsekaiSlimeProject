@@ -12,7 +12,7 @@ public class MonsterStatusController : MonoBehaviour, IDamageable
     public Stat<float, float> Speed = new Stat<float, float>((a, b) => a + b, value => value);
     public Stat<float, float> Defense = new Stat<float, float>((a, b) => a + b, value => value / 100);
     public Stat<float, float> DefenseMultiply = new Stat<float, float>((a, b) => a + b, value => value);
-    public Property<float> CurHp;
+    public Property<float> CurHp = new();
 
     private PhotonView pv;
 
@@ -27,8 +27,9 @@ public class MonsterStatusController : MonoBehaviour, IDamageable
     private void SetupStat()
     {
         Health.SetBaseValue(baseStat.Hp);
-        Speed.SetBaseValue(baseStat.defense);
-        Defense.SetBaseValue(baseStat.defense);
+        Speed.SetBaseValue(baseStat.Defense);
+        Defense.SetBaseValue(baseStat.Defense);
+        CurHp.Value = Health.Value;
     }
 
     public void TakeDamage(float damage)

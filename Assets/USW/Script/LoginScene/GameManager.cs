@@ -2,7 +2,6 @@ using Firebase.Auth;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
-using ExitGames.Client.Photon;
 using System.Collections;
 
 public class GameManager : MonoBehaviour

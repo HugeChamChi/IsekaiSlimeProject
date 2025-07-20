@@ -1,0 +1,287 @@
+using System;
+using System.Collections.Generic;
+using Photon.Pun;
+using UnityEngine;
+using Managers;
+using System.Linq;
+using Unit;
+using Units;
+
+namespace PlayerField
+{
+    /// <summary>
+    /// 각 플레이어의 유닛 배치 공간(패널)을 관리하는 컨트롤러.
+    /// </summary>
+    public class PlayerFieldController : MonoBehaviour
+    {
+        // --- reference --- //
+        private Transform _spawnPanel; // 패널 (유닛 스폰 영역)
+        public Transform SpawnPanel => _spawnPanel;
+        
+        // --- Map Info --- //
+        private List<GridSlot> mapSlot = new();
+
+        public IReadOnlyList<GridSlot> MapSlot => mapSlot;
+
+        public List<UnitHolder> UnitHolders = new();
+        // private List<Vector2> spawnList = new();  // 유닛을 배치할 수 있는 좌표 리스트
+        // private List<bool> spawnListArray = new(); // 각 슬롯의 점유 여부
+        
+        
+        public float SlotWidth { get; private set; }
+        public float SlotHeight  { get; private set; }
+        public Vector2 SlotScale => new Vector2(SlotWidth, SlotHeight);
+        private string gridBoxPrefabPath = "Prefabs/LDH_TestResource/GridSlot";
+        
+        // --- Grid Setting --- //
+        private int _xCount; 
+        private int _yCount;
+        public int MapXCount => _xCount + 2;
+        public int MapYCount => _yCount + 2;
+        
+        
+        private string _unitHolderPrefabPath = "Prefabs/LDH_TestResource/UnitHolder"; // 유닛 홀더 경로
+
+
+        public List<Action<bool>> CanSpawnLegendary = new();
+        private Action<bool> spawnLegendary1;
+        private Action<bool> spawnLegendary2;
+        
+        
+
+        public static void SwapHolderPosition(UnitHolder holder1, UnitHolder holder2)
+        {
+            Units.Unit temp = holder1.CurrentUnit;
+            
+            holder1.ChangeUnit(holder2);
+            holder2.ChangeUnit(holder1);
+
+            holder1.SetCurrentUnit(holder2.CurrentUnit);
+            holder2.SetCurrentUnit(temp);
+        }
+        
+        
+        
+        #region Unity LifeCycle
+        
+        private void Awake() => Init();
+
+        private void Start()
+        {
+            //GenerateGridSlots();
+            
+        }
+
+        #endregion
+        
+        
+        /// <summary>
+        /// 컴포넌트 초기화.
+        /// </summary>
+        private void Init()
+        {
+            //_photonView = GetComponent<PhotonView>();
+            _spawnPanel = transform.GetChild(0);
+            
+            _xCount = PlayerFieldManager.Instance.XCount;
+            _yCount = PlayerFieldManager.Instance.YCount;
+            
+            
+            CanSpawnLegendary.Add(spawnLegendary1);
+            CanSpawnLegendary.Add(spawnLegendary2);
+            
+        }
+
+
+        #region Grid
+
+        /// <summary>
+        /// 맵 전체 슬롯 그리드 생성
+        /// 유닛이 배치될 패널 영역을 X, Y로 나누어 그리드 슬롯 좌표를 계산한다.
+        /// 좌상단부터 우측 → 아래 방향으로 순차 배치
+        /// </summary>
+        public void GenerateGridSlots()
+        {
+            
+            Debug.Log("map grid slot 생성하기");
+            Bounds panelBounds = _spawnPanel.GetComponent<SpriteRenderer>().bounds;
+            float panelWidth = panelBounds.size.x;
+            float panelHeight = panelBounds.size.y;
+
+            SlotWidth = panelWidth / MapXCount;
+            SlotHeight = panelHeight / MapYCount;
+
+            float startX = -panelWidth / 2 + SlotWidth / 2;
+            float startY = panelHeight / 2 - SlotHeight / 2;
+
+            for (int row = 0; row < MapYCount; row++)
+            {
+                for (int col = 0; col < MapXCount; col++)
+                {
+                    float xPos = startX + col * SlotWidth;
+                    float yPos = startY - row * SlotHeight;
+                    Vector2 slotPos = new Vector2(xPos, yPos) + (Vector2)_spawnPanel.position;
+                    
+                    // 내부인지 외부인지 판단
+                    bool canSpawnable = (row >= 1 && row <= 4) && (col >= 1 && col <= 4);
+                    SlotType type = canSpawnable ? SlotType.Inner : SlotType.Outer;
+                    
+                    
+                    //slot gameobject 생성
+                    var gridSlot = Manager.Resources.Instantiate<GameObject>(gridBoxPrefabPath, slotPos, Quaternion.identity).GetComponent<GridSlot>();;
+
+                    gridSlot.SetupGridSlot(row, col, slotPos, type, null, new Vector3(SlotWidth, SlotHeight, 1), ComponentProvider.Get<InGameObject>(gameObject).uniqueID);
+
+                    if (type == SlotType.Inner)
+                    {
+                        UnitHolder holder = SpawnHolder(gridSlot);
+                        gridSlot.SetHolder(holder);
+                    }
+                    
+                    mapSlot.Add(gridSlot);
+                    
+                    
+                }
+            }
+            Debug.Log("generate grid");
+        }
+        
+         
+        
+        private UnitHolder SpawnHolder(GridSlot spawnSlot)
+        {
+           
+            // 슬롯 위치 가져오기
+            Vector3 position = spawnSlot.SpawnPosition;
+            
+            //Instantiate
+            var holder = Manager.Resources.Instantiate<GameObject>(_unitHolderPrefabPath, position, Quaternion.identity)
+                .GetComponent<UnitHolder>();
+            holder.SetCurrentSlot(spawnSlot);
+            holder.ClearCurrentUnit();
+            
+            
+            //홀더 리스트에 추가
+            UnitHolders.Add(holder);
+
+            return holder;
+        }
+        
+        #endregion
+
+
+        public void NotifyUnitChanged()
+        {
+            CheckUnitCombinations();
+
+            // int epicCount = UnitHolders.Count(h => h.CurrentUnit != null && h.CurrentUnit.Tier == UnitTier.Epic);
+            //OnEpicUnitCountChanged?.Invoke(epicCount);
+
+        }
+
+
+        private void CheckUnitCombinations()
+        {
+            for (int i = 0; i < PlayerFieldManager.Instance.UnitCombinations.Count; i++)
+            {
+                bool result = CheckUnitCombination(i);
+                //Debug.Log($"조합{i} 체크 결과 : {result}");
+                CanSpawnLegendary[i]?.Invoke(result);
+            }
+            
+        }
+
+        private bool CheckUnitCombination(int index)
+        {
+            if (index < 0 || index >= PlayerFieldManager.Instance.UnitCombinations.Count)
+            {
+                Debug.LogError("Combination - Out of Range");
+                return false;
+            }
+            var combination = PlayerFieldManager.Instance.UnitCombinations[index];
+            
+            //Debug.Log(combination.Entries.Count);
+            //Debug.Log(combination.Entries[1].UnitIndex);
+            foreach (var entry in combination.Entries)
+            {
+                var holders = PlayerFieldManager.Instance.UnitSpanwer.GetUnitHoldersByIndex(entry.Tier, entry.UnitIndex);
+                //Debug.Log($"{entry.Tier} {entry.UnitIndex} - 개수 : {holders.Count} / 필요개수 : {entry.RequiredCount}");
+                
+                if (holders.Count < entry.RequiredCount)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+
+        }
+        
+        #region Gizmo
+
+        private void OnDrawGizmos()
+        {
+            if (_spawnPanel == null)
+            {
+                return;
+            }
+            
+            Vector3 slotScale = new Vector3(SlotWidth, SlotHeight, 1);
+            
+            Gizmos.color = Color.yellow;
+            foreach (var slot in mapSlot)
+            {
+                Gizmos.DrawWireCube(slot.SpawnPosition, slotScale);
+            }
+            
+        }
+
+        #endregion
+        
+        
+        
+        #region Legacy
+        
+        
+        //---- Field Register / Field Setting ----//
+        /// <summary>
+        /// ActorNumber 등록 및 스케일, 색상 설정.
+        /// </summary>
+        public void RegisterField(int actorNumber)
+        {
+            SetScale();
+            
+            PlayerFieldManager.Instance.RegisterPlayerField(actorNumber, this);
+        }
+        
+        /// <summary>
+        /// 내 필드는 메인 스케일, 다른 플레이어 필드는 서브 스케일로 설정한다.
+        /// </summary>
+        private void SetScale()
+        {
+            int localActorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+
+            // float scale = (_actorNumber == localActorNumber)
+            //     ? PlayerFieldManager.Instance.MainScale
+            //     : PlayerFieldManager.Instance.SubScale;
+            //
+            // transform.localScale = Vector3.one * scale;
+            //
+            //
+            // //색깔도 임시로 설정 (임시 색상: 본인 = 파란색, 타인 = 흰색)
+            // //todo: 임시 설정 부분
+            // Color color = (_actorNumber == localActorNumber)
+            //     ? Color.blue
+            //     : Color.white;
+            //
+            // _spawnPanel.GetComponent<SpriteRenderer>().color = color;
+
+        }
+
+        #endregion
+
+
+      
+    }
+    
+}

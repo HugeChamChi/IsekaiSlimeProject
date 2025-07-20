@@ -4,6 +4,7 @@ using PlayerField;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Util;
 
 public class Map : MonoBehaviour
 {
@@ -13,7 +14,7 @@ public class Map : MonoBehaviour
     public Player Owner;
 
     [Header("Wave")]
-    private static readonly string waveController = "Prefabs/WaveController";
+    private const string waveController = "Prefabs/WaveController";
     [SerializeField] private Transform spawnPoint;
 
     [Header("PlayerFieldController")] 
@@ -23,5 +24,4 @@ public class Map : MonoBehaviour
     {
         PhotonNetwork.Instantiate(waveController, spawnPoint.position, spawnPoint.rotation);
     }
-    
 }

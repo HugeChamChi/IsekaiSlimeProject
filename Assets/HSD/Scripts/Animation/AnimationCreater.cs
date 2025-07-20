@@ -82,6 +82,7 @@ public class AnimationCreater : MonoBehaviour
                 Debug.Log($"추가됨: {clipInfos[i].clipName} → {controllerPath}");
             }
             else
+
             {
                 Debug.LogWarning($"이미 존재 : {clipInfos[i].clipName}");
             }

@@ -1,3 +1,4 @@
+using Monster;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,8 +8,10 @@ public class MonsterStat : ScriptableObject
 {
     public int ID;
     public string Name;
+    public Sprite icon;
+    public MonsterType MonsterType;
     public float Hp;
-    public float moveSpeed;
-    public float defense;
-    public int dropGold;    
+    public float MoveSpeed;
+    public float Defense;
+    public int DropGold;    
 }

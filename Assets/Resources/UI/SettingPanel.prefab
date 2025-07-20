@@ -1610,6 +1610,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9070301450616153120}
+  - component: {fileID: 724291943590640736}
   m_Layer: 5
   m_Name: GameExitPanel
   m_TagString: Untagged
@@ -1637,6 +1638,24 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0.000061035156}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &724291943590640736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4276733514578251529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35da95959fe8b05469f29c3074fecc38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sfxSlider: {fileID: 0}
+  bgmSlider: {fileID: 0}
+  gameExitButton: {fileID: 4089419581042629873}
+  infoButton: {fileID: 0}
+  allMuteButton: {fileID: 1594188026876396792}
+  gameExitPanel: {fileID: 0}
 --- !u!1 &4441896112551294404
 GameObject:
   m_ObjectHideFlags: 0
@@ -2005,10 +2024,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uAC8C\uC784\uD3EC\uAE30"
+  m_text: "\uC124\uC815"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 2458403c95fdc9a49ab2f7cbe83c3d01, type: 2}
-  m_sharedMaterial: {fileID: -60886821664528858, guid: 2458403c95fdc9a49ab2f7cbe83c3d01, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 3d6c92951190cb047aad24b99fd7a3e6, type: 2}
+  m_sharedMaterial: {fileID: 5552827058011985205, guid: 3d6c92951190cb047aad24b99fd7a3e6, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
