@@ -53,6 +53,9 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         InitializeUI();
         InitializeAudio();
 
+        // 씬 동기화 활성화
+        PhotonNetwork.AutomaticallySyncScene = true;
+        
         if (!PhotonNetwork.IsConnected)
         {
             PhotonNetwork.ConnectUsingSettings();
@@ -192,7 +195,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
         if (isInRoom && PhotonNetwork.IsMasterClient)
         {
-            SceneManager.LoadScene("InGameScene");
+            PhotonNetwork.LoadLevel("TestScene");
         }
     }
 
@@ -433,7 +436,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         roomOptions.MaxPlayers = 4;
         roomOptions.IsVisible = false;
         roomOptions.IsOpen = true;
-
+        
         PhotonNetwork.CreateRoom(currentRoomCode, roomOptions);
     }
 
