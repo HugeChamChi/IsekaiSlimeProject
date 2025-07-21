@@ -8,18 +8,25 @@ using UnityEditor.iOS;
 
 public class UI_Controller
 {
-    private UnityEngine.Transform root;
+    private WaveController waveController;
     private Canvas waveCanvas;
     public BossAppearsPanel BossAppearsPanel;
+    public BossClearPanel BossClearPanel;
     public InGameUIPanel wavePanel;
 
-    public void Init(UnityEngine.Transform _root)
-    {        
-        root = _root;
+    public void Init(WaveController _waveController)
+    {
+        waveController = _waveController;
         CreateWaveCanvas();
-        BossAppearsPanel = Object.Instantiate(Resources.Load<BossAppearsPanel>("UI/BossAppearsPanel"), waveCanvas.transform);        
         wavePanel = Object.Instantiate(Resources.Load<InGameUIPanel>("UI/InGameUIPanel"));
-        wavePanel.Init(root.GetComponent<WaveController>());
+        wavePanel.Init(_waveController);
+        wavePanel.transform.SetParent(waveCanvas.transform, false);
+
+        BossAppearsPanel = Object.Instantiate(Resources.Load<BossAppearsPanel>("UI/BossAppearsPanel"), waveCanvas.transform);
+        BossAppearsPanel.transform.SetParent(waveCanvas.transform, false);
+
+        BossClearPanel = Object.Instantiate(Resources.Load<BossClearPanel>("UI/BossClearPanel"), waveCanvas.transform);        
+        BossClearPanel.transform.SetParent(waveCanvas.transform, false);
     }
 
     private void CreateWaveCanvas()
@@ -32,9 +39,8 @@ public class UI_Controller
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920, 1080);
 
-        waveCanvas.AddComponent<RectTransform>();
         waveCanvas.AddComponent<GraphicRaycaster>();
 
-        waveCanvas.transform.SetParent(root, false);
+        waveCanvas.transform.SetParent(waveController.transform, false);
     }
 }

@@ -1,4 +1,7 @@
+using Managers;
 using Photon.Pun;
+using PlayerField;
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.U2D;
@@ -10,7 +13,6 @@ public class BaseMonster : NetworkUnit, IPunObservable
     private SpriteRenderer sr;
 
     [Header("Patrol")]
-    [SerializeField] private float distance;
     private Vector2[] points = new Vector2[4];
     private Coroutine moveRoutine;
 
@@ -33,8 +35,12 @@ public class BaseMonster : NetworkUnit, IPunObservable
 
     private void OnEnable()
     {
-        //if (points[0] != Vector2.zero && moveRoutine == null)
-        //    StartCoroutine(MoveRoutine());
+        if (points[0] != Vector2.zero && moveRoutine == null)
+        {
+            index = 0;
+            StartCoroutine(MoveRoutine());
+        }
+
         status ??= GetComponent<MonsterStatusController>();
         status.isFaint.AddEvent(Faint);
     }
@@ -52,10 +58,10 @@ public class BaseMonster : NetworkUnit, IPunObservable
 
         points = new Vector2[]
         {
-            origin + new Vector2(distance, 0),
-            origin + new Vector2(distance, -distance),
-            origin + new Vector2(0, -distance),
-            origin + new Vector2(0, 0)
+            PlayerFieldManager.Instance.GetLocalFieldController().MapSlot[0].SpawnPosition,
+            PlayerFieldManager.Instance.GetLocalFieldController().MapSlot[5].SpawnPosition,
+            PlayerFieldManager.Instance.GetLocalFieldController().MapSlot[35].SpawnPosition,
+            PlayerFieldManager.Instance.GetLocalFieldController().MapSlot[30].SpawnPosition
         };
     }
 
@@ -94,7 +100,7 @@ public class BaseMonster : NetworkUnit, IPunObservable
                 transform.position = Vector2.MoveTowards(
                     transform.position,
                     target,
-                    4 * Time.deltaTime
+                    status.Speed.Value * Time.deltaTime
                 );
 
                 yield return null;

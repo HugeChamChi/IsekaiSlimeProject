@@ -8,8 +8,6 @@ using Util;
 [System.Serializable]
 public struct WaveData
 {
-    public int WaveCount;
-    public int WaveIdx;
     public float WaveTime;
     public float SpawnTime;
     public ClearEventType EventType;
@@ -39,15 +37,22 @@ public class WaveController : MonoBehaviour
     
     private const int maxCount = 100;
 
+    private void Awake()
+    {
+        waveDatas = Manager.Data.WaveDatas;
+    }
+
     private void Start()
     {
         if(pv.IsMine)
         {
-            MonsterStatusController.OnDied += MonsterDie;
+            MonsterStatusController.OnDied              += MonsterDie;
+            MonsterStatusController.OnBossMonsterDied   += BossMonsterDie;
+            
             uiController = new UI_Controller();
-            //uiController.Init(transform);
-
             Info = new();
+            uiController.Init(this);
+
             clearCondition = new WaitUntil(() => Info.MonsterCount.Value == 0);
         }
     }
@@ -84,6 +89,7 @@ public class WaveController : MonoBehaviour
     private IEnumerator WaveRoutine()
     {
         WaveData waveData = waveDatas[Info.CurWaveIdx.Value];
+        waveData.WaveTime += 3;
         Info.WaveTimer.Value = waveData.WaveTime;
         curSpawnCount = 0;
         curBossCount = waveDatas[Info.CurWaveIdx.Value].SpawnBossCount;
@@ -98,7 +104,7 @@ public class WaveController : MonoBehaviour
 
         if(curBossCount > 0)
         {
-             MonsterSpawnBossMonster(waveData.SpawnBoss);            
+             MonsterSpawnBossMonster($"Monster/{waveData.SpawnBoss}");            
         }
 
         if(nextWaveRoutine != null)
@@ -108,7 +114,7 @@ public class WaveController : MonoBehaviour
         }
         nextWaveRoutine = StartCoroutine(NextWave());
 
-        yield return Utils.GetDelay(waveData.WaveTime - waveData.SpawnTime);
+        yield return Utils.GetDelay(waveData.WaveTime - waveData.SpawnTime - 3f);
 
         if(Info.CurWaveIdx.Value == waveDatas.Length - 1)
         {
@@ -142,6 +148,17 @@ public class WaveController : MonoBehaviour
         if (!pv.IsMine) return;
 
         Info.MonsterCount.Value--;
+        if(Info.MonsterCount.Value < 80)
+        {
+            Manager.UI.warningMessagePanel.StopWarning();
+        }
+    }
+
+    private void BossMonsterDie(PhotonView pv, MonsterStat stat)
+    {
+        if (!pv.IsMine) return;
+
+        uiController.BossClearPanel.Show(stat);
     }
 
     private void MonsterSpawn(string monsterName)
@@ -154,6 +171,12 @@ public class WaveController : MonoBehaviour
     {
         Info.MonsterCount.Value++;
         curSpawnCount++;
+        Debug.Log(Info.MonsterCount.Value);
+
+        if (Info.MonsterCount.Value >= 80)
+        {
+            Manager.UI.warningMessagePanel.Show();
+        }
 
         if (Info.MonsterCount.Value >= maxCount)
         {
