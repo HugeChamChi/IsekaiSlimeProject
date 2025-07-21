@@ -21,7 +21,11 @@ namespace PlayerField
 
         public Color originColor => SlotType == SlotType.Inner ? innerColor : outerColor;
         public Color skillColor = Color.yellow;
-
+        public Color selectedColor = Color.green;
+        
+        private bool isSelectedRangeOn = false; // 선택 표시용
+        private bool isSkillRangeOn = false;    // 스킬 표시용
+        
         public SpriteRenderer sr;
 
         public void SetupGridSlot(int row, int column, Vector2 spawnPosition, SlotType type, UnitHolder holder, Vector3 slotSize, int parentUniqueID, bool isOccupied = false)
@@ -58,10 +62,21 @@ namespace PlayerField
         
         
         //임시
-        public void SetColor(bool isSkill)
+        private void SetColor(bool isOn)
         {
             sr ??= GetComponent<SpriteRenderer>();
-            sr.color = isSkill ? skillColor : originColor;
+
+            if (!isOn)
+            {
+                if (isSkillRangeOn || isSelectedRangeOn) sr.color = isSkillRangeOn ? skillColor : selectedColor;
+                else sr.color = originColor;
+            }
+            else
+            {
+                sr.color = isSkillRangeOn ? skillColor : selectedColor;
+            }
+            
+            //sr.color = isSkillOn ? skillColor : originColor;
         }
 
         public void SetColor(SlotType slotType)
@@ -69,6 +84,19 @@ namespace PlayerField
             sr ??= GetComponent<SpriteRenderer>();
             sr.color = slotType == SlotType.Inner ? innerColor : outerColor;
         }
+
+
+        public void SetSelectedRange(bool isOn)
+        {
+            isSelectedRangeOn = isOn;
+            SetColor(isOn);
+        }
+        public void SetSkillRange(bool isOn)
+        {
+            isSkillRangeOn = isOn;
+            SetColor(isOn);
+        }
+        
         
         
     }
