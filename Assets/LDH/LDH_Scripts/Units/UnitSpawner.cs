@@ -119,7 +119,7 @@ namespace Units
             
             
             //랜덤 유닛 뽑기
-            Debug.Log("랜덤 유닛 뽑기");
+            //Debug.Log("랜덤 유닛 뽑기");
             int unitIndex = Manager.UnitData.PickRandomUnitIndexByTier(tier);
             SpawnUnit(tier, unitIndex, slotIndex);
             

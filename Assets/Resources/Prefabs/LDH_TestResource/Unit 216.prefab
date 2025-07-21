@@ -4759,6 +4759,10 @@ PrefabInstance:
       propertyPath: anim
       value: 
       objectReference: {fileID: 6940610436736142048}
+    - target: {fileID: 3021409765573639220, guid: 5457bd9608c0e43cf9bc3c11e9370aae, type: 3}
+      propertyPath: attackClip
+      value: 
+      objectReference: {fileID: 7400000, guid: 5fa777919e804474080fad7ccf0cb5b4, type: 2}
     - target: {fileID: 5526208607372821797, guid: 5457bd9608c0e43cf9bc3c11e9370aae, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -4801,7 +4805,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7837609619163477037, guid: 5457bd9608c0e43cf9bc3c11e9370aae, type: 3}
       propertyPath: m_Name
-      value: Unit 213
+      value: Unit 216
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
