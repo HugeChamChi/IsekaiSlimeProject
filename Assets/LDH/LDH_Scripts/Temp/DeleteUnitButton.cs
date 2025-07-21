@@ -6,10 +6,10 @@ using UnityEngine.UI;
 
 namespace LDH.LDH_Scripts.Temp
 {
-    public class TestButton : MonoBehaviour
+    public class DeleteUnitButton : MonoBehaviour
     {
         public Button button;
-        private void Awake()
+        private void Start()
         {
             
             button.interactable = InGameManager.Instance.SelectedHolder != null;

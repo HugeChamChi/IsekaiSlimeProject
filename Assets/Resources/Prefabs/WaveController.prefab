@@ -48,9 +48,7 @@ MonoBehaviour:
   pv: {fileID: -3540162939166955448}
   Info: {}
   waveDatas:
-  - WaveCount: 0
-    WaveIdx: 1
-    WaveTime: 10
+  - WaveTime: 10
     SpawnTime: 10
     EventType: 0
     SpawnMonster: 101_MushroomSlime
