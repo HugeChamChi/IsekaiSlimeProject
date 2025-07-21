@@ -51,6 +51,9 @@ public class SettingPanels : MonoBehaviour
     [SerializeField] private Button saveNicknameButton;
     [SerializeField] private Button cancelNicknameButton;
     
+    [Header("Password Change")]
+    [SerializeField] private Button editPasswordButton;
+    
     [Header("Account Management")]
     [SerializeField] private Button deleteAccountButton;
     [SerializeField] private Button logoutButton;
@@ -123,6 +126,8 @@ public class SettingPanels : MonoBehaviour
         if (editNicknameButton != null) editNicknameButton.onClick.AddListener(OnEditNicknameClick);
         if (saveNicknameButton != null) saveNicknameButton.onClick.AddListener(OnSaveNicknameClick);
         if (cancelNicknameButton != null) cancelNicknameButton.onClick.AddListener(OnCancelNicknameClick);
+        
+        if (editPasswordButton != null) editPasswordButton.onClick.AddListener(OnEditPasswordClick);
         
         if (deleteAccountButton != null) deleteAccountButton.onClick.AddListener(OnDeleteAccountClick);
         if (logoutButton != null) logoutButton.onClick.AddListener(OnLogoutClick);
@@ -361,6 +366,8 @@ public class SettingPanels : MonoBehaviour
         if (currentNicknameText != null) currentNicknameText.text = "";
     }
     
+    #region Nickname Change
+    
     public void OnEditNicknameClick()
     {
         SetNicknameEditMode(true);
@@ -430,6 +437,24 @@ public class SettingPanels : MonoBehaviour
         if (editNicknameButton != null) editNicknameButton.gameObject.SetActive(!editing);
         if (nicknameEditPanel != null) nicknameEditPanel.SetActive(editing);
     }
+    
+    #endregion
+    
+    #region Password Change
+    
+    public void OnEditPasswordClick()
+    {
+        if (PopupManager.Instance != null)
+        {
+            PopupManager.Instance.ShowPasswordChangePopup();
+        }
+        else
+        {
+            ShowMessage("PopupManager를 찾을 수 없습니다.");
+        }
+    }
+    
+    #endregion
     
     public void OnLogoutClick()
     {

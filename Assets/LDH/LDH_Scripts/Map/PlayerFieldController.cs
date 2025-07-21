@@ -136,6 +136,7 @@ namespace PlayerField
                     {
                         UnitHolder holder = SpawnHolder(gridSlot);
                         gridSlot.SetHolder(holder);
+                        holder.transform.SetParent(gridSlot.transform);  // holder 계층 구조 설정
                     }
                     
                     mapSlot.Add(gridSlot);

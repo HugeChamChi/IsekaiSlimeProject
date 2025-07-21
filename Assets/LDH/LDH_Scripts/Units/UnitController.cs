@@ -3,13 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Util;
 using Managers;
-using Photon.Pun;
-using PlayerField;
-using System;
-using System.Linq;
 using Unit;
 using Units;
-using Unity.VisualScripting;
 using UnityEngine.UI;
 
 namespace Units
@@ -101,7 +96,7 @@ namespace Units
         /// </summary>
         private void Init()
         {
-            anim = GetComponentInChildren<Animator>();
+            //anim = GetComponentInChildren<Animator>();
             sr = GetComponentInChildren<SpriteRenderer>();
 
             Unit unit = GetComponent<Unit>();
@@ -131,17 +126,18 @@ namespace Units
             skillCoolTime = info.SkillCoolTime;
             
             
-            //애니메이션 변경
-            // Resources 폴더에서 AnimatorController 로드
-            var animatorController = Manager.Resources.Load<RuntimeAnimatorController>($"Animators/Unit {info.Index}");
-            if (animatorController!=null)
-            {
-                anim.runtimeAnimatorController = animatorController;
-            }
-            else
-            {
-                Debug.LogError($"AnimatorController 'Unit {info.Index}'를 Resources/Animators에서 찾을 수 없습니다.");
-            }
+            // //애니메이션 변경
+            // // Resources 폴더에서 AnimatorController 로드
+            // var animatorController = Manager.Resources.Load<RuntimeAnimatorController>($"Animators/Unit {info.Index}");
+            // if (animatorController!=null)
+            // {
+            //     anim.runtimeAnimatorController = animatorController;
+            // }
+            // else
+            // {
+            //     Debug.LogError($"AnimatorController 'Unit {info.Index}'를 Resources/Animators에서 찾을 수 없습니다.");
+            // }
+            
             Debug.Log($"[UnitController] 초기화 완료! 공격력: {Stat.Attack}");
 
         }
