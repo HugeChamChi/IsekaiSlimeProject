@@ -191,7 +191,7 @@ public class WaveController : MonoBehaviour
 
         MonsterCountAddAndGameOverCheck();
 
-        uiController.BossAppearsPanel.Show(boss.GetComponent<MonsterStat>());
+        uiController.BossAppearsPanel.Show(boss.GetComponent<MonsterStatusController>().baseStat);
     }
     private void OnDestroy()
     {
