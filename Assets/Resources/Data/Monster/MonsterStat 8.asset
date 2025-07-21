@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 186938339c1e7814e800ac8aea21b02d, type: 3}
   m_Name: MonsterStat 8
   m_EditorClassIdentifier: 
-  ID: 0
-  Name: 
+  ID: 111
+  Name: "\uB8E8\uC778\uCF54\uC5B4\uC2AC\uB77C\uC784"
   icon: {fileID: 0}
-  MonsterType: 0
-  Hp: 0
-  MoveSpeed: 5
-  Defense: 0
-  DropGold: 0
+  Hp: 50000
+  MoveSpeed: 3
+  Defense: 35
+  DropGold: 200
+  MonsterType: 1

@@ -1,4 +1,5 @@
 using Managers;
+using Monster;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,16 +13,17 @@ public class DataDownloader
     private const string URL = "https://docs.google.com/spreadsheets/d/10QfD3I1AbOf_yOnV5AEE4zut2KNPh1pmiAEeALIUZzA/export?format=csv&range=B66:C66";
     // gid=2097254203 
     // 
-    private const string MonsterURL = "https://docs.google.com/spreadsheets/d/16VV5EYBHec3ZFEOQceXpXT-rPAykr-poMBNdsq6h2FY/export?format=csv&gid=486541091&range=C5:I24";
+    private const string WaveURL = "https://docs.google.com/spreadsheets/d/16VV5EYBHec3ZFEOQceXpXT-rPAykr-poMBNdsq6h2FY/export?format=csv&gid=486541091&range=C5:I24";
+    private const string MonsterURL = "https://docs.google.com/spreadsheets/d/16VV5EYBHec3ZFEOQceXpXT-rPAykr-poMBNdsq6h2FY/export?format=csv&gid=2082014794&range=A5:G24";
 
     public event Action OnDataSetupCompleted;
 
     public IEnumerator DownloadData()
     {
-        Debug.Log("진입");
         yield return null;
-        yield return LoadCSV(MonsterURL, SetupWaveDatas);
-        Debug.Log("끝");
+        yield return LoadCSV(WaveURL, SetupWaveDatas);
+        yield return LoadCSV(MonsterURL, SetupMonsterDatas);
+
         OnDataSetupCompleted?.Invoke();
     }
 
@@ -66,5 +68,24 @@ public class DataDownloader
             };
         }
         Manager.Data.WaveDatas = waveDatas;
+    }
+
+    private void SetupMonsterDatas(string[][] data)
+    {
+        MonsterStat[] monsterStats = Manager.Data.monsterStats;
+
+        foreach (var row in data)
+        {
+            int ID = int.Parse(row[0]);
+
+            MonsterStat stat = Array.Find(monsterStats, m => m.ID == ID);
+
+            stat.Name = row[1];
+            stat.Hp = float.Parse(row[2]);
+            stat.MoveSpeed = float.Parse(row[3]);
+            stat.Defense = float.Parse(row[4]);
+            stat.DropGold = int.Parse(row[5]);
+            stat.MonsterType = Enum.Parse<MonsterType>(row[6]);
+        }
     }
 }

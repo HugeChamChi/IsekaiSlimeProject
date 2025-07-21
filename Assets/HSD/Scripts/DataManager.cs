@@ -4,11 +4,15 @@ using UnityEngine;
 
 public class DataManager : DesignPattern.Singleton<DataManager>
 {
+    public Property<int> Gold = new();
     public WaveData[] WaveDatas;
-    private DataDownloader dataDownloader;
+    public MonsterStat[] monsterStats;
+    private DataDownloader dataDownloader;    
 
     private void Start()
     {
+        monsterStats = Resources.LoadAll<MonsterStat>("Data/Monster");
+
         dataDownloader = new DataDownloader();
         StartCoroutine(dataDownloader.DownloadData());
     }
