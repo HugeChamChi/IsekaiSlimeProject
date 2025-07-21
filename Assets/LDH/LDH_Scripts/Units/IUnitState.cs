@@ -84,7 +84,7 @@ namespace Units
                 unitController.UpdateSpriteFlip(Utils.DirToTarget(target.position, unit.transform.position));
 
                 Debug.Log("[Attack State] 공격 시작");
-                unitController.anim.SetTrigger("Attack");
+                unitController.anim.SetTrigger("2_Attack");
                 unitController.Attack(target.GetComponent<IDamageable>());
 
                 yield return unitController.attackAnimWait;

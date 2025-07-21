@@ -1,3 +1,4 @@
+using Managers;
 using System.Collections;
 using Unit;
 using System.Collections.Generic;
@@ -81,8 +82,10 @@ namespace Units
                     //디버프
                     if (target is IEffectable effectTarget)
                     {
+                        if (Effect == null) continue;   
+                        
                         Effect?.Apply(effectTarget);
-                        caster.StartCoroutine(RemoveEffect(effectTarget, Effect));
+                        currentHolder.StartCoroutine(RemoveEffect(effectTarget, Effect));
                     }
                     
                 }

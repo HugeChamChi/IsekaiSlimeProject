@@ -31,7 +31,7 @@ public class MonsterStatusController : MonoBehaviour, IDamageable, IEffectable
     private void SetupStat()
     {
         Health.SetBaseValue(baseStat.Hp);
-        Speed.SetBaseValue(baseStat.Defense);
+        Speed.SetBaseValue(baseStat.MoveSpeed);
         Defense.SetBaseValue(baseStat.Defense);
         CurHp.Value = Health.Value;
     }

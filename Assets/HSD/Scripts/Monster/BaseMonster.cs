@@ -30,7 +30,14 @@ public class BaseMonster : NetworkUnit, IPunObservable
 
         SetupPoints();
 
+        foreach (Vector2 point in points)
+        {
+            Debug.Log(point);
+        }
+
         moveRoutine = StartCoroutine(MoveRoutine());
+        
+       
     }
 
     private void OnEnable()
@@ -89,10 +96,11 @@ public class BaseMonster : NetworkUnit, IPunObservable
     {       
         while (true)
         {
+            Debug.Log($"[MoveRoutine] INDEX - {index}");
             Vector2 target = points[index];
 
             Vector2 direction = (target - (Vector2)transform.position).normalized;
-
+            Debug.Log($"[MoveRoutine] direction - {direction}");
             sr.flipX = direction.x < 0;
 
             while (Vector2.Distance(transform.position, target) > 0.1f)
