@@ -45,7 +45,6 @@ public class LoginPanel : MonoBehaviourPun
             FirebaseManager.Auth.StateChanged += OnAuthStateChanged;
         }
         
-        UpdateStatusText("로그인 대기 중...");
         StartCoroutine(PeriodicConnectionCheck());
     }
 
@@ -88,7 +87,6 @@ public class LoginPanel : MonoBehaviourPun
                 }
                 
                 ResetLoginStates();
-                UpdateStatusText("로그아웃됨");
             }
         }
     }
@@ -116,12 +114,10 @@ public class LoginPanel : MonoBehaviourPun
     {
         if (string.IsNullOrEmpty(emailInput.text) || string.IsNullOrEmpty(passInput.text))
         {
-            UpdateStatusText("이메일과 비밀번호를 입력해주세요");
             ShowPopup("이메일과 비밀번호를 입력해주세요.");
             return;
         }
 
-        UpdateStatusText("Firebase 로그인 중...");
         loginButton.interactable = false;
         ResetLoginStates();
 
@@ -130,14 +126,12 @@ public class LoginPanel : MonoBehaviourPun
             {
                 if (task.IsCanceled)
                 {
-                    UpdateStatusText("로그인이 취소되었습니다");
                     ShowPopup("로그인이 취소되었습니다.");
                     ResetLoginUI();
                     return;
                 }
                 if (task.IsFaulted)
                 {
-                    UpdateStatusText("로그인 실패했습니다");
                     ShowPopup($"로그인에 실패했습니다: {task.Exception?.GetBaseException()?.Message}");
                     ResetLoginUI();
                     return;
@@ -152,7 +146,6 @@ public class LoginPanel : MonoBehaviourPun
                 }
 
                 isFirebaseLoggedIn = true;
-                UpdateStatusText("Firebase 로그인 성공 - Photon 연결 중...");
                 
                 StartCoroutine(DelayedPhotonConnect());
             });
@@ -208,7 +201,6 @@ public class LoginPanel : MonoBehaviourPun
             else
             {
                 Debug.LogError("Photon 연결 시도 실패");
-                UpdateStatusText("네트워크 연결 실패");
                 ShowPopup("네트워크 연결에 실패했습니다.");
                 ResetLoginUI();
             }
@@ -216,7 +208,6 @@ public class LoginPanel : MonoBehaviourPun
         else
         {
             Debug.LogError("사용자 정보 없음");
-            UpdateStatusText("사용자 정보 오류");
             ShowPopup("사용자 정보가 올바르지 않습니다.");
             ResetLoginUI();
         }
@@ -238,7 +229,6 @@ public class LoginPanel : MonoBehaviourPun
         else
         {
             Debug.LogError("기존 연결 해제 실패");
-            UpdateStatusText("연결 해제 실패");
             ShowPopup("기존 연결을 해제할 수 없습니다.");
             ResetLoginUI();
         }
@@ -257,7 +247,6 @@ public class LoginPanel : MonoBehaviourPun
         if (!PhotonNetwork.IsConnected)
         {
             Debug.LogError("Photon 연결 시간 초과");
-            UpdateStatusText("네트워크 연결 시간 초과");
             ShowPopup("네트워크 연결에 시간이 너무 오래 걸립니다. 다시 시도해주세요.");
             ResetLoginUI();
         }
@@ -362,7 +351,6 @@ public class LoginPanel : MonoBehaviourPun
         }
         
         Debug.LogError("커스텀 프로퍼티 설정 시간 초과");
-        UpdateStatusText("사용자 정보 동기화 실패");
         
         // 시간 초과시에도 일단 진행 (로그인은 성공했으니까)
         isCustomPropertiesSet = true;
@@ -380,7 +368,6 @@ public class LoginPanel : MonoBehaviourPun
             }
             
             Debug.Log("모든 로그인 조건 충족 - 로비로 이동");
-            UpdateStatusText("로그인 완료 - 로비로 이동 중...");
             
             emailInput.text = "";
             passInput.text = "";
@@ -391,8 +378,6 @@ public class LoginPanel : MonoBehaviourPun
 
     private IEnumerator CheckAllSystemsReadyAndMoveToLobby()
     {
-        UpdateStatusText("시스템 준비 확인 중...");
-        
         // 1. Firebase Database 초기화 대기
         yield return StartCoroutine(WaitForFirebaseDatabase());
         
@@ -405,8 +390,6 @@ public class LoginPanel : MonoBehaviourPun
         // 4. 최종 상태 확인
         if (AreAllSystemsReady())
         {
-            UpdateStatusText("모든 시스템 준비 완료 - 로비로 이동 중...");
-            
             emailInput.text = "";
             passInput.text = "";
             
@@ -415,7 +398,6 @@ public class LoginPanel : MonoBehaviourPun
         }
         else
         {
-            UpdateStatusText("시스템 준비 실패");
             ShowPopup("시스템 초기화에 실패했습니다. 다시 시도해주세요.");
             ResetLoginUI();
         }
@@ -431,7 +413,7 @@ public class LoginPanel : MonoBehaviourPun
             // Firebase Database 초기화 확인
             if (FirebaseManager.IsFullyInitialized())
             {
-                Debug.Log("✅ Firebase Database 준비 완료");
+                Debug.Log("Firebase Database 준비 완료");
                 yield break;
             }
             
@@ -462,7 +444,7 @@ public class LoginPanel : MonoBehaviourPun
                 GameManager.Instance.IsPhotonConnected &&
                 !string.IsNullOrEmpty(GameManager.Instance.UserID))
             {
-                Debug.Log("✅ GameManager 완전 준비 완료");
+                Debug.Log("GameManager 완전 준비 완료");
                 yield break;
             }
             
@@ -483,7 +465,7 @@ public class LoginPanel : MonoBehaviourPun
             // UserManager 존재 확인 (없어도 진행)
             if (UserManager.Instance != null)
             {
-                Debug.Log("✅ UserManager 준비 완료");
+                Debug.Log("UserManager 준비 완료");
                 yield break;
             }
             
@@ -519,16 +501,6 @@ public class LoginPanel : MonoBehaviourPun
     {
         loginButton.interactable = true;
         ResetLoginStates();
-        UpdateStatusText("로그인 대기 중...");
-    }
-
-    private void UpdateStatusText(string status)
-    {
-        if (statusText != null)
-        {
-            statusText.text = status;
-        }
-        Debug.Log($"[로그인 상태] {status}");
     }
 
     #region Photon Callbacks
@@ -536,7 +508,6 @@ public class LoginPanel : MonoBehaviourPun
     public void OnConnectedToMaster()
     {
         Debug.Log("Photon 마스터 서버 연결 완료");
-        UpdateStatusText("Photon 연결 완료 - 사용자 정보 설정 중...");
         isPhotonConnected = true;
         
         if (GameManager.Instance != null)
@@ -560,7 +531,6 @@ public class LoginPanel : MonoBehaviourPun
     public void OnDisconnected(DisconnectCause cause)
     {
         Debug.Log($"Photon 연결 해제: {cause}");
-        UpdateStatusText($"Photon 연결 해제: {cause}");
         
         isPhotonConnected = false;
         isCustomPropertiesSet = false;
@@ -585,7 +555,6 @@ public class LoginPanel : MonoBehaviourPun
     public void OnConnectFailed()
     {
         Debug.LogError("Photon 연결 실패");
-        UpdateStatusText("네트워크 연결 실패");
         ShowPopup("네트워크 연결에 실패했습니다. 인터넷 연결을 확인해주세요.");
         ResetLoginUI();
     }
@@ -603,14 +572,12 @@ public class LoginPanel : MonoBehaviourPun
     public void OnCustomAuthenticationFailed(string debugMessage)
     {
         Debug.LogError($"커스텀 인증 실패: {debugMessage}");
-        UpdateStatusText("인증 실패");
         ShowPopup("사용자 인증에 실패했습니다.");
         ResetLoginUI();
     }
 
     private IEnumerator ReconnectToPhoton()
     {
-        UpdateStatusText("Photon 재연결 중...");
         yield return new WaitForSeconds(2f);
         
         if (isFirebaseLoggedIn && !PhotonNetwork.IsConnected)
@@ -624,6 +591,7 @@ public class LoginPanel : MonoBehaviourPun
     
     private IEnumerator PeriodicConnectionCheck()
     {
+        Debug.Log("PeriodicConnectionCheck 시작");
         while (true)
         {
             yield return new WaitForSeconds(2f);
