@@ -40,6 +40,8 @@ namespace PlayerField
             
             SetParent(parentUniqueID);
             SetColor(type);
+
+            sr.enabled = false;
         }
 
         public void SetHolder(UnitHolder holder)
@@ -69,11 +71,16 @@ namespace PlayerField
             if (!isOn)
             {
                 if (isSkillRangeOn || isSelectedRangeOn) sr.color = isSkillRangeOn ? skillColor : selectedColor;
-                else sr.color = originColor;
+                else
+                {
+                    sr.color = originColor;
+                    sr.enabled = false;
+                }
             }
             else
             {
                 sr.color = isSkillRangeOn ? skillColor : selectedColor;
+                sr.enabled = true;
             }
             
             //sr.color = isSkillOn ? skillColor : originColor;
