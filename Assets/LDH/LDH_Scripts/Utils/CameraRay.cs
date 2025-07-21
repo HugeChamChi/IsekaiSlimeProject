@@ -40,18 +40,21 @@ namespace Util
         {
             Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
             RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
-                
-            //스킬 범위 가리기
-            if (InGameManager.Instance.SelectedHolder!=null)
+            
+            if (hit.collider != null && hit.transform.TryGetComponent<UnitHolder>(out UnitHolder holder))
+            {
+                if (holder != InGameManager.Instance.SelectedHolder)
+                {
+                    InGameManager.Instance.SelectedHolder?.HideSkillRange();
+                    InGameManager.Instance.ClearSelectedHolder();
+                }
+                InGameManager.Instance.SetSelectedHolder(holder);
+
+            }
+            else
             {
                 InGameManager.Instance.SelectedHolder.HideSkillRange();
                 InGameManager.Instance.ClearSelectedHolder();
-            }
-                
-            if (hit.collider != null && hit.transform.TryGetComponent<UnitHolder>(out UnitHolder holder))
-            {
-                InGameManager.Instance.SetSelectedHolder(holder);
-
             }
         }
 
