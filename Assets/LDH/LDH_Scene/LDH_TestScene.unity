@@ -299,13 +299,13 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 0
-  m_Spacing: 0
+  m_Spacing: 68.93
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
+  m_ChildScaleHeight: 1
   m_ReverseArrangement: 0
 --- !u!114 &537073674 stripped
 MonoBehaviour:
@@ -353,9 +353,11 @@ MonoBehaviour:
   - {fileID: 8400000, guid: 386395990d5ea2345b0fdcfa5a47e295, type: 2}
   - {fileID: 8400000, guid: b262db2bad652ff4f8c4d7625455a15a, type: 2}
   - {fileID: 8400000, guid: 76d9b24216929854794349954cd085c7, type: 2}
+  playerCamObjects:
+  - {fileID: 286892656}
+  - {fileID: 955465577}
+  - {fileID: 809607149}
   xInterval: 20
-  _cameraWidth: 0
-  _cameraHeight: 0
 --- !u!4 &646599283
 Transform:
   m_ObjectHideFlags: 0

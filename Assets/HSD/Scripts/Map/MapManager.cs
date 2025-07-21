@@ -16,16 +16,14 @@ public class MapManager : MonoBehaviour
 
     private string mapPath = "Prefabs/Map_Test";
     [SerializeField] private RenderTexture[] playTextures;
+    [SerializeField] private GameObject[] playerCamObjects;
+    
+    
     private Player[] players;
 
     private static readonly Dictionary<Player, Map> maps = new Dictionary<Player, Map>();
     
     [SerializeField] private float xInterval;
-
-
-    [SerializeField] private float _cameraWidth;
-
-    [SerializeField] private float _cameraHeight;
     
     
     
@@ -91,6 +89,11 @@ public class MapManager : MonoBehaviour
                 idx++;
             }
         }
+
+        for(int i=0; i< 4-players.Length; i++ )
+        {
+            playerCamObjects[playerCamObjects.Length-1-i].SetActive(false);
+        }
     }
 
 
@@ -102,9 +105,6 @@ public class MapManager : MonoBehaviour
         Vector3 camPosition = playerFieldTransform.position;
         camPosition.z = playerMapCam.transform.position.z;
         playerMapCam.transform.position = camPosition;
-
-        playerMapCam.depth = -1;
-
 
     }
 }
