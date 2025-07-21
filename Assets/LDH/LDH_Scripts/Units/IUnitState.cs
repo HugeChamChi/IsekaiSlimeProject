@@ -86,6 +86,8 @@ namespace Units
                 Debug.Log("[Attack State] 공격 시작");
                 unitController.anim.SetTrigger("Attack");
                 unitController.Attack(target.GetComponent<IDamageable>());
+
+                yield return unitController.attackAnimWait;
             }
             
             yield return null;
