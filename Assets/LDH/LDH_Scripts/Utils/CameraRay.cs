@@ -93,11 +93,15 @@ namespace Util
                 {
                     if (InGameManager.Instance.SelectedHolder?.transform == hit.collider.transform)
                     {
-                        //todo: 공격 범위, 스킬 범위 보여주기(shader), 시간 등
-                        InGameManager.Instance.SelectedHolder?.ShowSkillRange();
-                        Manager.UI.characterInfoPanel.Show( InGameManager.Instance.SelectedHolder.CurrentUnit);
+                        if (InGameManager.Instance.SelectedHolder != null &&
+                            InGameManager.Instance.SelectedHolder.CurrentUnit != null
+                           )
+                        {
+                            //todo: 공격 범위, 스킬 범위 보여주기(shader), 시간 등
+                            InGameManager.Instance.SelectedHolder?.ShowSkillRange();
+                            Manager.UI.characterInfoPanel.Show(InGameManager.Instance.SelectedHolder.CurrentUnit);
+                        }
                     }
-                    
                 }
             }
 
