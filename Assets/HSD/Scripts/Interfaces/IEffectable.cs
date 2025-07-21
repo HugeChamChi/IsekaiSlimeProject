@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unit;
-using UnityEditor.ShaderGraph.Internal;
-using UnityEngine;
+
 
 public interface IEffectable
 {

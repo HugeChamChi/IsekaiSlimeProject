@@ -4,7 +4,7 @@ using UnityEngine;
 using static UnityEngine.RuleTile.TilingRuleOutput;
 using UnityEngine.UI;
 using Unity.VisualScripting;
-using UnityEditor.iOS;
+
 
 public class UI_Controller
 {
