@@ -77,6 +77,22 @@ namespace Managers
 
 
         #endregion
+
+        #region Photon
+
+        [PunRPC]
+        public void OnGameStart()
+        {
+            if (InGameManager.Instance != null)
+            {
+                InGameManager.Instance.OnGameStart();
+            }
+        }
+
+        #endregion
+        
+        
+        
         
         #region Field Manage
 
