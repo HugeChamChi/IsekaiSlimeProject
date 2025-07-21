@@ -11,7 +11,9 @@ public class LegendaryMergeButton : MonoBehaviour
 {
     public int legendaruOrder = 0; //0번째, 1번째 중 하나
     private Button _button;
-
+    [SerializeField] private VideoController2 _videoController2;
+    
+    
     private void Start() => Init();
 
     private void Init()
@@ -24,7 +26,12 @@ public class LegendaryMergeButton : MonoBehaviour
 
     private void SetupButtonEvent(PlayerFieldController fieldController)
     {
-        _button.onClick.AddListener(()=>PlayerFieldManager.Instance.UnitSpanwer.MergeEpicUnits(legendaruOrder));
+        _button.onClick.AddListener(()=>
+        {
+            //연출
+            _videoController2.PlayCutScene(legendaruOrder==0? 216: 217);
+            PlayerFieldManager.Instance.UnitSpanwer.MergeEpicUnits(legendaruOrder);
+        });
         
         fieldController.CanSpawnLegendary[legendaruOrder] += SetButtonInteractable;
     }

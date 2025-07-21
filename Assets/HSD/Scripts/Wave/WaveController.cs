@@ -130,7 +130,7 @@ public class WaveController : MonoBehaviour
             nextWaveRoutine = null;
         }
 
-        nextWaveRoutine = StartCoroutine(NextWave());
+        nextWaveRoutine = StartCoroutine(NextWave(waveData));
         
     }
 
