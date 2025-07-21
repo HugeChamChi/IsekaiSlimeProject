@@ -115,7 +115,8 @@ public class WaveController : MonoBehaviour
         {
             MonsterSpawnBossMonster($"Monster/{waveData.SpawnBoss}");
         }
-
+        
+        
 
         if (nextWaveRoutine != null)
         {
@@ -124,18 +125,7 @@ public class WaveController : MonoBehaviour
         }
 
         nextWaveRoutine = StartCoroutine(NextWave());
-
-        yield return Utils.GetDelay(waveData.WaveTime - waveData.SpawnTime - 3f);
-
-        if (Info.CurWaveIdx.Value == waveDatas.Length - 1)
-        {
-            // 게임 클리어
-        }
-        else
-        {
-            WaveStart();
-            Info.CurWaveIdx.Value++;
-        }
+        
     }
 
     private IEnumerator WaveTimerRoutine()
@@ -150,8 +140,17 @@ public class WaveController : MonoBehaviour
     private IEnumerator NextWave()
     {
         yield return clearCondition;
-        Info.CurWaveIdx.Value++;
-        WaveStart();
+        
+        if (Info.CurWaveIdx.Value == waveDatas.Length - 1)
+        {
+            // 게임 클리어
+        }
+        else
+        {
+            Info.CurWaveIdx.Value++;
+            WaveStart();
+        }
+        
     }
 
     private void MonsterDie(PhotonView pv)
