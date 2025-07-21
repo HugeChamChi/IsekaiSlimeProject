@@ -126,7 +126,7 @@ public class FirebaseManager : MonoBehaviour
                     Debug.Log("에디터");
                     #else
                     database.SetPersistenceEnabled(true);
-                    Debug.Log("활성화")
+                    Debug.Log("활성화");
                     #endif
                 }
                 catch
