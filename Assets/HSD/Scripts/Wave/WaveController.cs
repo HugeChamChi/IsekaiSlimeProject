@@ -92,6 +92,12 @@ public class WaveController : MonoBehaviour
 
             if (waveTimerRoutine == null)
                 waveTimerRoutine = StartCoroutine(WaveTimerRoutine());
+
+            if(nextWaveRoutine != null)
+            {
+                StopCoroutine(nextWaveRoutine);
+                nextWaveRoutine = null;
+            }
         }
     }
 
@@ -137,7 +143,7 @@ public class WaveController : MonoBehaviour
         }
     }
 
-    private IEnumerator NextWave()
+    private IEnumerator NextWave(WaveData waveData)
     {
         yield return clearCondition;
         
@@ -207,6 +213,9 @@ public class WaveController : MonoBehaviour
     private void OnDestroy()
     {
         if (pv.IsMine)
-            MonsterStatusController.OnDied -= MonsterDie;
+        {
+            MonsterStatusController.OnDied              -= MonsterDie;
+            MonsterStatusController.OnBossMonsterDied   -= BossMonsterDie;
+        }
     }
 }
