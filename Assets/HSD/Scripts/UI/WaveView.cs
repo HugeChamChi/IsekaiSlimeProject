@@ -11,12 +11,12 @@ public class WaveView : MonoBehaviour
 
     public void UpdateWaveText(int amount)
     {
-        waveText.text = amount.ToString();
+        waveText.text = amount+1.ToString();
     }
 
     public void UpdateTimerText(float time)
     {
-        timerText.text = time.ToString();
+        timerText.text = time.ToString("F2");
     }
 
     public void UpdateMonsterCountText(int amount)

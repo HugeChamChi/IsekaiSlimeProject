@@ -20,6 +20,7 @@ public class MonsterStatusController : MonoBehaviour, IDamageable, IEffectable
     private PhotonView pv;    
 
     public static event Action<PhotonView> OnDied;
+    public static event Action<PhotonView, MonsterStat> OnBossMonsterDied;
 
     private void Awake()
     {
@@ -57,6 +58,9 @@ public class MonsterStatusController : MonoBehaviour, IDamageable, IEffectable
     private void Die()
     {
         OnDied?.Invoke(pv);
+
+        if(baseStat.MonsterType == Monster.MonsterType.Boss)
+            OnBossMonsterDied?.Invoke(pv,baseStat);
 
         if(pv.IsMine)
             PhotonNetwork.Destroy(gameObject);

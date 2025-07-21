@@ -1,4 +1,7 @@
+using Managers;
 using Photon.Pun;
+using PlayerField;
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.U2D;
@@ -33,8 +36,12 @@ public class BaseMonster : NetworkUnit, IPunObservable
 
     private void OnEnable()
     {
-        //if (points[0] != Vector2.zero && moveRoutine == null)
-        //    StartCoroutine(MoveRoutine());
+        if (points[0] != Vector2.zero && moveRoutine == null)
+        {
+            index = 0;
+            StartCoroutine(MoveRoutine());
+        }
+
         status ??= GetComponent<MonsterStatusController>();
         status.isFaint.AddEvent(Faint);
     }
@@ -52,10 +59,10 @@ public class BaseMonster : NetworkUnit, IPunObservable
 
         points = new Vector2[]
         {
-            origin + new Vector2(distance, 0),
-            origin + new Vector2(distance, -distance),
-            origin + new Vector2(0, -distance),
-            origin + new Vector2(0, 0)
+            PlayerFieldManager.Instance.playerFields[0].transform.position,
+            PlayerFieldManager.Instance.playerFields[5].transform.position,
+            PlayerFieldManager.Instance.playerFields[35].transform.position,
+            PlayerFieldManager.Instance.playerFields[30].transform.position
         };
     }
 

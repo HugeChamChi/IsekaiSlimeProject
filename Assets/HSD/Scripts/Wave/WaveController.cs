@@ -43,11 +43,13 @@ public class WaveController : MonoBehaviour
     {
         if(pv.IsMine)
         {
-            MonsterStatusController.OnDied += MonsterDie;
+            MonsterStatusController.OnDied              += MonsterDie;
+            MonsterStatusController.OnBossMonsterDied   += BossMonsterDie;
+            
             uiController = new UI_Controller();
-            //uiController.Init(transform);
-
             Info = new();
+            uiController.Init(this);
+
             clearCondition = new WaitUntil(() => Info.MonsterCount.Value == 0);
         }
     }
@@ -84,6 +86,7 @@ public class WaveController : MonoBehaviour
     private IEnumerator WaveRoutine()
     {
         WaveData waveData = waveDatas[Info.CurWaveIdx.Value];
+        waveData.WaveTime += 3;
         Info.WaveTimer.Value = waveData.WaveTime;
         curSpawnCount = 0;
         curBossCount = waveDatas[Info.CurWaveIdx.Value].SpawnBossCount;
@@ -144,6 +147,13 @@ public class WaveController : MonoBehaviour
         Info.MonsterCount.Value--;
     }
 
+    private void BossMonsterDie(PhotonView pv, MonsterStat stat)
+    {
+        if (!pv.IsMine) return;
+
+        uiController.BossClearPanel.Show(stat);
+    }
+
     private void MonsterSpawn(string monsterName)
     {
         Manager.Resources.NetworkInstantiate<GameObject>(monsterName, transform.position, false, true);
@@ -154,7 +164,7 @@ public class WaveController : MonoBehaviour
     {
         Info.MonsterCount.Value++;
         curSpawnCount++;
-
+        Debug.Log(Info.MonsterCount.Value);
         if (Info.MonsterCount.Value >= maxCount)
         {
             // 게임 오버

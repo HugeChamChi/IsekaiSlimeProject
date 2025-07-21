@@ -14,6 +14,10 @@ public class InGameUIPanel : MonoBehaviour
     {
         waveController = _waveController;
         Subscribe();
+
+        waveView.UpdateMonsterCountText(waveController.Info.MonsterCount.Value);
+        waveView.UpdateTimerText(waveController.Info.WaveTimer.Value);
+        waveView.UpdateWaveText(waveController.Info.CurWaveIdx.Value);
         settingPanel = Instantiate(Resources.Load<SettingPanel>("UI/SettingPanel"), transform);
     }    
 
@@ -27,6 +31,7 @@ public class InGameUIPanel : MonoBehaviour
         waveController.Info.CurWaveIdx.AddEvent(waveView.UpdateWaveText);
         waveController.Info.MonsterCount.AddEvent(waveView.UpdateMonsterCountText);
         waveController.Info.WaveTimer.AddEvent(waveView.UpdateTimerText);
+        Debug.Log("이벤트 등록 완료");
     }
 
     private void UnSubscribe()
