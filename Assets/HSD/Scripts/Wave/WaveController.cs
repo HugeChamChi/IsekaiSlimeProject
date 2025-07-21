@@ -103,6 +103,7 @@ public class WaveController : MonoBehaviour
 
     private IEnumerator WaveRoutine()
     {
+        Debug.Log("WaveRoutine 코루틴 시작");
         WaveData waveData = waveDatas[Info.CurWaveIdx.Value];
         waveData.WaveTime += 3;
         Info.WaveTimer.Value = waveData.WaveTime;
@@ -113,6 +114,7 @@ public class WaveController : MonoBehaviour
 
         while (waveData.SpawnCount != curSpawnCount)
         {
+            
             MonsterSpawn($"Monster/{waveData.SpawnMonster}");
             yield return Utils.GetDelay(waveData.SpawnTime / waveData.SpawnCount);
         }
@@ -179,7 +181,7 @@ public class WaveController : MonoBehaviour
 
     private void MonsterSpawn(string monsterName)
     {
-        Manager.Resources.NetworkInstantiate<GameObject>(monsterName, transform.position, false, true);
+        Manager.Resources.NetworkInstantiate<GameObject>(monsterName, transform.position, false, false);
         MonsterCountAddAndGameOverCheck();
     }
 
@@ -203,7 +205,7 @@ public class WaveController : MonoBehaviour
     private void MonsterSpawnBossMonster(string monsterName)
     {
         GameObject boss =
-            Manager.Resources.NetworkInstantiate<GameObject>(monsterName, transform.position, false, true);
+            Manager.Resources.NetworkInstantiate<GameObject>(monsterName, transform.position, false, false);
 
         MonsterCountAddAndGameOverCheck();
 

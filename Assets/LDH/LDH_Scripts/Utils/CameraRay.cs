@@ -107,7 +107,8 @@ namespace Util
 
             else
             {
-                if (InGameManager.Instance.SelectedHolder.CurrentUnit != null)
+                if (InGameManager.Instance.SelectedHolder != null &&
+                    InGameManager.Instance.SelectedHolder.CurrentUnit != null)
                 {
                     PlayerFieldController.SwapHolderPosition(InGameManager.Instance.SelectedHolder, _moveHolder);
                 }
