@@ -56,11 +56,16 @@ namespace Units
             {
                 skillCount++;
                 Debug.Log($"[skill state] 스킬 ({caster.Type.ToString()}) 실행 횟수 : {skillCount}회");
-               UnitHolder currentHolder = caster.GetComponentInParent<UnitHolder>();
-
+               
+                //애니메이션
+                caster.Controller.anim.SetTrigger("2_Attack");
+                
+                
+                UnitHolder currentHolder = caster.GetComponentInParent<UnitHolder>();
+                
                if (holder != currentHolder)
                {
-                   holder.HideSkillRange();
+                   holder.HideSkillApplyRange();
                    holder = currentHolder;
                    holder.ShowSkillApplyRange();
                }
@@ -91,7 +96,7 @@ namespace Units
 
             
             yield return null;
-            holder.HideSkillRange();
+            holder.HideSkillApplyRange();
         }
 
         
@@ -125,33 +130,33 @@ namespace Units
 
         #region Legacy
 
-        private IEnumerator RangeAttackCoroutine(Unit caster)
-        {
-            float remainDuration = Duration;
-            do
-            {
-                skillCount++;
-                Debug.Log($"[skill state] 스킬 ({caster.Type.ToString()}) 실행 횟수 : {skillCount}회");
-                UnitHolder currentHolder = caster.GetComponentInParent<UnitHolder>();
-
-                currentHolder.ShowSkillApplyRange();
-
-                foreach (var target in GetTargetListInSkillRange(currentHolder, caster))
-                {
-
-                    float damage = caster.Controller.CalcDamage(true);
-                    target.TakeDamage(damage); // 예: 1.5배 데미지
-                }
-
-
-                yield return skillIntervalWait;
-                remainDuration -= 0.5f;
-                
-
-                currentHolder.HideSkillRange();
-                
-            } while (remainDuration > 0f);
-        }
+        // private IEnumerator RangeAttackCoroutine(Unit caster)
+        // {
+        //     float remainDuration = Duration;
+        //     do
+        //     {
+        //         skillCount++;
+        //         Debug.Log($"[skill state] 스킬 ({caster.Type.ToString()}) 실행 횟수 : {skillCount}회");
+        //         UnitHolder currentHolder = caster.GetComponentInParent<UnitHolder>();
+        //
+        //         currentHolder.ShowSkillApplyRange();
+        //
+        //         foreach (var target in GetTargetListInSkillRange(currentHolder, caster))
+        //         {
+        //
+        //             float damage = caster.Controller.CalcDamage(true);
+        //             target.TakeDamage(damage); // 예: 1.5배 데미지
+        //         }
+        //
+        //
+        //         yield return skillIntervalWait;
+        //         remainDuration -= 0.5f;
+        //         
+        //
+        //         currentHolder.HideSkillApplyRange();
+        //         
+        //     } while (remainDuration > 0f);
+        // }
 
 
         #endregion

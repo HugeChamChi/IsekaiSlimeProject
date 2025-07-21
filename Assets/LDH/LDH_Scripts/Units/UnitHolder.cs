@@ -84,8 +84,7 @@ namespace Units
         {
             holderIndex = unitIndex;
             
-            //todo: 테스트중 → 추후 Manager.Resources.NetworkInstantiate 사용 가능한지 확인 필요 , 로직 변동 될 수 있음
-            var unit= PhotonNetwork.Instantiate(_unitPrefabPath, transform.position, Quaternion.identity, 0, new object[] { unitIndex});
+            var unit= PhotonNetwork.Instantiate($"{_unitPrefabPath} {unitIndex}", transform.position, Quaternion.identity, 0, new object[] { unitIndex});
 
             int holderID = ComponentProvider.Get<InGameObject>(gameObject).uniqueID;
             //unit.transform.SetParent(transform);  // 홀더 안으로 배치
@@ -107,25 +106,34 @@ namespace Units
             
             foreach (GridSlot gridSlot in skillRangeSlots)
             {
-                gridSlot.SetColor(true);
+                gridSlot.SetSelectedRange(true);
             }
         }
 
+        // ReSharper disable Unity.PerformanceAnalysis
         public void ShowSkillApplyRange()
         {
             if (currentUnit == null || skillApplySlots.Count == 0) return;
             
             foreach (GridSlot gridSlot in skillApplySlots)
             {
-                gridSlot.SetColor(true);
+                gridSlot.SetSkillRange(true);
             }
         }
 
+        public void HideSkillApplyRange()
+        {
+            foreach (GridSlot gridSlot in skillApplySlots)
+            {
+                gridSlot.SetSkillRange(false);
+            }           
+        }
+        
         public void HideSkillRange()
         {
             foreach (GridSlot gridSlot in skillRangeSlots)
             {
-                gridSlot.SetColor(false);
+                gridSlot.SetSelectedRange(false);
             }            
         }
 
