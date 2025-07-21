@@ -2,6 +2,7 @@ using Managers;
 using Photon.Pun;
 using Photon.Realtime;
 using PlayerField;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -25,21 +26,37 @@ public class MapManager : MonoBehaviour
     
     [SerializeField] private float xInterval;
     
+    private bool isInitialized = false;
     
     
 
-    private void Update()
-    {
-        if(Input.GetKeyDown(KeyCode.R))
-        {
-            players = PhotonNetwork.PlayerList;
-            MapGenerate();
-            MapSetting();
-        }
-    }
+    //private void Update()
+    //{
+    //    if(Input.GetKeyDown(KeyCode.R))
+    //    {
+    //        players = PhotonNetwork.PlayerList;
+    //        MapGenerate();
+    //        MapSetting();
+    //    }
+    //}
     private void Start()
     {
-        
+        if (InGameManager.Instance != null)
+        {
+            if (InGameManager.Instance !=null)
+            {
+                InGameManager.Instance.OnGameStarted += OnGameStarted;
+            }
+        }  
+    }
+
+    // 이벤트 구독 해체 
+    private void OnDestroy()
+    {
+        if (InGameManager.Instance != null)
+        {
+            InGameManager.Instance.OnGameStarted -= OnGameStarted;
+        }
     }
 
     private void MapGenerate()
@@ -107,4 +124,29 @@ public class MapManager : MonoBehaviour
         playerMapCam.transform.position = camPosition;
 
     }
+
+    public void InitializeGame()
+    {
+        // 맵매니저가 init 되었으면 return
+        if (isInitialized)
+        {
+            return;
+        }
+        
+        players = PhotonNetwork.PlayerList;
+        MapGenerate();
+        MapSetting();
+
+        isInitialized = true;
+
+    }
+
+    void OnGameStarted()
+    {
+        Debug.Log("MapManager OnGameStarted");
+    }
+
+    // 게임이 초기화 되어있는지 확인 하는 프로퍼티
+    public bool IsInitialized => isInitialized;
+
 }
