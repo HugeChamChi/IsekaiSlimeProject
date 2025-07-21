@@ -25,6 +25,7 @@ namespace Units
         public SpriteRenderer sr;
         public Animator anim;
         
+        
         [Header("Target Setting")]
         [SerializeField] private LayerMask targetLayer;         // 공격 대상 레이어
 
@@ -50,6 +51,12 @@ namespace Units
         //shader
         private string shaderFade = "_OuterOutlineFade";
         private string shaderColor = "_OuterOutlineColor";
+        
+        
+        //애니메이션 클립 길이
+        [SerializeField] private AnimationClip attackClip;
+        private float attackAnimLength;
+        public WaitForSeconds attackAnimWait;
         
         #region Unity LifeCycle
 
@@ -103,8 +110,10 @@ namespace Units
             _idleState = new UnitIdleState(unit, this);
             _attackState = new UnitAttackState(unit, this);
             _skillState = new UnitSkillState(unit, this);
-            
-            
+
+            attackAnimLength = attackClip.length;
+            attackAnimWait = new WaitForSeconds(attackAnimLength);
+            //Debug.Log($"animation clip length : {attackAnimLength}");
             //idle 상태로 시작
             ChangeState(_idleState);
 

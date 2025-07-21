@@ -53,7 +53,7 @@ namespace Util
             }
             else
             {
-                InGameManager.Instance.SelectedHolder.HideSkillRange();
+                InGameManager.Instance.SelectedHolder?.HideSkillRange();
                 InGameManager.Instance.ClearSelectedHolder();
             }
         }
