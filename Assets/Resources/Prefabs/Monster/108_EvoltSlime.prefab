@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 4880838183994151565}
   - component: {fileID: 6042598975646838693}
   - component: {fileID: -503861816464776193}
+  - component: {fileID: -4783090142307706197}
   m_Layer: 12
   m_Name: 108_EvoltSlime
   m_TagString: Untagged
@@ -93,7 +94,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a11334fbe18c54b40921ac28998d64f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  distance: 5
 --- !u!114 &4957498521992930538
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -239,3 +239,19 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &-4783090142307706197
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5644212922484277607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 1
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 1
