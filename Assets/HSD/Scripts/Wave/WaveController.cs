@@ -121,17 +121,14 @@ public class WaveController : MonoBehaviour
         {
             MonsterSpawnBossMonster($"Monster/{waveData.SpawnBoss}");
         }
-        
-        
-
+               
         if (nextWaveRoutine != null)
         {
             StopCoroutine(nextWaveRoutine);
             nextWaveRoutine = null;
         }
-
-        nextWaveRoutine = StartCoroutine(NextWave());
-        
+      
+        nextWaveRoutine = StartCoroutine(NextWave(waveData));       
     }
 
     private IEnumerator WaveTimerRoutine()
@@ -146,7 +143,10 @@ public class WaveController : MonoBehaviour
     private IEnumerator NextWave(WaveData waveData)
     {
         yield return clearCondition;
-        
+
+        if (waveData.SpawnBossCount > 0 && waveData.EventType == ClearEventType.Effect)
+            Manager.UI.cardPanel.OpenCardPanel();
+
         if (Info.CurWaveIdx.Value == waveDatas.Length - 1)
         {
             // 게임 클리어

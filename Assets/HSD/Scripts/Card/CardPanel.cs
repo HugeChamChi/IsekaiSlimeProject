@@ -59,4 +59,6 @@ public class CardPanel : MonoBehaviour
             slots[i].SetupData(Manager.Card.GetRandomCardData());
         }
     }
+
+    public void SetActiveFalse() => gameObject.SetActive(false);
 }
