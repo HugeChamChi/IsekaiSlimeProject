@@ -284,7 +284,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Cam: {fileID: 2741794007451711209}
-  spawnPoint: {fileID: 113259640121086946}
+  spawnPoint: {x: 0, y: 0}
   fieldController: {fileID: 2890136410927848327}
 --- !u!1 &5620622545599842177
 GameObject:
@@ -680,23 +680,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1286538580305366115, guid: 828839e74d8ae4ecc943be9f1d3da099, type: 3}
       propertyPath: m_LocalScale.x
-      value: 9
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 1286538580305366115, guid: 828839e74d8ae4ecc943be9f1d3da099, type: 3}
       propertyPath: m_LocalScale.y
-      value: 9
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 1286538580305366115, guid: 828839e74d8ae4ecc943be9f1d3da099, type: 3}
       propertyPath: m_LocalScale.z
-      value: 9
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 1286538580305366115, guid: 828839e74d8ae4ecc943be9f1d3da099, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.86
+      value: 2.85
       objectReference: {fileID: 0}
     - target: {fileID: 1286538580305366115, guid: 828839e74d8ae4ecc943be9f1d3da099, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.07
+      value: -1.11
       objectReference: {fileID: 0}
     - target: {fileID: 1286538580305366115, guid: 828839e74d8ae4ecc943be9f1d3da099, type: 3}
       propertyPath: m_LocalPosition.z

@@ -6,8 +6,10 @@ using UnityEngine;
 
 namespace Managers
 {
-    public class InGameManager : Singleton<InGameManager>
+    public class InGameManager : MonoBehaviour
     {
+        public static InGameManager Instance { get; private set; }
+        
         private int idCounter = 1000; // 시작 값 (원하면 1, 1000, 10000 등으로)
         public UnitHolder SelectedHolder { get; private set; }
 
@@ -16,6 +18,23 @@ namespace Managers
         
         public Dictionary<int, Transform> inGameObjects = new();
 
+
+        private void Awake()
+        {
+            Debug.Log("초기화");
+            //싱글톤 초기화
+            if (Instance == null)
+                Instance = this;
+            else
+                Destroy(gameObject);
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+                Instance = null;
+        }
+        
         public int GenerateUniqueID()
         {
             idCounter++;
