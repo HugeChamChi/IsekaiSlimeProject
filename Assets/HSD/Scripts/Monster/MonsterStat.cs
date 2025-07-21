@@ -9,9 +9,9 @@ public class MonsterStat : ScriptableObject
     public int ID;
     public string Name;
     public Sprite icon;
-    public MonsterType MonsterType;
     public float Hp;
     public float MoveSpeed;
     public float Defense;
-    public int DropGold;    
+    public int DropGold;  
+    public MonsterType MonsterType;
 }

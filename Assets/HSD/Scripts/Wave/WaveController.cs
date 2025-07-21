@@ -107,7 +107,8 @@ public class WaveController : MonoBehaviour
              MonsterSpawnBossMonster($"Monster/{waveData.SpawnBoss}");            
         }
 
-        if(nextWaveRoutine != null)
+        
+        if (nextWaveRoutine != null)
         {
             StopCoroutine(nextWaveRoutine);
             nextWaveRoutine = null;
@@ -121,9 +122,9 @@ public class WaveController : MonoBehaviour
             // 게임 클리어
         }
         else
-        {
-            Info.CurWaveIdx.Value++;
+        {            
             WaveStart();
+            Info.CurWaveIdx.Value++;
         }
     }
 
@@ -139,7 +140,7 @@ public class WaveController : MonoBehaviour
     private IEnumerator NextWave()
     {
         yield return clearCondition;
-
+        Info.CurWaveIdx.Value++;
         WaveStart();
     }
 
