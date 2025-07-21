@@ -1,3 +1,5 @@
+using Managers;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -23,7 +25,7 @@ public class CharacterInfoPanel : MonoBehaviour
     public void Show(Units.Unit info)
     {
         gameObject.SetActive(true);
-        //characterImage.sprite = info.UnitSprite;
+        characterImage.sprite = info.UnitSprite;
         characterName.text = info.Name;
         characterDescription.text = info.Description;
         skillDescription.text = info.Controller.Skill.Description;
@@ -33,6 +35,8 @@ public class CharacterInfoPanel : MonoBehaviour
 
     public void Close()
     {
+       
+        anim ??= GetComponent<Animator>();
         anim.ResetTrigger(Utils.inHash);
         anim.SetTrigger(Utils.outHash);
     }

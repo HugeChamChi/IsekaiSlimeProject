@@ -59,6 +59,7 @@ namespace Managers
             OnSelectedHolderChanged?.Invoke(holder);
 
             Debug.Log($"[GameManager] Selected holder: {holder.name}");
+            
         }
         public void ClearSelectedHolder()
         {
