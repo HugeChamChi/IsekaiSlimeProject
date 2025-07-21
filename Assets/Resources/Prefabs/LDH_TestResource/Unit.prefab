@@ -159,11 +159,15 @@ MonoBehaviour:
     <Attack>k__BackingField: 10
     <AttackSpeed>k__BackingField: 4
     <AttackRange>k__BackingField: 2.1
-    <BuffRange>k__BackingField: 10
+  sr: {fileID: 0}
+  anim: {fileID: 0}
   targetLayer:
     serializedVersion: 2
     m_Bits: 4096
   isLeftFacingSprite: 1
+  skillCoolTime: 0
+  attackCoolTime: 0
+  canAttack: 0
 --- !u!114 &1762821425609110763
 MonoBehaviour:
   m_ObjectHideFlags: 0
