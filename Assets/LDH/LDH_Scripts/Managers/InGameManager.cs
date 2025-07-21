@@ -11,26 +11,24 @@ namespace Managers
 {
     public class InGameManager : MonoBehaviourPunCallbacks
     {
-        [Header("Game Settings")] 
-        
-        [SerializeField] private float gameStartDelay = 5f;
+        [Header("Game Settings")] [SerializeField]
+        private float gameStartDelay = 5f;
+
         [SerializeField] private MapManager mapManager;
-        
-        
+
+
         public static InGameManager Instance { get; private set; }
-        
+
         private int idCounter = 1000; // 시작 값 (원하면 1, 1000, 10000 등으로)
         public UnitHolder SelectedHolder { get; private set; }
 
         public event Action<UnitHolder> OnSelectedHolderChanged;
-        
+
         public event Action OnGameStarted;
 
         private bool gameStarted = false;
-        
-        
-        
-        
+
+
         public Dictionary<int, Transform> inGameObjects = new();
 
 
@@ -57,7 +55,7 @@ namespace Managers
             if (Instance == this)
                 Instance = null;
         }
-        
+
         public int GenerateUniqueID()
         {
             idCounter++;
@@ -67,12 +65,11 @@ namespace Managers
         /// <summary>
         /// 게임 시작 준비 - 지연 시간 후 자동 시작하게끔 
         /// </summary>
-
         private IEnumerator PrepareGameStart()
         {
             // 일단 모든 플레이어가 씬에 로드 될때까지 대기함
             yield return new WaitForSeconds(1f);
-            
+
             // 게임 시작 카운트 시작
             yield return new WaitForSeconds(gameStartDelay - 1f);
 
@@ -84,15 +81,25 @@ namespace Managers
             if (gameStarted) return;
 
             if (PhotonNetwork.IsMasterClient)
-            { photonView.RPC("OnGameStart", RpcTarget.All);
+            {
+                if (PlayerFieldManager.Instance != null && PlayerFieldManager.Instance.photonView != null)
+                {
+                    PlayerFieldManager.Instance.photonView.RPC("OnGameStart",RpcTarget.All);
+                }
+                else
+                {
+                    Debug.Log("로컬에서 돌림");
+                    // 로컬에서라도 ? 
+                    OnGameStart();
+                }
             }
         }
 
         [PunRPC]
-        void OnGameStart()
+        public void OnGameStart()
         {
             if (gameStarted) return;
-            
+
             gameStarted = true;
 
             // mapmanager 초기화
@@ -100,37 +107,36 @@ namespace Managers
             {
                 mapManager.InitializeGame();
             }
-            
+
             OnGameStarted?.Invoke();
         }
-        
+
         public void RegisterInGameObject(InGameObject obj)
         {
             inGameObjects[obj.uniqueID] = obj.transform;
             //Debug.Log($"Registered object {obj.name} with ID {obj.uniqueID}");
         }
+
         public Transform GetInGameObjectByID(int uniqueID)
         {
             inGameObjects.TryGetValue(uniqueID, out var transform);
             return transform;
         }
-        
-        
+
+
         public void SetSelectedHolder(UnitHolder holder)
         {
             SelectedHolder = holder;
             OnSelectedHolderChanged?.Invoke(holder);
 
             Debug.Log($"[GameManager] Selected holder: {holder.name}");
-            
         }
+
         public void ClearSelectedHolder()
         {
             SelectedHolder = null;
             OnSelectedHolderChanged?.Invoke(null);
             Debug.Log($"[GameManager] Cleared selected holder");
         }
-        
-        
     }
 }
