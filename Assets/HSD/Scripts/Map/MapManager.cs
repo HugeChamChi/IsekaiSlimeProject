@@ -12,23 +12,23 @@ using Util;
 
 public class MapManager : MonoBehaviour
 {
-    [Header("Map")]
-    [SerializeField] private GameObject mapPrefab;
+    [Header("Map")] [SerializeField] private GameObject mapPrefab;
 
     private string mapPath = "Prefabs/Map_Test";
     [SerializeField] private RenderTexture[] playTextures;
     [SerializeField] private GameObject[] playerCamObjects;
-    
-    
+
+    [SerializeField] private Camera backgroundCam;
+
+
     private Player[] players;
 
     private static readonly Dictionary<Player, Map> maps = new Dictionary<Player, Map>();
-    
+
     [SerializeField] private float xInterval;
-    
+
     private bool isInitialized = false;
-    
-    
+
 
     //private void Update()
     //{
@@ -43,11 +43,11 @@ public class MapManager : MonoBehaviour
     {
         if (InGameManager.Instance != null)
         {
-            if (InGameManager.Instance !=null)
+            if (InGameManager.Instance != null)
             {
                 InGameManager.Instance.OnGameStarted += OnGameStarted;
             }
-        }  
+        }
     }
 
     // 이벤트 구독 해체 
@@ -61,24 +61,30 @@ public class MapManager : MonoBehaviour
 
     private void MapGenerate()
     {
-        Map map = null;        
+        Map map = null;
 
         for (int i = 0; i < players.Length; i++)
         {
             map = Instantiate(mapPrefab, new Vector3(xInterval * i, 0), Quaternion.identity).GetComponent<Map>();
-            
+
             // map = PhotonNetwork.Instantiate(mapPath, new Vector3(xInterval * i, 0), Quaternion.identity).GetComponent<Map>();
             map.Owner = players[i];
             maps.Add(players[i], map);
-            
+
             //필드 매니저에 플레이어의 PlayerFieldController 등록 (추가)
             PlayerFieldManager.Instance.RegisterPlayerField(players[i].ActorNumber, map.fieldController);
             map.fieldController.GenerateGridSlots();
-            
-            
+
+
             //카메라
-            if (players[i] == PhotonNetwork.LocalPlayer) continue;
-            AdjustCameraSize(map.Cam, map.fieldController.transform);
+            if (players[i] == PhotonNetwork.LocalPlayer)
+            {
+                MakeLocalMapCameraOverlay(map.Cam);
+            }
+            else
+            {
+                AdjustCameraSize(map.Cam, map.fieldController.transform);
+            }
         }
     }
 
@@ -94,10 +100,9 @@ public class MapManager : MonoBehaviour
                 mapCam.depth = 1;
                 mapCam.AddComponent<AudioListener>();
                 var camRay = mapCam.AddComponent<CameraRay>(); //local player의 map에만 camera ray 추가
-                camRay.SetCamera(mapCam);  // 카메라 지정
-                
-                maps[players[i]].CreateWaveController();   
-               
+                camRay.SetCamera(mapCam); // 카메라 지정
+
+                maps[players[i]].CreateWaveController();
             }
             else
             {
@@ -107,9 +112,9 @@ public class MapManager : MonoBehaviour
             }
         }
 
-        for(int i=0; i< 4-players.Length; i++ )
+        for (int i = 0; i < 4 - players.Length; i++)
         {
-            playerCamObjects[playerCamObjects.Length-1-i].SetActive(false);
+            playerCamObjects[playerCamObjects.Length - 1 - i].SetActive(false);
         }
     }
 
@@ -117,12 +122,24 @@ public class MapManager : MonoBehaviour
     public void AdjustCameraSize(Camera playerMapCam, Transform playerFieldTransform)
     {
         Vector3 worldScale = playerFieldTransform.lossyScale;
-        
+
         playerMapCam.orthographicSize = worldScale.y / 2f;
         Vector3 camPosition = playerFieldTransform.position;
         camPosition.z = playerMapCam.transform.position.z;
         playerMapCam.transform.position = camPosition;
+    }
 
+
+    public void MakeLocalMapCameraOverlay(Camera localMapCam)
+    {
+        var localMapCamData = localMapCam.GetUniversalAdditionalCameraData();
+        var bgCamData = backgroundCam.GetUniversalAdditionalCameraData();
+        //local map cam render type 변경
+        localMapCamData.renderType = CameraRenderType.Overlay;
+
+        //background cam에 stack에 local map cam 등록하기
+
+        bgCamData.cameraStack.Add(localMapCam);
     }
 
     public void InitializeGame()
@@ -132,13 +149,12 @@ public class MapManager : MonoBehaviour
         {
             return;
         }
-        
+
         players = PhotonNetwork.PlayerList;
         MapGenerate();
         MapSetting();
 
         isInitialized = true;
-
     }
 
     void OnGameStarted()
@@ -148,5 +164,4 @@ public class MapManager : MonoBehaviour
 
     // 게임이 초기화 되어있는지 확인 하는 프로퍼티
     public bool IsInitialized => isInitialized;
-
 }
