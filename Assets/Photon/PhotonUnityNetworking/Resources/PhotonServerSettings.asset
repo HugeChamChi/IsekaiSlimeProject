@@ -50,6 +50,7 @@ MonoBehaviour:
   - SetParentAndScale
   - SetParentRPC
   - Rpc_MapSetting
+  - OnGameStart
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
