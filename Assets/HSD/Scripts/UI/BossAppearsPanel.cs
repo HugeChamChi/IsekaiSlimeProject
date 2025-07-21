@@ -18,6 +18,7 @@ public class BossAppearsPanel : MonoBehaviour
 
     public void Show(MonsterStat stat)
     {
+        anim ??= GetComponent<Animator>();
         anim.SetTrigger(Utils.inHash);
         bossImage.sprite = stat.icon;
         bossAppearsText.text = stat.Name;

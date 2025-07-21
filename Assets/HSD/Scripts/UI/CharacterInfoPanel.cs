@@ -25,6 +25,7 @@ public class CharacterInfoPanel : MonoBehaviour
     public void Show(Units.Unit info)
     {
         gameObject.SetActive(true);
+        anim.ResetTrigger(Utils.outHash);
         characterImage.sprite = info.UnitSprite;
         characterName.text = info.Name;
         characterDescription.text = info.Description;
@@ -34,8 +35,7 @@ public class CharacterInfoPanel : MonoBehaviour
     }
 
     public void Close()
-    {
-       
+    {        
         anim ??= GetComponent<Animator>();
         anim.ResetTrigger(Utils.inHash);
         anim.SetTrigger(Utils.outHash);

@@ -12,7 +12,7 @@ public struct WaveData
     public float SpawnTime;
     public ClearEventType EventType;
     public string SpawnMonster;
-    public string SpawnBoss;    
+    public string SpawnBoss;
     public int SpawnCount;
     public int SpawnBossCount;
 }
@@ -24,8 +24,7 @@ public class WaveController : MonoBehaviour
     public UI_Controller uiController;
     public WaveInfo Info;
 
-    [Header("Wave")]
-    [SerializeField] private WaveData[] waveDatas;
+    [Header("Wave")] [SerializeField] private WaveData[] waveDatas;
     private int curSpawnCount;
     private int curBossCount;
     private Coroutine waveRoutine;
@@ -34,8 +33,10 @@ public class WaveController : MonoBehaviour
     private WaitUntil clearCondition;
 
     [SerializeField] private GameObject prefab;
-    
+
     private const int maxCount = 100;
+
+    [Header("Auto Start")] private bool hasStarted = false;
 
     private void Awake()
     {
@@ -44,47 +45,61 @@ public class WaveController : MonoBehaviour
 
     private void Start()
     {
-        if(pv.IsMine)
+        if (pv.IsMine)
         {
-            MonsterStatusController.OnDied              += MonsterDie;
-            MonsterStatusController.OnBossMonsterDied   += BossMonsterDie;
-            
+            MonsterStatusController.OnDied += MonsterDie;
+            MonsterStatusController.OnBossMonsterDied += BossMonsterDie;
+
             uiController = new UI_Controller();
             Info = new();
             uiController.Init(this);
 
             clearCondition = new WaitUntil(() => Info.MonsterCount.Value == 0);
+
+
+            if (pv.IsMine && !hasStarted)
+            {
+                pv.RPC(nameof(WaveStart_RPC), RpcTarget.AllViaServer);
+            }
         }
     }
+    
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.V))
-            pv.RPC(nameof(WaveStart_RPC), RpcTarget.AllViaServer);
-    }
+    // private void Update()
+    // {
+    //     if (Input.GetKeyDown(KeyCode.V))
+    //         pv.RPC(nameof(WaveStart_RPC), RpcTarget.AllViaServer);
+    // }
 
     [PunRPC]
     private void WaveStart_RPC()
     {
-        if(pv.IsMine)
+        if (pv.IsMine)
             WaveStart();
     }
 
     private void WaveStart()
-    {   
-        if(pv.IsMine)
+    {
+        if (pv.IsMine)
         {
-            if(waveRoutine != null)
+            if (waveRoutine != null)
             {
                 StopCoroutine(waveRoutine);
                 waveRoutine = null;
             }
+
             waveRoutine = StartCoroutine(WaveRoutine());
 
             if (waveTimerRoutine == null)
                 waveTimerRoutine = StartCoroutine(WaveTimerRoutine());
+
+            if(nextWaveRoutine != null)
+            {
+                StopCoroutine(nextWaveRoutine);
+                nextWaveRoutine = null;
+            }
         }
-    }    
+    }
 
     private IEnumerator WaveRoutine()
     {
@@ -102,46 +117,46 @@ public class WaveController : MonoBehaviour
             yield return Utils.GetDelay(waveData.SpawnTime / waveData.SpawnCount);
         }
 
-        if(curBossCount > 0)
+        if (curBossCount > 0)
         {
-             MonsterSpawnBossMonster($"Monster/{waveData.SpawnBoss}");            
+            MonsterSpawnBossMonster($"Monster/{waveData.SpawnBoss}");
         }
-
         
+        
+
         if (nextWaveRoutine != null)
         {
             StopCoroutine(nextWaveRoutine);
             nextWaveRoutine = null;
         }
+
         nextWaveRoutine = StartCoroutine(NextWave());
-
-        yield return Utils.GetDelay(waveData.WaveTime - waveData.SpawnTime - 3f);
-
-        if(Info.CurWaveIdx.Value == waveDatas.Length - 1)
-        {
-            // 게임 클리어
-        }
-        else
-        {            
-            WaveStart();
-            Info.CurWaveIdx.Value++;
-        }
+        
     }
 
     private IEnumerator WaveTimerRoutine()
     {
-        while(true)
+        while (true)
         {
             Info.WaveTimer.Value -= Time.deltaTime;
             yield return null;
         }
     }
 
-    private IEnumerator NextWave()
+    private IEnumerator NextWave(WaveData waveData)
     {
         yield return clearCondition;
-        Info.CurWaveIdx.Value++;
-        WaveStart();
+        
+        if (Info.CurWaveIdx.Value == waveDatas.Length - 1)
+        {
+            // 게임 클리어
+        }
+        else
+        {
+            Info.CurWaveIdx.Value++;
+            WaveStart();
+        }
+        
     }
 
     private void MonsterDie(PhotonView pv)
@@ -149,7 +164,7 @@ public class WaveController : MonoBehaviour
         if (!pv.IsMine) return;
 
         Info.MonsterCount.Value--;
-        if(Info.MonsterCount.Value < 80)
+        if (Info.MonsterCount.Value < 80)
         {
             Manager.UI.warningMessagePanel.StopWarning();
         }
@@ -187,15 +202,20 @@ public class WaveController : MonoBehaviour
 
     private void MonsterSpawnBossMonster(string monsterName)
     {
-        GameObject boss = Manager.Resources.NetworkInstantiate<GameObject>(monsterName, transform.position, false, true);        
+        GameObject boss =
+            Manager.Resources.NetworkInstantiate<GameObject>(monsterName, transform.position, false, true);
 
         MonsterCountAddAndGameOverCheck();
 
-        uiController.BossAppearsPanel.Show(boss.GetComponent<MonsterStat>());
+        uiController.BossAppearsPanel.Show(boss.GetComponent<MonsterStatusController>().baseStat);
     }
+
     private void OnDestroy()
     {
         if (pv.IsMine)
-            MonsterStatusController.OnDied -= MonsterDie;
+        {
+            MonsterStatusController.OnDied              -= MonsterDie;
+            MonsterStatusController.OnBossMonsterDied   -= BossMonsterDie;
+        }
     }
 }

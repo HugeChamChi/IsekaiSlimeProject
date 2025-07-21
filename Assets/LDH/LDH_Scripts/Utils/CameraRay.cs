@@ -12,7 +12,7 @@ namespace Util
     {
         private Camera _cam;
         private UnitHolder _moveHolder;
-        
+
         //RayCast 사용
         private void Update()
         {
@@ -20,13 +20,13 @@ namespace Util
             //ui 클릭은 제외
             if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
             {
-                MouseButtonDown();  
+                MouseButtonDown();
             }
 
             //드래그
             if (Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject())
             {
-                MouseButton();   
+                MouseButton();
             }
 
 
@@ -40,19 +40,19 @@ namespace Util
         {
             Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
             RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
-            
+
             if (hit.collider != null && hit.transform.TryGetComponent<UnitHolder>(out UnitHolder holder))
             {
                 if (holder != InGameManager.Instance.SelectedHolder)
                 {
                     InGameManager.Instance.SelectedHolder?.HideSkillRange();
-                
+
                     InGameManager.Instance.ClearSelectedHolder();
                     Manager.UI.characterInfoPanel.Close();
-                    
+
                 }
                 InGameManager.Instance.SetSelectedHolder(holder);
-                
+
 
             }
             else
@@ -63,7 +63,7 @@ namespace Util
             }
         }
 
-     
+
 
         private void MouseButton()
         {
@@ -78,9 +78,9 @@ namespace Util
                 }
             }
         }
-        
-        
-             
+
+
+
         private void MouseButtonUp()
         {
 
@@ -98,11 +98,10 @@ namespace Util
                             InGameManager.Instance.SelectedHolder.CurrentUnit != null)
                         {
                             InGameManager.Instance.SelectedHolder?.ShowSkillRange();
-                            Manager.UI.characterInfoPanel.Show( InGameManager.Instance.SelectedHolder.CurrentUnit);
+                            Manager.UI.characterInfoPanel.Show(InGameManager.Instance.SelectedHolder.CurrentUnit);
                         }
-                     
+
                     }
-                    
                 }
             }
 
@@ -113,19 +112,19 @@ namespace Util
                     PlayerFieldController.SwapHolderPosition(InGameManager.Instance.SelectedHolder, _moveHolder);
                 }
             }
-            
+
             _moveHolder = null;
 
         }
 
-        
-        
+
+
         public void SetCamera(Camera cam)
         {
             _cam = cam;
         }
-        
-   
+
+
 
     }
 }
