@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 4173554466419592110}
   - component: {fileID: 641424811181727538}
   - component: {fileID: -1858638350316968368}
+  - component: {fileID: 7084337522914414564}
   m_Layer: 12
   m_Name: 119_PoisonCoreSlime
   m_TagString: Untagged
@@ -93,7 +94,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a11334fbe18c54b40921ac28998d64f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  distance: 5
 --- !u!114 &6240981934177850266
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -239,3 +239,19 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &7084337522914414564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1176504866117729659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 1
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 1

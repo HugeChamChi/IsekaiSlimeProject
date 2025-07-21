@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 5466608165038213490}
   - component: {fileID: 6665184159737742458}
   - component: {fileID: -4280494534520792363}
+  - component: {fileID: 680621101619176799}
   m_Layer: 12
   m_Name: 110_DeepSeaSlime
   m_TagString: Untagged
@@ -93,7 +94,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a11334fbe18c54b40921ac28998d64f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  distance: 5
 --- !u!114 &3569326212673491144
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -239,3 +239,19 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &680621101619176799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4933119981519403508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 1
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 1

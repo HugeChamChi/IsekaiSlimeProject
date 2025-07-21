@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.U2D;
 
 
-public class BaseMonster : NetworkUnit, IPunObservable
+public class BaseMonster : NetworkUnit
 {
     private Rigidbody2D rb;
     private SpriteRenderer sr;
@@ -36,8 +36,6 @@ public class BaseMonster : NetworkUnit, IPunObservable
         }
 
         moveRoutine = StartCoroutine(MoveRoutine());
-        
-       
     }
 
     private void OnEnable()
@@ -115,20 +113,6 @@ public class BaseMonster : NetworkUnit, IPunObservable
             }
 
             index = (index + 1) % points.Length; // 0→1→2→3→0 순환
-        }
-    }
-
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
-        {
-            stream.SendNext(transform.position);
-            stream.SendNext(transform.rotation);
-        }
-        else if (stream.IsReading)
-        {
-            transform.position = (Vector3)stream.ReceiveNext();
-            transform.rotation = (Quaternion)stream.ReceiveNext();
         }
     }
 }
