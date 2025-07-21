@@ -8,8 +8,6 @@ using Util;
 [System.Serializable]
 public struct WaveData
 {
-    public int WaveCount;
-    public int WaveIdx;
     public float WaveTime;
     public float SpawnTime;
     public ClearEventType EventType;
@@ -38,6 +36,11 @@ public class WaveController : MonoBehaviour
     [SerializeField] private GameObject prefab;
     
     private const int maxCount = 100;
+
+    private void Awake()
+    {
+        waveDatas = Manager.Data.WaveDatas;
+    }
 
     private void Start()
     {
@@ -101,7 +104,7 @@ public class WaveController : MonoBehaviour
 
         if(curBossCount > 0)
         {
-             MonsterSpawnBossMonster(waveData.SpawnBoss);            
+             MonsterSpawnBossMonster($"Monster/{waveData.SpawnBoss}");            
         }
 
         if(nextWaveRoutine != null)
@@ -111,7 +114,7 @@ public class WaveController : MonoBehaviour
         }
         nextWaveRoutine = StartCoroutine(NextWave());
 
-        yield return Utils.GetDelay(waveData.WaveTime - waveData.SpawnTime);
+        yield return Utils.GetDelay(waveData.WaveTime - waveData.SpawnTime - 3f);
 
         if(Info.CurWaveIdx.Value == waveDatas.Length - 1)
         {
@@ -145,6 +148,7 @@ public class WaveController : MonoBehaviour
         if (!pv.IsMine) return;
 
         Info.MonsterCount.Value--;
+        // 골드추가 
     }
 
     private void BossMonsterDie(PhotonView pv, MonsterStat stat)

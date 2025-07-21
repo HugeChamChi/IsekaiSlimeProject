@@ -13,7 +13,6 @@ public class BaseMonster : NetworkUnit, IPunObservable
     private SpriteRenderer sr;
 
     [Header("Patrol")]
-    [SerializeField] private float distance;
     private Vector2[] points = new Vector2[4];
     private Coroutine moveRoutine;
 
@@ -59,10 +58,10 @@ public class BaseMonster : NetworkUnit, IPunObservable
 
         points = new Vector2[]
         {
-            PlayerFieldManager.Instance.playerFields[0].transform.position,
-            PlayerFieldManager.Instance.playerFields[5].transform.position,
-            PlayerFieldManager.Instance.playerFields[35].transform.position,
-            PlayerFieldManager.Instance.playerFields[30].transform.position
+            PlayerFieldManager.Instance.GetLocalFieldController().MapSlot[0].SpawnPosition,
+            PlayerFieldManager.Instance.GetLocalFieldController().MapSlot[5].SpawnPosition,
+            PlayerFieldManager.Instance.GetLocalFieldController().MapSlot[35].SpawnPosition,
+            PlayerFieldManager.Instance.GetLocalFieldController().MapSlot[30].SpawnPosition
         };
     }
 
@@ -101,7 +100,7 @@ public class BaseMonster : NetworkUnit, IPunObservable
                 transform.position = Vector2.MoveTowards(
                     transform.position,
                     target,
-                    4 * Time.deltaTime
+                    status.Speed.Value * Time.deltaTime
                 );
 
                 yield return null;
