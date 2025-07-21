@@ -17,11 +17,16 @@ public class WarningMessagePanel : MonoBehaviour
     private float timer;
     private Color tempColor;
 
-    private const int max = 255;
-    private const int min = 110;
+    private const float maxAlpha = 1.0f;
+    private const float minAlpha = 110f / 255f;
 
     private Coroutine startRoutine;
     private YieldInstruction delay;
+
+    private void Awake()
+    {
+        anim = GetComponent<Animator>();
+    }
 
     private void Start()
     {
@@ -35,12 +40,8 @@ public class WarningMessagePanel : MonoBehaviour
 
         anim.SetTrigger(Utils.inHash);
 
-        if(startRoutine != null)
-        {
-            StopCoroutine(startRoutine);
-            startRoutine = null;
-        }
-        startRoutine = StartCoroutine(WarningStartRoutine());
+        if(startRoutine == null)
+            startRoutine = StartCoroutine(WarningStartRoutine());
     }
 
     public void StopWarning()
@@ -53,8 +54,9 @@ public class WarningMessagePanel : MonoBehaviour
 
     private IEnumerator WarningStartRoutine()
     {
+        Debug.Log("1");
         yield return delay;
-
+        Debug.Log("2");
         if (warningRoutine == null)
             warningRoutine = StartCoroutine(WarningRoutine());
     }
@@ -66,28 +68,28 @@ public class WarningMessagePanel : MonoBehaviour
             timer = 0;
             tempColor = up.color;
 
-            while (timer > 0)
+            while (timer < time)
             {
                 timer += Time.deltaTime;                
-                tempColor.a = Mathf.Lerp(max, min, timer / time);
+                tempColor.a = Mathf.Lerp(maxAlpha, minAlpha, timer / time);
                 up.color = tempColor;
                 down.color = tempColor;
-                return null;
+                yield return null;
             }
 
             timer = 0;
             tempColor = up.color;
 
-            while (timer > 0)
+            while (timer < time)
             {
                 timer += Time.deltaTime;
-                tempColor.a = Mathf.Lerp(min, max, timer / time);
+                tempColor.a = Mathf.Lerp(minAlpha, maxAlpha, timer / time);
                 up.color = tempColor;
                 down.color = tempColor;
-                return null;
+                yield return null;
             }
 
-            return null;
+            yield return null;
         }
     }
 
@@ -96,16 +98,17 @@ public class WarningMessagePanel : MonoBehaviour
         timer = 0;
         tempColor = up.color;        
 
-        while (timer > 0)
+        while (timer < time)
         {
             timer += Time.deltaTime;
-            tempColor.a = Mathf.Lerp(min, 0, timer / time);
+            tempColor.a = Mathf.Lerp(minAlpha, 0, timer / time);
             up.color = tempColor;
             down.color = tempColor;
-            return null;
+            yield return null;
         }
 
         gameObject.SetActive(false);
-        return null;
+        startRoutine = null;
+        yield return null;
     }
 }

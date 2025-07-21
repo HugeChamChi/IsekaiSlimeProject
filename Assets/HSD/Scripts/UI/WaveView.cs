@@ -11,7 +11,7 @@ public class WaveView : MonoBehaviour
 
     public void UpdateWaveText(int amount)
     {
-        waveText.text = amount+1.ToString();
+        waveText.text = $"{amount+1}".ToString();
     }
 
     public void UpdateTimerText(float time)

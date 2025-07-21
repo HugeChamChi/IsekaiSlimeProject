@@ -148,7 +148,10 @@ public class WaveController : MonoBehaviour
         if (!pv.IsMine) return;
 
         Info.MonsterCount.Value--;
-        // 골드추가 
+        if(Info.MonsterCount.Value < 80)
+        {
+            Manager.UI.warningMessagePanel.StopWarning();
+        }
     }
 
     private void BossMonsterDie(PhotonView pv, MonsterStat stat)
@@ -169,6 +172,12 @@ public class WaveController : MonoBehaviour
         Info.MonsterCount.Value++;
         curSpawnCount++;
         Debug.Log(Info.MonsterCount.Value);
+
+        if (Info.MonsterCount.Value >= 80)
+        {
+            Manager.UI.warningMessagePanel.Show();
+        }
+
         if (Info.MonsterCount.Value >= maxCount)
         {
             // 게임 오버
