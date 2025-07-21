@@ -84,8 +84,7 @@ namespace Managers
             if (gameStarted) return;
 
             if (PhotonNetwork.IsMasterClient)
-            {
-                photonView.RPC("OnGameStart", RpcTarget.All);
+            { photonView.RPC("OnGameStart", RpcTarget.All);
             }
         }
 
