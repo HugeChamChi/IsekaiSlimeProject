@@ -92,6 +92,12 @@ public class WaveController : MonoBehaviour
 
             if (waveTimerRoutine == null)
                 waveTimerRoutine = StartCoroutine(WaveTimerRoutine());
+
+            if(nextWaveRoutine != null)
+            {
+                StopCoroutine(nextWaveRoutine);
+                nextWaveRoutine = null;
+            }
         }
     }
 
@@ -123,9 +129,12 @@ public class WaveController : MonoBehaviour
             nextWaveRoutine = null;
         }
 
-        nextWaveRoutine = StartCoroutine(NextWave());
+        nextWaveRoutine = StartCoroutine(NextWave(waveData));
 
         yield return Utils.GetDelay(waveData.WaveTime - waveData.SpawnTime - 3f);
+
+        if (waveData.EventType == ClearEventType.Effect)
+            Manager.UI.cardPanel.OpenCardPanel();
 
         if (Info.CurWaveIdx.Value == waveDatas.Length - 1)
         {
@@ -147,9 +156,13 @@ public class WaveController : MonoBehaviour
         }
     }
 
-    private IEnumerator NextWave()
+    private IEnumerator NextWave(WaveData waveData)
     {
         yield return clearCondition;
+
+        if (waveData.EventType == ClearEventType.Effect)
+            Manager.UI.cardPanel.OpenCardPanel();
+
         Info.CurWaveIdx.Value++;
         WaveStart();
     }
@@ -208,6 +221,9 @@ public class WaveController : MonoBehaviour
     private void OnDestroy()
     {
         if (pv.IsMine)
-            MonsterStatusController.OnDied -= MonsterDie;
+        {
+            MonsterStatusController.OnDied              -= MonsterDie;
+            MonsterStatusController.OnBossMonsterDied   -= BossMonsterDie;
+        }
     }
 }
