@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
+using System;
 
 public class LoginPanel : MonoBehaviourPun
 {
@@ -30,6 +31,8 @@ public class LoginPanel : MonoBehaviourPun
     
     private Coroutine connectionTimeoutCoroutine;
     private const float CONNECTION_TIMEOUT = 15f;
+    
+    private bool isPeriodicCheckRunning = false;
 
     private void Awake()
     {
@@ -591,15 +594,16 @@ public class LoginPanel : MonoBehaviourPun
     
     private IEnumerator PeriodicConnectionCheck()
     {
+        isPeriodicCheckRunning = true;
         Debug.Log("PeriodicConnectionCheck 시작");
+    
         while (true)
         {
+           
             yield return new WaitForSeconds(2f);
-            
-            // 로그인 진행 중이고 아직 연결되지 않은 경우만 체크
+        
             if (isFirebaseLoggedIn && !isPhotonConnected)
             {
-                // 실제로 연결되었는데 콜백이 호출되지 않은 경우 수동 처리
                 if (PhotonNetwork.IsConnected && PhotonNetwork.NetworkClientState == ClientState.ConnectedToMasterServer)
                 {
                     Debug.Log("연결되었지만 콜백 미호출 - 수동 처리");
@@ -607,12 +611,21 @@ public class LoginPanel : MonoBehaviourPun
                     break;
                 }
             }
-            
-            // 로그인 완료되면 체크 중단
+        
             if (isFirebaseLoggedIn && isPhotonConnected && isCustomPropertiesSet)
             {
                 break;
             }
+        }
+    
+        isPeriodicCheckRunning = false;
+    }
+
+    private void OnEnable()
+    {
+        if (!isPeriodicCheckRunning)
+        {
+            StartCoroutine(PeriodicConnectionCheck());
         }
     }
 
