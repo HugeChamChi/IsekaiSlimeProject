@@ -72,7 +72,7 @@ public class LoginPanel : MonoBehaviourPun
         loginButton.onClick.AddListener(Login);
     }
     
-    private void OnAuthStateChanged(object sender, System.EventArgs eventArgs)
+    private void OnAuthStateChanged(object sender, EventArgs eventArgs)
     {
         FirebaseAuth auth = sender as FirebaseAuth;
         if (auth != null)
@@ -270,7 +270,7 @@ public class LoginPanel : MonoBehaviourPun
                 
                 if (currentState == ClientState.ConnectedToMasterServer && !isPhotonConnected)
                 {
-                    Debug.Log("마스터 서버 연결 감지 - 수동 처리");
+                    Debug.Log("연결되었지만 콜백 미호출 - 수동 처리");
                     OnConnectedToMaster();
                 }
             }

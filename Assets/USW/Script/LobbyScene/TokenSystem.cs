@@ -109,7 +109,7 @@ public class TokenSystem : MonoBehaviour
         {
             if (task.IsCompletedSuccessfully && task.Result.Exists)
             {
-                var settings = task.Result.Value as System.Collections.IDictionary;
+                var settings = task.Result.Value as IDictionary;
                 if (settings != null)
                 {
                     if (settings.Contains("maxTokens"))
@@ -142,7 +142,7 @@ public class TokenSystem : MonoBehaviour
                 var snapshot = task.Result;
                 if (snapshot.Exists)
                 {
-                    var data = snapshot.Value as System.Collections.IDictionary;
+                    var data = snapshot.Value as IDictionary;
                     if (data != null)
                     {
                         if (data.Contains("currentTokens"))
@@ -181,7 +181,7 @@ public class TokenSystem : MonoBehaviour
             return;
         }
         
-        var data = args.Snapshot.Value as System.Collections.IDictionary;
+        var data = args.Snapshot.Value as IDictionary;
         if (data != null)
         {
             int newTokens = data.Contains("currentTokens") ? Convert.ToInt32(data["currentTokens"]) : currentTokens;
@@ -225,7 +225,7 @@ public class TokenSystem : MonoBehaviour
         
         isProcessingRequest = true;
         
-        var requestData = args.Snapshot.Value as System.Collections.IDictionary;
+        var requestData = args.Snapshot.Value as IDictionary;
         if (requestData == null)
         {
             isProcessingRequest = false;
@@ -238,7 +238,7 @@ public class TokenSystem : MonoBehaviour
         });
     }
     
-    private void ProcessServerSideTokenLogic(System.Collections.IDictionary requestData, long serverTime)
+    private void ProcessServerSideTokenLogic(IDictionary requestData, long serverTime)
     {
         // 현재 토큰 데이터 가져오기
         userTokenRef.GetValueAsync().ContinueWithOnMainThread(task =>
@@ -249,7 +249,7 @@ public class TokenSystem : MonoBehaviour
                 return;
             }
             
-            var currentData = task.Result.Value as System.Collections.IDictionary;
+            var currentData = task.Result.Value as IDictionary;
             if (currentData == null)
             {
                 isProcessingRequest = false;
@@ -354,7 +354,7 @@ public class TokenSystem : MonoBehaviour
     }
     
     // 콜백 방식 토큰 사용 
-    public void UseTokensWithCallback(int amount, System.Action<bool> onComplete)
+    public void UseTokensWithCallback(int amount, Action<bool> onComplete)
     {
         if (!isInitialized)
         {
@@ -375,7 +375,7 @@ public class TokenSystem : MonoBehaviour
         StartCoroutine(WaitForTokenChange(tokensBeforeRequest, amount, onComplete));
     }
     
-    private IEnumerator WaitForTokenChange(int originalTokens, int requestedAmount, System.Action<bool> onComplete)
+    private IEnumerator WaitForTokenChange(int originalTokens, int requestedAmount, Action<bool> onComplete)
     {
         float timeout = 5f; // 5초 타임아웃
         float elapsed = 0f;

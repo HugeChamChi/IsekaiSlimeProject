@@ -76,7 +76,7 @@ public class GameManager : MonoBehaviour
         FirebaseManager.OnUserLoggedOut -= OnFirebaseUserLoggedOut;
     }
 
-    private void OnFirebaseAuthStateChanged(object sender, System.EventArgs eventArgs)
+    private void OnFirebaseAuthStateChanged(object sender, EventArgs eventArgs)
     {
         if (isCleaningUp) return;
         
@@ -144,7 +144,7 @@ public class GameManager : MonoBehaviour
                     yield break;
                 }
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 Debug.LogWarning($"TokenSystem 알림 실패: {e.Message}");
             }
@@ -212,7 +212,7 @@ public class GameManager : MonoBehaviour
                 Debug.Log("TokenSystem에 로그아웃 알림");
             }
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Debug.LogWarning($"TokenSystem 로그아웃 알림 실패: {e.Message}");
         }
@@ -366,12 +366,12 @@ public class GameManager : MonoBehaviour
         props["firebaseUID"] = UserID;
         props["email"] = UserEmail;
         props["displayName"] = UserName;
-        props["loginTime"] = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        props["loginTime"] = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         
         return props;
     }
 
-    public string GetPlayerFirebaseUID(Photon.Realtime.Player player)
+    public string GetPlayerFirebaseUID(Player player)
     {
         if (player?.CustomProperties != null && player.CustomProperties.TryGetValue("firebaseUID", out object uid))
         {
@@ -395,7 +395,7 @@ public class GameManager : MonoBehaviour
             return null;
         }
         
-        string timestamp = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+        string timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
         return $"{UserID}_{timestamp}";
     }
 

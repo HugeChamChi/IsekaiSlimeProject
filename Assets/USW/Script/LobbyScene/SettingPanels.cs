@@ -508,7 +508,7 @@ public class SettingPanels : MonoBehaviour
             Debug.Log("Firebase 로그아웃 완료");
             logoutSuccess = true;
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             errorMessage = e.Message;
             Debug.LogError($"Firebase 로그아웃 중 오류: {errorMessage}");
@@ -516,17 +516,10 @@ public class SettingPanels : MonoBehaviour
         
         if (logoutSuccess)
         {
-            try
+            if (GameManager.Instance != null)
             {
-                if (GameManager.Instance != null)
-                {
-                    GameManager.Instance.ClearUserInfo();
-                    Debug.Log("GameManager 사용자 정보 정리 완료");
-                }
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError($"GameManager 정리 중 오류: {e.Message}");
+                GameManager.Instance.ClearUserInfo();
+                Debug.Log("GameManager 사용자 정보 정리 완료");
             }
         }
         
@@ -539,21 +532,14 @@ public class SettingPanels : MonoBehaviour
         
         if (logoutSuccess)
         {
-            try
-            {
-                CleanupDontDestroyOnLoadObjects();
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError($"오브젝트 정리 중 오류: {e.Message}");
-            }
+            CleanupDontDestroyOnLoadObjects();
             
             try
             {
                 Debug.Log("LoginScene으로 전환 시작");
                 SceneManager.LoadScene("LoginScene");
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 Debug.LogError($"Scene 전환 중 오류: {e.Message}");
                 if (PopupManager.Instance != null)
@@ -623,15 +609,6 @@ public class SettingPanels : MonoBehaviour
         {
             deletionSuccess = success;
             deletionCompleted = true;
-            
-            if (success)
-            {
-                Debug.Log("Firebase 계정 삭제 성공");
-            }
-            else
-            {
-                Debug.LogError("Firebase 계정 삭제 실패");
-            }
         });
         
         float timeout = 0f;
@@ -655,33 +632,19 @@ public class SettingPanels : MonoBehaviour
             
             yield return new WaitForSeconds(2f);
             
-            try
+            if (GameManager.Instance != null)
             {
-                if (GameManager.Instance != null)
-                {
-                    GameManager.Instance.ClearUserInfo();
-                }
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError($"GameManager 정리 중 오류: {e.Message}");
+                GameManager.Instance.ClearUserInfo();
             }
             
-            try
-            {
-                CleanupDontDestroyOnLoadObjects();
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError($"오브젝트 정리 중 오류: {e.Message}");
-            }
+            CleanupDontDestroyOnLoadObjects();
             
             try
             {
                 Debug.Log("계정 탈퇴 완료 - LoginScene으로 전환");
                 SceneManager.LoadScene("LoginScene");
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 Debug.LogError($"Scene 전환 중 오류: {e.Message}");
                 if (PopupManager.Instance != null)

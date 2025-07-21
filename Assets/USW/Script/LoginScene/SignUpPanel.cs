@@ -281,12 +281,9 @@ public class SignUpPanel : MonoBehaviour
                 }
 
                 // 회원가입 성공
-                FirebaseUser user = task.Result.User;
-
                 ShowCelebrationPopup();
 
                 // 회원가입 후 즉시 로그아웃 (GameManager 호출 없이)
-                // Firebase CreateUser는 자동 로그인하므로 바로 로그아웃 처리
                 FirebaseAuth.DefaultInstance.SignOut();
                 
                 // 로그아웃 완료 후 로그인 화면으로 이동
@@ -428,40 +425,6 @@ public class SignUpPanel : MonoBehaviour
         ResetUI();
     }
 
-    private IEnumerator WaitForSignOutAndReturnToLogin()
-    {
-        // 로그아웃 완료까지 기다리기 (최대 3초)
-        float waitTime = 0f;
-        const float maxWaitTime = 3f;
-        
-        while (FirebaseAuth.DefaultInstance.CurrentUser != null && waitTime < maxWaitTime)
-        {
-            yield return new WaitForSeconds(0.1f);
-            waitTime += 0.1f;
-        }
-        
-        // 추가 안전 대기
-        yield return new WaitForSeconds(0.5f);
-        
-        // UI 상태 리셋
-        ResetSignUpUI();
-        
-        // 로그인 화면으로 이동
-        if (loginPanel != null)
-        {
-            gameObject.SetActive(false);
-            loginPanel.SetActive(true);
-            
-            // LoginPanel 상태도 리셋 (혹시 모를 상태 이상 방지)
-            LoginPanel loginPanelScript = loginPanel.GetComponent<LoginPanel>();
-            if (loginPanelScript != null)
-            {
-                // LoginPanel의 상태 리셋 (필요하다면)
-                Debug.Log("회원가입 완료 - 로그인 화면으로 이동");
-            }
-        }
-    }
-
     private IEnumerator WaitForSignOutComplete()
     {
         // 로그아웃 완료까지 기다리기 (최대 3초)
@@ -487,21 +450,6 @@ public class SignUpPanel : MonoBehaviour
             loginPanel.SetActive(true);
             
             Debug.Log("회원가입 완료 - 로그인 화면으로 이동");
-        }
-    }
-
-    private IEnumerator ReturnToLoginAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-
-        // 입력 필드 초기화
-        ResetInputs();
-
-        // 로그인 화면으로 이동
-        if (loginPanel != null)
-        {
-            loginPanel.SetActive(true);
-            gameObject.SetActive(false);
         }
     }
 

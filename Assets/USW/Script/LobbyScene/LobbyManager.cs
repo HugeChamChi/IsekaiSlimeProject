@@ -67,7 +67,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         if (roomCodeText != null) roomCodeText.text = currentRoomCode;
         if (codeInputPanel != null) codeInputPanel.SetActive(false);
         if (settingPanel != null) settingPanel.SetActive(false);
-        if (playerPanel != null) playerPanel.SetActive(false); // 플레이어 패널 초기 비활성화
+        if (playerPanel != null) playerPanel.SetActive(false); 
 
         if (generateCodeButton != null) generateCodeButton.onClick.AddListener(OnGenerateCodeClick);
         if (joinRoomButton != null) joinRoomButton.onClick.AddListener(OnJoinRoomClick);
@@ -355,7 +355,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     private void ClearAllPlayerPanels()
     {
-        // 모든 패널을 빈 상태로 만들기 (패널 자체는 활성화 유지)
+        // 모든 패널을 빈 상태로 만들기 
         for (int i = 0; i < playerPanelItems.Length; i++)
         {
             if (playerPanelItems[i] != null)
@@ -527,7 +527,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
             UpdateButtonText(generateCodeButton, "방 나가기");
             UpdateButtonText(joinRoomButton, "방 나가기");
 
-            ShowPlayerPanel(); // 방에 입장하면 플레이어 패널 표시
+            ShowPlayerPanel(); 
         }
         else
         {
@@ -599,7 +599,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         UpdateButtonText(joinRoomButton, "방 나가기");
 
         ShowMessage($"방이 생성되었습니다! 코드: {currentRoomCode}");
-        ShowPlayerPanel(); // 방 생성 시 플레이어 패널 표시
+        ShowPlayerPanel(); 
     }
 
     public void OnJoinedRoom()
@@ -616,7 +616,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         UpdateButtonText(joinRoomButton, "방 나가기");
 
         ShowMessage($"방에 참가했습니다! 코드: {currentRoomCode}");
-        ShowPlayerPanel(); // 방 참가 시 플레이어 패널 표시
+        ShowPlayerPanel();
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)

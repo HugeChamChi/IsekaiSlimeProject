@@ -11,30 +11,17 @@ public class PlayerPanelItem : MonoBehaviourPunCallbacks
 {
     [Header("UI Components")]
     [SerializeField] private TextMeshProUGUI nicknameText;
-    [SerializeField] private Image hostImage; // 왕관 이미지
+    [SerializeField] private Image hostImage; 
     
     private Player currentPlayer;
     private bool isInitialized = false;
-    private bool hasPlayer = false; // 플레이어가 할당되었는지 여부
+    private bool hasPlayer = false; 
     
     private void Awake()
     {
-        ValidateUIComponents();
-        InitializeEmptyState(); // 초기 상태를 빈 상태로 설정
+        InitializeEmptyState(); 
     }
     
-    private void ValidateUIComponents()
-    {
-        if (nicknameText == null)
-        {
-            Debug.LogError($"PlayerPanelItem: nicknameText가 할당되지 않았습니다. - {gameObject.name}");
-        }
-        
-        if (hostImage == null)
-        {
-            Debug.LogWarning($"PlayerPanelItem: hostImage가 할당되지 않았습니다. - {gameObject.name}");
-        }
-    }
     
     /// <summary>
     /// 빈 상태로 초기화 (플레이어 없음)
@@ -149,7 +136,7 @@ public class PlayerPanelItem : MonoBehaviourPunCallbacks
             hostImage.gameObject.SetActive(isMaster);
         }
         
-        // 방장일 때 닉네임 색상 변경 (선택사항)
+        // 방장일 때 닉네임 색상 변경
         if (nicknameText != null)
         {
             nicknameText.color = isMaster ? Color.yellow : Color.white;
@@ -181,7 +168,7 @@ public class PlayerPanelItem : MonoBehaviourPunCallbacks
     {
         if (hasPlayer && currentPlayer != null && otherPlayer.ActorNumber == currentPlayer.ActorNumber)
         {
-            // 이 플레이어가 나갔으므로 패널을 빈 상태로 만들기
+            // 플레이어가 나갔으므로 패널을 빈 상태로 만들기
             ClearPlayer();
         }
     }

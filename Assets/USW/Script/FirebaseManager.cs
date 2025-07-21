@@ -144,14 +144,14 @@ public class FirebaseManager : MonoBehaviour
                 IsDatabaseReady = false;
             }
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Debug.LogError($"Firebase Database 초기화 실패: {e.Message}");
             IsDatabaseReady = false;
         }
     }
 
-    private void OnAuthStateChanged(object sender, System.EventArgs eventArgs)
+    private void OnAuthStateChanged(object sender, EventArgs eventArgs)
     {
         FirebaseAuth authSender = sender as FirebaseAuth;
         if (authSender != null)
@@ -221,7 +221,7 @@ public class FirebaseManager : MonoBehaviour
     
     #region 계정 관리 메서드
     
-    public static void UpdateUserProfile(string displayName, System.Action<bool> onComplete = null)
+    public static void UpdateUserProfile(string displayName, Action<bool> onComplete = null)
     {
         if (auth?.CurrentUser == null)
         {
@@ -250,7 +250,7 @@ public class FirebaseManager : MonoBehaviour
         });
     }
     
-    public static void DeleteCurrentUserAccount(System.Action<bool> onComplete = null)
+    public static void DeleteCurrentUserAccount(Action<bool> onComplete = null)
     {
         if (auth?.CurrentUser == null)
         {
@@ -300,7 +300,7 @@ public class FirebaseManager : MonoBehaviour
         }
     }
     
-    private static void HandleAccountDeletionError(System.Exception exception, System.Action<bool> onComplete)
+    private static void HandleAccountDeletionError(Exception exception, Action<bool> onComplete)
     {
         string errorMessage = exception?.GetBaseException()?.Message ?? "알 수 없는 오류";
         
@@ -327,7 +327,7 @@ public class FirebaseManager : MonoBehaviour
         Debug.Log("계정 삭제 후 정리 완료");
     }
     
-    public static void SendPasswordResetEmail(string email, System.Action<bool> onComplete = null)
+    public static void SendPasswordResetEmail(string email, Action<bool> onComplete = null)
     {
         if (auth == null)
         {
@@ -368,7 +368,7 @@ public class FirebaseManager : MonoBehaviour
         PerformLogoutCleanup();
     }
     
-    public static void SignOutWithSceneTransition(string targetScene = "LoginScene", System.Action onComplete = null)
+    public static void SignOutWithSceneTransition(string targetScene = "LoginScene", Action onComplete = null)
     {
         Debug.Log($"Scene 전환을 포함한 로그아웃 시작 - 대상: {targetScene}");
         
@@ -391,7 +391,7 @@ public class FirebaseManager : MonoBehaviour
         }
     }
     
-    private static IEnumerator DelayedSceneTransition(string targetScene, System.Action onComplete)
+    private static IEnumerator DelayedSceneTransition(string targetScene, Action onComplete)
     {
         yield return new WaitForSeconds(0.5f);
         
@@ -475,7 +475,7 @@ public class FirebaseManager : MonoBehaviour
     
     #region 유틸리티 메서드
     
-    public static void CheckNetworkConnection(System.Action<bool> onResult)
+    public static void CheckNetworkConnection(Action<bool> onResult)
     {
         if (database == null)
         {
@@ -498,7 +498,7 @@ public class FirebaseManager : MonoBehaviour
         });
     }
     
-    public static void GetServerTimestamp(System.Action<long> onResult)
+    public static void GetServerTimestamp(Action<long> onResult)
     {
         if (database == null)
         {
