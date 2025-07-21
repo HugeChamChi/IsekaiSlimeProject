@@ -17,7 +17,8 @@ public class MonsterStatusController : MonoBehaviour, IDamageable, IEffectable
     public Property<float> CurHp    = new();
     public Property<bool> isFaint   = new();
 
-    private PhotonView pv;    
+    private PhotonView pv;
+    private bool isDead;
 
     public static event Action<PhotonView> OnDied;
     public static event Action<PhotonView, MonsterStat> OnBossMonsterDied;
@@ -26,6 +27,11 @@ public class MonsterStatusController : MonoBehaviour, IDamageable, IEffectable
     {
         pv = GetComponent<PhotonView>();
         SetupStat();
+    }
+
+    private void OnEnable()
+    {
+        isDead = false;
     }
 
     private void SetupStat()
@@ -57,6 +63,8 @@ public class MonsterStatusController : MonoBehaviour, IDamageable, IEffectable
 
     private void Die()
     {
+        if (isDead) return;
+
         OnDied?.Invoke(pv);
 
         if(baseStat.MonsterType == Monster.MonsterType.Boss)
@@ -64,6 +72,8 @@ public class MonsterStatusController : MonoBehaviour, IDamageable, IEffectable
 
         if(pv.IsMine)
             PhotonNetwork.Destroy(gameObject);
+
+        isDead = true;
     }
 
     public void Apply(EffectType type, float amount)
