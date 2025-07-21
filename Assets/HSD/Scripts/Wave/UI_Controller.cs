@@ -33,6 +33,7 @@ public class UI_Controller
     {
         waveCanvas = new GameObject("MainCanvas").AddComponent<Canvas>();
         waveCanvas.pixelPerfect = true;
+        waveCanvas.sortingOrder = 4;
         waveCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
         CanvasScaler scaler = waveCanvas.AddComponent<CanvasScaler>();
