@@ -21,7 +21,7 @@ namespace PlayerField
 
         public Color originColor => SlotType == SlotType.Inner ? innerColor : outerColor;
         public Color skillColor = Color.yellow;
-        public Color selectedColor = Color.green;s
+        public Color selectedColor = Color.green;
         
         private bool isSelectedRangeOn = false; // 선택 표시용
         private bool isSkillRangeOn = false;    // 스킬 표시용
