@@ -1634,7 +1634,7 @@ MonoBehaviour:
   <Type>k__BackingField: 0
   <Description>k__BackingField: 
   <ModelFileName>k__BackingField: 
-  <UnitSprite>k__BackingField: {fileID: 0}
+  <UnitSprite>k__BackingField: {fileID: -1158617593, guid: 7703bd353fd254b17a98137cc0b08e40, type: 3}
   <SkillRangeType>k__BackingField: 2
   Controller: {fileID: 8178612371028201056}
 --- !u!114 &8178612371028201056

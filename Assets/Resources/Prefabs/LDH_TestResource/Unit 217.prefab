@@ -256,6 +256,10 @@ PrefabInstance:
       propertyPath: attackClip
       value: 
       objectReference: {fileID: 7400000, guid: 77d0cbeb8cff46548ba462d0640e8276, type: 2}
+    - target: {fileID: 4891890051523790261, guid: 5457bd9608c0e43cf9bc3c11e9370aae, type: 3}
+      propertyPath: <UnitSprite>k__BackingField
+      value: 
+      objectReference: {fileID: 21300000, guid: 9d80e106a3dabee4285d0cd78396250d, type: 3}
     - target: {fileID: 5526208607372821797, guid: 5457bd9608c0e43cf9bc3c11e9370aae, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
