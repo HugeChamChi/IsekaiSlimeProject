@@ -368,6 +368,7 @@ GameObject:
   - component: {fileID: 5330955484314031221}
   - component: {fileID: 5354793883120258050}
   - component: {fileID: 7162725240138148418}
+  - component: {fileID: 1854251388549743647}
   m_Layer: 5
   m_Name: WaveInfo
   m_TagString: Untagged
@@ -437,6 +438,20 @@ MonoBehaviour:
   waveText: {fileID: 2934342470410887356}
   timerText: {fileID: 419598626443081066}
   monsterCountText: {fileID: 1613947323607450178}
+--- !u!114 &1854251388549743647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1264678287761695360}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc6cb5cbf933c154aab4f606a89c9991, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  goldAmount: {fileID: 4411389927049352645}
+  gemAmount: {fileID: 3970768115632452278}
 --- !u!1 &1879705674173371657
 GameObject:
   m_ObjectHideFlags: 0

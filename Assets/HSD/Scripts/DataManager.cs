@@ -5,6 +5,8 @@ using UnityEngine;
 public class DataManager : DesignPattern.Singleton<DataManager>
 {
     public Property<int> Gold = new();
+    public Property<int> Gem = new();
+
     public WaveData[] WaveDatas;
     public MonsterStat[] monsterStats;
     private DataDownloader dataDownloader;    
